@@ -16,6 +16,7 @@ module Multitaper
   include("StructsTypes.jl")
     export ecoef, mtparams, mtspec, mtdemod, mtacf, mtacvf, mtceps
     export mtccvf, mtccf, mttransf, mtdemod, mtcoh, mtcspecqspec 
+    export Demodulate
 
   include("Utils.jl")
     export tanhtrans, atanhtrans, EJN
@@ -26,6 +27,9 @@ module Multitaper
     export multispec, mt_acvf, welsh, blockerr
 
   include("PlotsRecipes/univariaterecipes.jl")
+
+  include("Demodulation.jl")
+    export demodulate
 
   # Multivariate
 

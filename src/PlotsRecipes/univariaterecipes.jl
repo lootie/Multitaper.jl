@@ -9,10 +9,10 @@
                       phase = false) 
   #
   yscale --> :log10
-  dt = S.params.dt
-  NW = S.params.NW
-  K = S.params.K
-  N = S.params.N
+  dt   = S.params.dt
+  NW   = S.params.NW
+  K    = S.params.K
+  N    = S.params.N
   xlab = (S.phase == nothing) ? "Frequency" : " "
   xlabel --> xlab
   ylab = (S.phase == nothing) ? "Spectrum" : "Cross-Spectrum"
@@ -55,7 +55,7 @@ end
   xlabel --> xlab
   ylab = (S[1].phase == nothing) ? "Spectrum" : "Cross-Spectrum"
   ylabel --> ylab
-  J = length(S)
+  J    = length(S)
   #
   for j = 1:J  
     if S[j].jkvar != nothing
@@ -74,11 +74,11 @@ end
     end  
     # If the cross is desired
     if cross
-      dt = S[j].params.dt
-      K = S[j].params.K
-      NW = S[j].params.NW
-      N = S[j].params.N
-      ejn = EJN(2*K*S[j].params.nsegments)
+      dt   = S[j].params.dt
+      K    = S[j].params.K
+      NW   = S[j].params.NW
+      N    = S[j].params.N
+      ejn  = EJN(2*K*S[j].params.nsegments)
       cent = [0.15*S[j].f[end],maximum(S[j].S)*0.8]
       #
       @series begin 
@@ -132,6 +132,24 @@ end
   l --> :stem
   @series begin
     A.lags, A.ceps
+  end
+end
+
+""" Demodulate recipe """
+@recipe function mtdemodplt(cdm::Demodulate)
+  layout --> (2,1)
+  @series begin
+    subplot := 1
+    ylabel --> "Magnitude"
+    label --> "Magnitude"
+    cdm.time, cdm.mag
+  end
+  @series begin
+    subplot := 2
+    ylabel --> "Phase"
+    label --> "Phase"
+    xlabel --> "Time"
+    cdm.time, cdm.phase
   end
 end
 

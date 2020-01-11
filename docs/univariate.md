@@ -158,5 +158,29 @@ being the default value. Depending on the value of typ, you will get one of thre
 
 when you plot one of the `mtacf`, `mtacvf`, or `mtceps` structs using the recipe, you'll get a stem plot. 
 
+# demodulate
 
+This function computes the multitaper estimate of the complex demodulate. Note that there are
+several published implementations of this, but this one uses a single zeroth order slepian taper as
+a filter. Note that this is identical to the implementation in the R multitaper package. The
+function signature is 
+
+```
+function demodulate(x::Vector{Float64}, dt::Float64, f0::Float64, NW::Float64, 
+                      blockLen::Int64, wrapphase::Bool = true)
+```
+
+The inputs are the following:
+* x is the data vector to be demodulated
+* dt is the sampling rate (in years, for example)
+* f0 is the center frequency (e.g. one cycle per year)
+* NW is the time-bandwidth product for the filter (typically narrow, use a float)
+* blockLen is a subjective length to use for the data filter, note that the output will be shortened
+  by this amount, so a short filter is sometimes better. 
+* wrapphase is an optional boolean which tells the algorithm whether or not to unwrap the phase for
+  pretty plotting. 
+
+The output will be a `Demodulate` struct containing time (time), magnitude (mag), and phase (phase).
+For easy plotting there is a Plots.jl recipe. See also the notebook in the Examples directory for
+usage.  
 

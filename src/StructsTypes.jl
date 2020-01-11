@@ -153,3 +153,13 @@ mutable struct mtccf
   params  ::mtparams
 end
 
+"""
+Multitaper complex demodulates are held in the Demodulate struct which contains
+          magnitude (Mag), 
+          phase (Phase)
+"""
+mutable struct Demodulate
+  time    ::LinRange{Float64}
+  mag     ::Array{Float64, 1}
+  phase   ::Array{Float64, 1}
+end

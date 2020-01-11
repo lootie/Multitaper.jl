@@ -49,7 +49,7 @@ println("Autocorrelation:")
 acvf = mt_acvf(dat[:,3], NW = NW, K = K, dt = dt)
 acvfspec = mt_acvf(univ)
 
-println("9-12. Testing univariate acvf")
+println("9-11. Testing univariate acvf")
 @test collect(acvf.lags[1:3]) ≈ [0.0, 0.0833333333333, 0.166666666667] 
 @test acvf.acvf[1:5]      ≈  [0.012255897713702007, 0.007260759850546666, 0.004502534551242927, 
                               0.002412704328674198, 0.0002545617261240325]
@@ -59,10 +59,17 @@ println("Cepstrum:")
 ceps = mt_acvf(dat[:,3], NW = NW, K = K, dt = dt, typ = :ceps)
 cepsspec = mt_acvf(univ, typ = :ceps)
 
-println("13-16. Testing univariate cepstrum")
+println("12-14. Testing univariate cepstrum")
 @test collect(ceps.lags[1:3]) ≈ [0.0, 0.0833333333333, 0.166666666667] 
 @test ceps.ceps[1:5]      ≈ [-5.143067306451898, 0.3666296616675006, 0.16488294222178018, 
                              0.1880899501961062, 0.1398326259962087]
 @test ceps.params.NW      == NW
 
+println("15. Testing complex demodulation")
+cet = readdlm("../Examples/data/CETmonthly.dat")
+cdm = demodulate(cet[:,3], 1.0/12, 1.0, 2.0, 15*12, true)
+@test cdm.mag[1:5] ≈ [6.786697185396128, 6.79296024005296, 6.799489409493339, 
+                      6.805499133878922, 6.809510248764921]
+@test cdm.phase[1:5] ≈ [-30.0, -219.08828405071444, -219.09860363476352, 
+                      -219.1157259083309, -219.1140494394275]
 end
