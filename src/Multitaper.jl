@@ -31,6 +31,8 @@ module Multitaper
   include("Demodulation.jl")
     export demodulate
 
+  include("crossings.jl")
+
   # Multivariate
 
   include("Multivariate.jl")

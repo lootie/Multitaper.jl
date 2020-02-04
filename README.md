@@ -52,8 +52,7 @@ As of version 0.0, 01/2020
 
 * F-test for line components (Thomson, 1982).
 
-* Expected number of upcrossings of extreme levels of a univariate spectrum estimate on white noise
-  data. See Thomson and Haley, 2014. 
+* Complex demodulation
 
 # Multivariate
 

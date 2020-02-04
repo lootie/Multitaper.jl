@@ -65,7 +65,7 @@ println("12-14. Testing univariate cepstrum")
                              0.1880899501961062, 0.1398326259962087]
 @test ceps.params.NW      == NW
 
-println("15. Testing complex demodulation")
+println("15-16. Testing complex demodulation")
 cet = readdlm("../Examples/data/CETmonthly.dat")
 cdm = demodulate(cet[:,3], 1.0/12, 1.0, 2.0, 15*12, true)
 @test cdm.mag[1:5] ≈ [6.786697185396128, 6.79296024005296, 6.799489409493339, 

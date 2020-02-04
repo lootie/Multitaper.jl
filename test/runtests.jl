@@ -5,7 +5,7 @@ using Test
 
 printstyled("Running tests:\n", color=:blue)
 
-tests = ["univariate", "multivariate"]
+tests = ["univariate", "crossings", "multivariate"]
 
 for t in tests
     @testset "Test $t multitaper" begin
