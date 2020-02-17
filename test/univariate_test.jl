@@ -20,7 +20,7 @@ println("1. Testing univariate frequency")
 @test univ.f[1:5]         == 12*LinRange(0, 1, 454 + 453)[1:5]
 
 println("2. Testing univariate MT spectrum")
-@test univ.S[1:5]         ≈ [0.05776450047987208, 0.0510836499696889, 0.053947076576308435,
+@test univ.S[1:5]         ≈ [0.05776450047987208, 0.0510836499696889, 0.053947076576308435, 
                              0.03960810660934419, 0.03238905443102084]
 
 println("3. Testing univariate MT phase")
@@ -30,7 +30,7 @@ println("4. Testing univariate parameters")
 @test univ.params.M       == 906
 
 println("5. Testing univariate eigencoefficients")
-@test univ.coef.coef[1:2] ≈ [0.0763450617941093 + 0.0im, -0.018461837449426248 - 0.07253045824096403im]
+@test univ.coef.coef[1:2] ≈ [0.0763450617941093 + 0.0im, -0.018461837449426248 - 0.07253045824096403im] 
 
 println("6. Testing univariate F-test")
 @test univ.Fpval[1:5]     ≈ [0.9999999498486979, 0.3106832963307704, 0.46150154664925935, 

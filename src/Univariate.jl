@@ -26,23 +26,34 @@ function dpss_tapers(n::Int64, nw::Float64, k::Int64, tap_or_egval::Symbol=:tap)
   end
 end
 
-"""Adaptive weighting at each frequency. (5.3) in T82. Returns squared weights"""
-function aweights(eigspec::Union{Vector{Float64},Vector{ComplexF64}}, adaptive::Bool,
-                  egvals::Union{Vector{Float64},Nothing}; dvar::Float64=1.0,tol::Float64=0.05)
-  maxiter   = 15
-  weightvec = vcat(ones(2)*0.5,zeros(length(eigspec)-2))
-  out       = hcat(weightvec.*eigspec./sum(abs2,weightvec), zeros(length(eigspec)))
-  niter     = 1
-  if adaptive
-    while (out[:,2] == NaN)||(niter<maxiter)||(abs((out[:,1]-out[:,2])/out[:,1]) > tol)
-      weightvec = @. (sqrt(egvals)*out[:,1]/(egvals*out[:,1] + (1.0 .- egvals)*dvar))
-      out       = [abs2.(weightvec)*eigspec./sum(abs2,weightvec) out[:,1]]
-      niter    += 1 
-    end
-    return @. abs(weightvec)^2
-  else
-    return ones(length(weightvec))
+# a dot function that is faster for very small vectors. for aweight function.
+function _dot(v1, v2)
+  s = 0.0
+  @inbounds @simd for j in eachindex(v1, v2)
+    s += v1[j]*v2[j]
   end
+  s
+end
+
+# a specific weight updating function. for aweight function.
+function weightupdate!(new, est, evalues, evar)
+  @inbounds @simd for j in eachindex(new, evalues)
+    new[j] = sqrt(evalues[j])*est/(evalues[j]*est+evar*(1.0-evalues[j]))^2
+  end
+  nothing
+end
+
+# obtained adaptively weighted estimates. somewhat micro-optimized.
+function aweighted(old, new, len, estimates, evalues, evar, maxit, tol)
+  est = _dot(estimates, old)/sum(old)
+  for _ in 1:maxit
+    weightupdate!(new, est, evalues, evar)
+    new_est = _dot(estimates, new)/sum(new)
+    isapprox(est, new_est, rtol=tol) && return new_est
+    est  = new_est
+    old .= new
+  end
+  est
 end
 
 """ Guts function for jackknifing spectra """
@@ -67,7 +78,6 @@ function jknife_spec(tap::ecoef, tap2::Union{ecoef,Nothing} = nothing,
     return (size(tap.coef,2)*repeat(allin,1,size(tap.coef,2))-(size(tap.coef,2)-1)*(pseudovals))
   end
 end
-
 
 """ Guts function for jackknifing coherences, leave one out values are returned"""
 function jknife_coh(tap::ecoef, tap2::ecoef, loo_or_psv::Symbol = :loo)
@@ -175,20 +185,31 @@ function output_len(S1::Vector{T}, pad::Union{Int,Float64} = 1.0) where T<:Numbe
 end
 
 """ Computes multitaper guts, both eigencoefficients and adaptive weighting """
-function mtspec_guts(S1::Vector{T}, dpVec::Matrix{Float64}, fftleng::Int64,
+function mtspec_guts(S1::Vector{T}, 
+                     dpVec::Matrix{Float64}, 
+                     fftleng::Int64,
                      halffreq::Union{Int64,Nothing},
                      cvar::Float64 = 1.0,
-                     ctr::Bool = true, egval::Union{Nothing,Matrix{Float64}} = nothing) where T<:Number
+                     ctr::Bool = true, 
+                     egval::Union{Nothing,Matrix{Float64}} = nothing,
+                     maxit = 15,
+                     tol = 0.05
+                    ) where T<:Number
   # Compute the eigencoefficients 
-  S1 .-= mean(S1).*(ctr==true)
-  tap  = mapreduce(slep -> fft(vcat(S1.*slep,zeros(fftleng-length(S1)))), hcat, 
-                  (dpVec[:,j] for j in 1:size(dpVec,2)))
-  # Compute the adaptive weights
-  dsq  = (egval == nothing) ? nothing :  mapreduce(dk -> aweights(dk, (egval != nothing), egval,
-                                                   dvar=cvar)[2], hcat, (abs2.(tap[i,:]) for i in 1:halffreq))
-  return ecoef(tap[1:halffreq,:], dsq)
+  S1      .-= mean(S1).*(ctr==true)
+  k         = size(dpVec,2)
+  eigcoefs  = mapreduce(slep -> fft(vcat(S1.*slep,zeros(fftleng-length(S1)))), hcat, 
+                  (dpVec[:,j] for j in 1:k))
+  dsq = (egval == nothing) ? nothing : zeros(halffreq,k)
+  if egval != nothing
+    (old, new) = vcat(ones(2).*0.5, zeros(k-2)), zeros(k) # is this weird with threads?
+    Threads.@threads for j in 1:halffreq
+      @inbounds dsq[j,:] = aweighted(old, new, k, abs2.(view(eigcoefs,j,:)), 
+                                   egval, cvar, maxit, tol)
+    end
+  end
+  return ecoef(eigcoefs[1:halffreq,:], dsq)
 end
-
 
 """ Computes univariate multitaper spectra with a handful of extra gadgets. """
 function multispec(S1::Union{Vector{T}}; NW::Real = 4.0, K::Int = 6, 
