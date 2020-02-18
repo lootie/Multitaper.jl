@@ -28,6 +28,11 @@ module Multitaper
 
   include("PlotsRecipes/univariaterecipes.jl")
 
+  # Univariate multitaper on data with gaps 
+
+  include("MDmwps.jl")
+    export MDslepian, MDmwps
+
   include("Demodulation.jl")
     export demodulate
 

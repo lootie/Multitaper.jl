@@ -184,3 +184,41 @@ The output will be a `Demodulate` struct containing time (time), magnitude (mag)
 For easy plotting there is a Plots.jl recipe. See also the notebook in the Examples directory for
 usage.  
 
+# Data with gaps
+
+Recently, Chave wrote a paper in GJI that shows how to compute dpss's on data with gaps and we have
+rewritten the code in julia so that it can be used here. The function signature is 
+
+
+```
+function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}}, 
+                xx::Union{Vector{Float64}, Matrix{Float64}};
+                bw::Float64 = 5/length(tt),
+                k::Int64    = Int64(2*bw*size(xx,1) - 1),
+                nz::Int64   = 0, 
+                alpha::Float64 = 1.0)
+```
+
+The inputs are the following:
+  * tt -- real vector of time (required)
+  * xx -- real vector of data (required)
+  * bw -- bandwidth of estimate, 5/length(t) default
+  * k -- number of slepian tapers, must be <=2 bw length(x), 2 bw length(x)-1 default
+  * nz -- zero padding factor, 0 default
+  * alpha -- probability level for reshaping, 1 if none, 1 default
+
+The outputs are simply a list of the following 
+  * sxx -- power spectrum vector of length length(x)/2+1 (required)
+  * nu1 -- degrees-of-freedom vector for sxx of length length(x)/2+1
+  * ft -- f-test vector of length length(x)/2+1
+  * il -- frequency indices of spectral lines
+  * plin -- spectral line power vector
+  * srr -- reshaped power spectrum vector of length length(x)/2+1 if alpha<1
+  * nu2 -- degrees-of-freedom vector for srr of length length(x)/2+1
+
+One can also simply generate Slepian tapers using the MDslepian function.
+
+If you make use of this script, kindly cite the original work:
+Chave, Alan D. "A multitaper spectral estimator for time-series with missing data." Geophysical Journal International 218.3 (2019): 2165-2178.
+
+
