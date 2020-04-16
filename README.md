@@ -100,4 +100,10 @@ The functions described below are those mainly given in
 
 This software is distributed under the GNU GPL v2 license.
 
+## Acknowledgment
+
+Kindly acknowledge `Multitaper.jl` in scientific publications as
+
+    “Haley, C.L. and Geoga, C.J. (2020), Multitaper.jl: a Julia library for multitaper nonparametric
+spectrum analysis, http://bitbucket.org/clhaley/Multitaper.jl.”
 
