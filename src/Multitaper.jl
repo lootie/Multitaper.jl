@@ -45,5 +45,9 @@ module Multitaper
   
   include("PlotsRecipes/multivariaterecipes.jl")
 
+  # Two-dimensional 
+  include("2DRectangle.jl")
+    export multispec2_Rectangle
+
 end
 
