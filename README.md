@@ -42,9 +42,10 @@ Examples folder (requires IJulia.jl).
 
 As of version 0.0, 01/2020
 
-# Univariate
+### Univariate
 
-* Discrete Prolate Spheroidal sequences and sine tapers
+* Discrete Prolate Spheroidal sequences (Slepian 1974) and sine tapers (Riedel & Sidorenko), and 
+  the former with gaps (Chave 2019) 
 
 * Multitaper spectra that use dpss (multispec) tapers. 
 
@@ -54,7 +55,10 @@ As of version 0.0, 01/2020
 
 * Complex demodulation
 
-# Multivariate
+* Multitaper spectrum estimation for time series with equal temporal spacing except with gaps (Chave
+  2019)
+
+### Multivariate
 
 * Magnitude squared coherence, implemented in the spirit of Thomson and Chave, 1991.
 
@@ -63,10 +67,15 @@ As of version 0.0, 01/2020
 * T-squared test (Thomson, "Some comments on possibly cyclostationary series", Asilomar Conference
   Proceedings) for simultaneous line components. 
 
+### 2 Dimensional
+
+* 2 Dimensional Cartesian tapers supported on the square in space and 2D disk in time as described in 
+  Simons and Wang, 2011 
+
 ## Plots Recipes
 
 You will find plots recipes in the separate file ./Examples/plotsrecipes.jl. These provide a
-convenient Plots.jl format for plotting multispec objects.
+Plots.jl format for plotting multispec output structs with little effort.
 
 ## Main References 
 
@@ -105,5 +114,5 @@ This software is distributed under the GNU GPL v2 license.
 Kindly acknowledge `Multitaper.jl` in scientific publications as
 
     “Haley, C.L. and Geoga, C.J. (2020), Multitaper.jl: a Julia library for multitaper nonparametric
-spectrum analysis, http://bitbucket.org/clhaley/Multitaper.jl.”
+    spectrum analysis, http://bitbucket.org/clhaley/Multitaper.jl.”
 
