@@ -31,7 +31,7 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
                 xx::Union{Vector{Float64}, Matrix{Float64}};
                 bw::Float64 = 5/length(tt),
                 k::Int64    = Int64(2*bw*size(xx,1) - 1),
-                nz::Int64   = 0, 
+                nz::Union{Float64,Int64}   = 0, 
                 alpha::Float64 = 1.0)
   n, p  = (typeof(tt) == Matrix{Float64}) ? size(tt) : (length(tt),1)
   t     = copy(tt)
