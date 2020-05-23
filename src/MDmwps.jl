@@ -40,7 +40,7 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
   if mod(nfft,2) != 0 
     nfft = nfft + 1
   end
-  nfft  = (nz + 1)*nfft
+  nfft  = Int64(round((nz + 1)*nfft))
   nfft2 = Int64(round(nfft/2)) + 1
   s2    = var(x)
   e     = Array{Matrix{ComplexF64},1}(undef, nfft2)
