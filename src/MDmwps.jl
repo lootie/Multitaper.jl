@@ -31,7 +31,7 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
                 xx::Union{Vector{Float64}, Matrix{Float64}};
                 bw::Float64 = 5/length(tt),
                 k::Int64    = Int64(2*bw*size(xx,1) - 1),
-                nz::Int64   = 0, 
+                nz::Union{Float64,Int64}   = 0, 
                 alpha::Float64 = 1.0)
   n, p  = (typeof(tt) == Matrix{Float64}) ? size(tt) : (length(tt),1)
   t     = copy(tt)
@@ -40,7 +40,7 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
   if mod(nfft,2) != 0 
     nfft = nfft + 1
   end
-  nfft  = (nz + 1)*nfft
+  nfft  = Int64(round((nz + 1)*nfft))
   nfft2 = Int64(round(nfft/2)) + 1
   s2    = var(x)
   e     = Array{Matrix{ComplexF64},1}(undef, nfft2)
