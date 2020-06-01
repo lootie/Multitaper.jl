@@ -30,7 +30,7 @@ The ecoef structure holds
 """
 mutable struct ecoef
   coef    ::Union{Matrix{ComplexF64}}
-  wts     ::Union{Matrix{ComplexF64}, Nothing}
+  wts     ::Union{Matrix{ComplexF64}, Matrix{Float64}, Nothing}
 end
 
 """ 
