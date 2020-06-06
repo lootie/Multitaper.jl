@@ -1,17 +1,22 @@
 
 # MT routines by Chave, adapted for Julia from Matlab by C Haley in 2020
 # Original Chave license text appended at the end of this doc. 
-# Credit is due to the original author, cite: 
+# Credit is due to the original author: 
 #
 # Chave, Alan D. "A multitaper spectral estimator for time-series with missing data." Geophysical
 # Journal International 218.3 (2019): 2165-2178.
+#
+# NB: (i) This code removes the sample mean from the data by default, and additionally scales the 
+# spectrum by dt, when provided. 
+# (ii) Chave used a zero-finding routine to compute adaptive weights while here we use the iterative 
+# method from Thomson, 82. 
 #
 
 using Statistics, FFTW, Arpack, LinearAlgebra, Distributions
 
 """ Multi-taper power spectrum estimation with f-test and reshaping
 for time series with missing data
-input arguments 
+t arguments 
    tt -- real vector of time (required)
    xx -- real vector of data (required)
    bw -- bandwidth of estimate, 5/length(t) default
@@ -28,29 +33,32 @@ output arguments
    nu2 -- degrees-of-freedom vector for srr of length length(x)/2+1
 """
 function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}}, 
-                xx::Union{Vector{Float64}, Matrix{Float64}};
+                x::Union{Vector{Float64}, Matrix{Float64}};
                 bw::Float64 = 5/length(tt),
-                k::Int64    = Int64(2*bw*size(xx,1) - 1),
-                nz::Union{Float64,Int64}   = 0, 
-                alpha::Float64 = 1.0)
-  n, p  = (typeof(tt) == Matrix{Float64}) ? size(tt) : (length(tt),1)
-  t     = copy(tt)
-  x     = copy(xx)
+                k::Int64    = Int64(2*bw*size(x,1) - 1),
+                nz::Int64   = 0, 
+                alpha::Float64 = 1.0,
+                jk::Bool = false, 
+                Tsq::Union{Vector{Float64},Vector{Vector{Float64}},Vector{Int64},Vector{Vector{Int64}},Nothing}=nothing, 
+                dof::Bool = false)
+  n     = length(tt)
   nfft  = length(x)
+  (n != nfft) && error("Time vector and data vector must have the same lengths.")
+  # Assuming that equal sampling occurs between the first two observations
+  dt = (tt[2]-tt[1])
   if mod(nfft,2) != 0 
     nfft = nfft + 1
   end
-  nfft  = Int64(round((nz + 1)*nfft))
+  nfft  = (nz + 1)*nfft
   nfft2 = Int64(round(nfft/2)) + 1
   s2    = var(x)
   e     = Array{Matrix{ComplexF64},1}(undef, nfft2)
   sxx   = zeros(nfft2)
   ak    = 0.0im*zeros(nfft2,k)
   lambda,u = MDslepian(bw, k, tt)
-  d = zeros(nfft2,k)
   for i = 1:nfft2
       f      = (i - 1)/nfft
-      e[i]   = transpose(u.*repeat(exp.(0.0 .- 2.0*pi*im*f*t),outer=(1,k)))       
+      e[i]   = transpose(u.*repeat(exp.(0.0 .- 2.0*pi*im*f*tt),outer=(1,k)))       
       # eigencoefficients
       ak[i,:] = e[i]*x
       # eigenspectra at frequency index i
@@ -58,68 +66,42 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
       # Adaptive weighting 
       (old, new) = vcat(ones(2).*0.5, zeros(k-2)), zeros(k) 
       sxx[i] = aweighted(old, new, k, sk, lambda, s2, 15,0.05)
-      d[i,:] = new
   end
-  sxx[2:nfft2-1] = 2*sxx[2:nfft2-1]
-  nu1   = 2*d*lambda
+  sxx[2:nfft2-1] .*= 2
+  d = sxx*sqrt.(lambda')./(sxx*lambda' .+ s2*(1.0 .- lambda'))
+  nu1   = 2*d.^2*lambda
+  coefswts = ecoef(ak,d.^2)
+  jv       = jk ? jknife(coefswts,nothing,:spec)[2] : nothing
   # F-test
   dpsw0 = real.(sum(e[1],dims=2))
-  mu    = ak*dpsw0/sum(dpsw0.^2)
-  num   = (nu1 .- 2).*abs2.(mu).*sum(dpsw0.^2)
-  denom = 2*sum(abs2.(ak[1:nfft2,:] - kron(mu,transpose(dpsw0))), dims = 2)
+  dpsw02= sum(dpsw0.^2)
+  mu    = ak*dpsw0/dpsw02
+  num   = (nu1 .- 2).*abs2.(mu)*dpsw02
+  denom = 2*sum(abs2.(ak - mu*dpsw0'), dims = 2)
   ft    = (num./denom)[:]
-  Falpha= quantile(FDist(2,2*k-2),alpha)
-  il1   = findall(ft .>= Falpha)
-  # reshape the spectrum after removing lines
-  dpsw  = mapreduce(x -> sum(x, dims=2)', vcat, e)
-  dpsw  = fftshift(vcat(dpsw, dpsw[nfft2-1:-1:2,:]),1)
-  zk    = fftshift(vcat(ak, conj(ak[nfft2-1:-1:2,:])),1)
-  il    = []
-  plin  = []
-  if length(il1) != 0
-      n   = Int64((nz + 1)*round(bw*length(x)) + 1)
-      i   = 2:length(il1)
-      i1  = vcat(findall(il1[i] .!= il1[i.-1] .+ 1), [length(il1)])
-      j   = -n .+ 1:n .- 1
-     #
-     ii = [1]
-      for i = 1:length(i1)
-        if (i1[i] == ii)
-          push!(il,il1[ii[end]]) 
-          push!(ii,ii+1)
-        else 
-          push!(il,findall(ft .== maximum(ft[il1[ii[end]]:il1[i1[i]]]))[1])
-          push!(ii,i1[i] + 1)
-        end
-      end
-      for i2 in il
-        m         = nfft2 .+ i2 .+ j .- 1
-        mm        = m .> size(zk,1)
-        m[mm]     = m[mm] .- size(zk,1)
-        zk[m,1:k] -= mu[i2]*dpsw[nfft2 .+ j,1:k]
-        push!(plin, mean(sum(abs2.(mu[i2]*dpsw[nfft2.+j,1:k]))))
-      end
+  Fpval = 1.0 .- cdf.(FDist.(2,2*nu1 .- 2), ft)
+  # T^2 test
+  if typeof(Tsq) != Nothing
+    Tsq      = (typeof(Tsq) <: Vector{Number}) ? [Tsq] : Tsq
+    map!(x -> freq_to_int(Tsq[x], n, dt), Tsq, eachindex(Tsq))
+    Tsq = Vector{Vector{Int64}}(Tsq)  
+    if (2*k < (true ? 1 : 2)*maximum(length.(Tsq)))
+      error("There are too few tapers for the number of Tsq tests.")
+    end
+    dcs = map(isodd,1:K).*sum(u,dims=1)[:]
+    Tv = map(x->Tsqtest_pval(dcs,ecoef(coefswts.coef[Tsq[x],:],nothing)),eachindex(Tsq)) 
+  else
+    Tv = nothing
   end
-  zk  = ifftshift(zk,1)
-  s2  = mean(abs2.(zk[1,:] .+ 2*sum(abs2.(zk[2:nfft2-1,:])) .+ abs2.(zk[nfft2,:])))/nfft
-  sk  = abs2.(zk)
-  srr = zeros(nfft2)
-  for i = 1:nfft2
-      # Adaptive weighting again
-      (old, new) = vcat(ones(2).*0.5, zeros(k-2)), zeros(k) 
-      srr[i] = aweighted(old, new, k, sk[i,:], lambda, s2, 15, 0.05)
-      d[i,:] = new
+  # Package up the outputs
+  pkg = mtspec((1/dt)*LinRange(0,1,nfft)[1:nfft2], sxx, nothing, 
+              mtparams(bw*n, k, n, tt[2]-tt[1], 2*(nfft2-1), 1, nothing),
+              coefswts, Fpval, jv, Tv)
+  if dof 
+      return pkg, nu1
+  else
+      return pkg
   end
-  srr[2:nfft2-1]  .*= 2.0
-  if length(il1) != 0
-      if il[1] != 1
-          plin  .*= 2.0
-      else
-          plin[2:length(plin)] .*= 2.0
-      end
-  end
-  nu2 = 2*d*lambda
-  return (sxx, nu1, ft, il, plin, srr, nu2)
 end
 
 """ Helper function MDslepian computes generalized slepian function for 1D missing data problem
