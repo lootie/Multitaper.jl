@@ -25,7 +25,7 @@ t arguments
    nz -- zero padding factor, kwarg 0 default
    Ftest -- whether to compute the F-test (kwarg, default true)
    alpha -- probability level for reshaping, 1 if none, 1 default
-   jk -- whether to compute jackknifed confidence intervals (kwarg, default false)
+   jk -- whether to compute jackknifed confidence intervals (kwarg, default true)
    Tsq -- lines at which to compute a T^2 test for multiple line components, returns a list of p-values. 
    dof -- whether to return the degrees of freedom for the adaptively weighted spectrum estimate
 output arguments 
@@ -40,7 +40,7 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
                 nz::Union{Int64,Float64}   = 0, 
                 Ftest::Bool = true,
                 alpha::Float64 = 1.0,
-                jk::Bool = false, 
+                jk::Bool = true, 
                 Tsq::Union{Vector{Float64},Vector{Vector{Float64}},Vector{Int64},Vector{Vector{Int64}},Nothing}=nothing, 
                 dof::Bool = false)
   x     .-= mean(x)
@@ -51,7 +51,7 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
   if mod(nfft,2) != 0 
     nfft = nfft + 1
   end
-  nfft  = Int64((nz + 1)*nfft)
+  nfft  = Int64(round((nz + 1)*nfft))
   nfft2 = Int64(round(nfft/2)) + 1
   s2    = var(x)
   e     = Array{Matrix{ComplexF64},1}(undef, nfft2)
