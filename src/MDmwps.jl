@@ -18,38 +18,40 @@ using Statistics, FFTW, Arpack, LinearAlgebra, Distributions
 for time series with missing data
 t arguments 
    tt -- real vector of time (required)
-   xx -- real vector of data (required)
-   bw -- bandwidth of estimate, 5/length(t) default
-   k -- number of slepian tapers, must be <=2*bw*length(x), 2*bw*length(x)-1 default
-   nz -- zero padding factor, 0 default
+   x -- real vector of data (required)
+   bw -- bandwidth of estimate, kwarg 5/length(t) default
+   k -- number of slepian tapers, must be <=2*bw*length(x), kwarg 2*bw*length(x)-1 default
+   dt -- sampling frequency in time units (kwarg, default tt[2]-tt[1])
+   nz -- zero padding factor, kwarg 0 default
+   Ftest -- whether to compute the F-test (kwarg, default true)
    alpha -- probability level for reshaping, 1 if none, 1 default
+   jk -- whether to compute jackknifed confidence intervals (kwarg, default false)
+   Tsq -- lines at which to compute a T^2 test for multiple line components, returns a list of p-values. 
+   dof -- whether to return the degrees of freedom for the adaptively weighted spectrum estimate
 output arguments 
-   sxx -- power spectrum vector of length length(x)/2+1 (required)
-   nu1 -- degrees-of-freedom vector for sxx of length length(x)/2+1
-   ft -- f-test vector of length length(x)/2+1
-   il -- frequency indices of spectral lines
-   plin -- spectral line power vector
-   srr -- reshaped power spectrum vector of length length(x)/2+1 if alpha<1
-   nu2 -- degrees-of-freedom vector for srr of length length(x)/2+1
+   output mtspec struct containing the spectrum and other results.
+   nu -- the optional degrees-of-freedom for the adaptively weighted spectrum estimate
 """
 function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}}, 
                 x::Union{Vector{Float64}, Matrix{Float64}};
                 bw::Float64 = 5/length(tt),
                 k::Int64    = Int64(2*bw*size(x,1) - 1),
-                nz::Int64   = 0, 
+                dt::Union{Int64, Float64} = tt[2] - tt[1],
+                nz::Union{Int64,Float64}   = 0, 
+                Ftest::Bool = true,
                 alpha::Float64 = 1.0,
                 jk::Bool = false, 
                 Tsq::Union{Vector{Float64},Vector{Vector{Float64}},Vector{Int64},Vector{Vector{Int64}},Nothing}=nothing, 
                 dof::Bool = false)
+  x     .-= mean(x)
   n     = length(tt)
   nfft  = length(x)
   (n != nfft) && error("Time vector and data vector must have the same lengths.")
   # Assuming that equal sampling occurs between the first two observations
-  dt = (tt[2]-tt[1])
   if mod(nfft,2) != 0 
     nfft = nfft + 1
   end
-  nfft  = (nz + 1)*nfft
+  nfft  = Int64((nz + 1)*nfft)
   nfft2 = Int64(round(nfft/2)) + 1
   s2    = var(x)
   e     = Array{Matrix{ComplexF64},1}(undef, nfft2)
@@ -73,13 +75,17 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
   coefswts = ecoef(ak,d.^2)
   jv       = jk ? jknife(coefswts,nothing,:spec)[2] : nothing
   # F-test
-  dpsw0 = real.(sum(e[1],dims=2))
-  dpsw02= sum(dpsw0.^2)
-  mu    = ak*dpsw0/dpsw02
-  num   = (nu1 .- 2).*abs2.(mu)*dpsw02
-  denom = 2*sum(abs2.(ak - mu*dpsw0'), dims = 2)
-  ft    = (num./denom)[:]
-  Fpval = 1.0 .- cdf.(FDist.(2,2*nu1 .- 2), ft)
+  if Ftest
+    dpsw0 = real.(sum(e[1],dims=2))
+    dpsw02= sum(dpsw0.^2)
+    mu    = ak*dpsw0/dpsw02
+    num   = (nu1 .- 2).*abs2.(mu)*dpsw02
+    denom = 2*sum(abs2.(ak - mu*dpsw0'), dims = 2)
+    ft    = (num./denom)[:]
+    Fpval = 1.0 .- cdf.(FDist.(2,2*nu1 .- 2), ft)
+  else
+    Fpval = nothing
+  end
   # T^2 test
   if typeof(Tsq) != Nothing
     Tsq      = (typeof(Tsq) <: Vector{Number}) ? [Tsq] : Tsq
@@ -94,7 +100,7 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
     Tv = nothing
   end
   # Package up the outputs
-  pkg = mtspec((1/dt)*LinRange(0,1,nfft)[1:nfft2], sxx, nothing, 
+  pkg = mtspec((1/dt)*LinRange(0,1,nfft)[1:nfft2], dt*sxx, nothing, 
               mtparams(bw*n, k, n, tt[2]-tt[1], 2*(nfft2-1), 1, nothing),
               coefswts, Fpval, jv, Tv)
   if dof 
