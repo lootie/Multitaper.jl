@@ -5,8 +5,7 @@ f0 the frequency to center at,
 nw the time bandpValidth product, 
 blockLen, the length of the dpss filter 
 wrapphase indicates whether or not to unwrap the phase"""
-function demodulate(x::Vector{Float64}, dt::Float64, f0::Float64, NW::Float64, 
-                      blockLen::Int64, wrapphase::Bool = true)
+function demodulate(x, f0, NW, blockLen, wrapphase=true, dt = 1.0, basetime = 0.0)
   # Generate the zeroth order Slepian taper as a lowpass filter
   dpVal      = dpss_tapers(blockLen, NW, 1, :tap)
   # Complex factor to shift by
@@ -14,12 +13,13 @@ function demodulate(x::Vector{Float64}, dt::Float64, f0::Float64, NW::Float64,
   cshift  = broadcast(*, broadcast(*, cshift, dpVal), (2.0/sum(dpVal)))
   nResVal = length(x) - blockLen + 1
   # Apply the fiter by convolution
-  cdm     = mapreduce(x-> x'*cshift, vcat, x[i:(i+blockLen-1)] for i in 1:nResVal)[:,1]
+  cdm     = vec(mapreduce(x-> x'*cshift, vcat, x[i:(i+blockLen-1)] for i in
+                      1:nResVal))
   # Process the phase information
   phase   = angle.(cdm) * 180/pi
   phase   = wrapphase ? unwrapphase(phase,:deg) : phase
   phase   = phase - 360 * dt * f0 * (1:nResVal)
-  return Demodulate(LinRange(0, length(x), nResVal)*dt, abs.(cdm), phase)
+  return Demodulate(range(0, length(x), length=nResVal)*dt .+ basetime, abs.(cdm), phase)
 end
 
 

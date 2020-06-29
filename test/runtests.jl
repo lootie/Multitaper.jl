@@ -1,11 +1,13 @@
 
 # GNU GPL v2 licenced to C. Haley and C. Geoga 12/2019
 
-using Test
+
+using Multitaper, Test 
+using DelimitedFiles, LinearAlgebra, Statistics
 
 printstyled("Running tests:\n", color=:blue)
 
-tests = ["univariate", "crossings", "multivariate"]
+tests = ["univariate", "crossings", "mdmwps", "multivariate"]
 
 for t in tests
     @testset "Test $t multitaper" begin

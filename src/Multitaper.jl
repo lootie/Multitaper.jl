@@ -6,20 +6,18 @@ __precompile__()
 module Multitaper
 
   using StatsFuns, FastGaussQuadrature, Statistics, FFTW 
-  using SparseArrays, LinearAlgebra, SpecialFunctions, RecipesBase, Arpack, Distributions
+  using SparseArrays, LinearAlgebra, SpecialFunctions, RecipesBase, Arpack
+  using Distributions
 
   # Utiltity
 
-  include("mtbase.jl")
-    export conv
-
   include("StructsTypes.jl")
-    export ecoef, mtparams, mtspec, mtdemod, mtacf, mtacvf, mtceps
-    export mtccvf, mtccf, mttransf, mtdemod, mtcoh, mtcspecqspec 
+    export Ecoef, MtParams, MtSpec, Demodulate, MtAcf, MtAcvf, MtCeps
+    export MtCcvf, MtCcf, MtTransf, MtCoh 
     export Demodulate
 
   include("Utils.jl")
-    export tanhtrans, atanhtrans, EJN
+    export tanhtrans, atanhtrans, ejn
 
   # Univariate 
 
@@ -31,7 +29,7 @@ module Multitaper
   # Univariate multitaper on data with gaps 
 
   include("MDmwps.jl")
-    export MDslepian, MDmwps
+    export mdslepian, mdmwps
 
   include("Demodulation.jl")
     export demodulate

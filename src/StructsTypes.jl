@@ -3,6 +3,9 @@
 
 #### MT-like structs 
 
+
+const OutputPoints = Union{Vector{Float64}, StepRangeLen{Float64}, UnitRange{Int64}}
+
 """ 
 Multitaper parameters: 
   time bandwidth (NW) as Float, 
@@ -13,144 +16,145 @@ Multitaper parameters:
   number of segments (nsegments), and 
   overlap if nsegments is greater than 1, nothing otherwise.
 """
-struct mtparams
+struct MtParams
   NW      ::Float64
   K       ::Int64
   N       ::Int64
   dt      ::Float64
   M       ::Int64
   nsegments ::Int64
-  overlap ::Union{Nothing, Float64}
+  overlap ::Union{Nothing, Float64} # nothing? fixable?
 end
 
 """ 
-The ecoef structure holds 
+The Ecoef structure holds 
   multitaper eigencoefficients (coef) and, optionally, 
   adaptive weights (wts) 
 """
-mutable struct ecoef
-  coef    ::Union{Matrix{ComplexF64}}
-  wts     ::Union{Matrix{ComplexF64}, Matrix{Float64}, Nothing}
+mutable struct Ecoef
+  coef    ::Matrix{ComplexF64}
+  wts     ::Union{Matrix{Float64}, Nothing}
 end
 
 """ 
-The multitaper spectrum is given as a mtspec structure which holds 
+The multitaper spectrum is given as a MtSpec structure which holds 
   frequency (f), 
   spectrum (S), 
   phase (optional), 
-  chosen values of the multitaper time bandwidth product etc of type mtparams (params)
+  chosen values of the multitaper time bandwidth product etc of type MtParams
+    (params)
   eigencoefficients (coef, optional), 
   Ftest values (Fpval, optional), 
   jackknife output (jkvar, optional), and
   Tsquared test results (Tsq_pval, optional). 
 """
-mutable struct mtspec
-  f       ::Union{Array{Float64, 1}, LinRange{Float64}}
-  S       ::Union{Array{Float64, 1}, Array{ComplexF64, 1}}
+mutable struct MtSpec{C,J,P}
+  f       ::OutputPoints
+  S       ::Vector{Float64} 
   phase   ::Union{Array{Float64, 1}, Nothing}
-  params  ::mtparams
-  coef    ::Union{ecoef, Array{ecoef,1}, Array{Float64,2}, Nothing}
+  params  ::MtParams
+  coef    ::C
   Fpval   ::Union{Array{Float64, 1}, Nothing}
-  jkvar   ::Union{Array{Float64, 1}, Array{Float64, 2}, Array{Array{Float64, 1}, 1}, Nothing}
-  Tsq_pval::Union{Float64, Array{Float64, 1}, Nothing}
+  jkvar   ::J
+  Tsq_pval::P
 end
 
 """ 
-The multitaper autocovariance function is given in the mtacvf structure, which holds
+The multitaper autocovariance function is given in the MtAcvf structure, which holds
   lags (lags), 
   autocovariance function (acvf), 
-  mtparams (params)
+  MtParams (params)
 """
-mutable struct mtacvf
-  lags    ::Union{Array{Float64, 1}, LinRange, UnitRange}
-  acvf    ::Union{Array{Float64, 1}, Array{ComplexF64, 1}} 
-  params  ::mtparams
+mutable struct MtAcvf{T}
+  lags    ::OutputPoints
+  acvf    ::Vector{T}
+  params  ::MtParams
 end
 
 """ 
-The multitaper autocorrelation function is given in the mtacf structure which holds 
+The multitaper autocorrelation function is given in the MtAcf structure which holds 
   lags (lags), 
   autocorrelation function (acf), 
-  mtparams (params)
+  MtParams (params)
 """
-mutable struct mtacf
-  lags    ::Union{Array{Float64, 1}, LinRange, UnitRange}
-  acf     ::Union{Array{Float64, 1}, Array{ComplexF64, 1}} 
-  params  ::mtparams
+mutable struct MtAcf{T}
+  lags    ::OutputPoints
+  acf     ::Vector{T}
+  params  ::MtParams
 end
 
 """ 
-The multitaper cepstrum is given in the mtceps structure which holds 
+The multitaper cepstrum is given in the MtCeps structure which holds 
   lags (lags), 
   cepstrum (ceps), 
-  mtparams (params)
+  MtParams (params)
 """
-mutable struct mtceps
-  lags    ::Union{Array{Float64, 1}, LinRange, UnitRange}
-  ceps    ::Union{Array{Float64, 1}, Array{ComplexF64, 1}} 
-  params  ::mtparams
+mutable struct MtCeps{T}
+  lags    ::OutputPoints
+  ceps    ::Vector{T}
+  params  ::MtParams
 end
 
 """ 
-The multitaper coherence structure, mtcoh, holds 
+The multitaper coherence structure, MtCoh, holds 
   frequency (f), 
   coherence (coh), 
   phase (phase), 
-  eigencoefficients (ecoeffs, optional), 
+  eigencoefficients (coef, optional), 
   jackknife output (jkvar, optional), and 
   Tsquared test results (Tsq, optional).
 """
-mutable struct mtcoh
-  f       ::Union{Array{Float64, 1}, LinRange}
+mutable struct MtCoh{C,J,P}
+  f       ::OutputPoints
   coh     ::Array{Float64, 1}
   phase   ::Union{Array{Float64, 1}, Nothing}
-  params  ::mtparams
-  coef    ::Union{ecoef, Array{ecoef,1}, Array{Float64,2}, Array{Array{Float64, 2}, 1}, Nothing}
-  jkvar   ::Union{Array{Float64, 1}, Array{Float64, 2}, Array{Array{Float64, 1}, 1}, Nothing}
-  Tsq_pval::Union{Float64, Array{Float64, 1}, Nothing}
+  params  ::MtParams
+  coef    ::C
+  jkvar   ::J
+  Tsq_pval::P
 end
 
 """ 
-The multitaper transfer function is given as a mttransf structure which holds 
+The multitaper transfer function is given as a MtTransf structure which holds 
           frequency (f), 
           transfer function (transf), 
           phase (phase), 
-          mtparams (params),
-          eigencoefficients (ecoeffs, optional), 
+          MtParams (params),
+          eigencoefficients (Ecoeffs, optional), 
           jackknife output (jkvar, optional), and 
           Tsquared test results (Tsq, optional).
 """
-mutable struct mttransf
-  f       ::Union{Array{Float64, 1}, LinRange}
+mutable struct MtTransf{C,J}
+  f       ::OutputPoints
   transf  ::Union{Array{Float64, 1}, Array{Float64, 2}}
   phase   ::Union{Array{Float64, 1}, Nothing}
-  params  ::mtparams
-  coef    ::Union{ecoef, Array{ecoef,1}, Array{Float64,2}, Array{Array{Float64, 2}, 1}, Nothing}
-  jkvar   ::Union{Array{Float64, 1}, Array{Float64, 2}, Array{Array{Float64, 1}, 1}, Nothing}
+  params  ::MtParams
+  coef    ::C
+  jkvar   ::J
 end
 
 """ 
-The multitaper cross-covariance function is given in the mtccvf structure which holds 
+The multitaper cross-covariance function is given in the MtCcvf structure which holds 
   lags (lags), 
   cross-covariance function (acvf), 
-  mtparams (params)
+  MtParams (params)
 """
-mutable struct mtccvf
-  lags    ::Union{Array{Float64, 1}, LinRange, UnitRange}
-  ccvf    ::Union{Array{Float64, 1}, Array{ComplexF64, 1}} 
-  params  ::mtparams
+mutable struct MtCcvf{T}
+  lags    ::OutputPoints
+  ccvf    ::Vector{T}
+  params  ::MtParams
 end
 
 """ 
-The multitaper cross-correlation function is given as a mtccf structure which holds 
+The multitaper cross-correlation function is given as a MtCcf structure which holds 
   lags (lags), 
   cross-correlation function (acf), 
-  mtparams (params)
+  MtParams (params)
 """
-mutable struct mtccf
-  lags    ::Union{Array{Float64, 1}, LinRange, UnitRange}
-  ccf     ::Union{Array{Float64, 1}, Array{ComplexF64, 1}} 
-  params  ::mtparams
+mutable struct MtCcf{T}
+  lags    ::OutputPoints
+  ccf     ::Vector{T} 
+  params  ::MtParams
 end
 
 """
@@ -159,7 +163,7 @@ Multitaper complex demodulates are held in the Demodulate struct which contains
           phase (Phase)
 """
 mutable struct Demodulate
-  time    ::LinRange{Float64}
+  time    ::OutputPoints
   mag     ::Array{Float64, 1}
   phase   ::Array{Float64, 1}
 end

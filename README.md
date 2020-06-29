@@ -44,8 +44,8 @@ As of version 0.0, 01/2020
 
 ### Univariate
 
-* Discrete Prolate Spheroidal sequences (Slepian 1974) and sine tapers (Riedel & Sidorenko), and 
-  the former with gaps (Chave 2019) 
+* Discrete Prolate Spheroidal sequences (Slepian 1974) and sine tapers (Riedel &
+  Sidorenko), and the former with gaps (Chave 2019) 
 
 * Multitaper spectra that use dpss (multispec) tapers. 
 
@@ -55,8 +55,8 @@ As of version 0.0, 01/2020
 
 * Complex demodulation
 
-* Multitaper spectrum estimation for time series with equal temporal spacing except with gaps (Chave
-  2019)
+* Multitaper spectrum estimation for time series with equal temporal spacing except
+  with gaps (Chave 2019)
 
 ### Multivariate
 
@@ -64,18 +64,18 @@ As of version 0.0, 01/2020
 
 * Jackknife estimates of phase, unwrapped, similar to R's implementation. 
 
-* T-squared test (Thomson, "Some comments on possibly cyclostationary series", Asilomar Conference
-  Proceedings) for simultaneous line components. 
+* T-squared test (Thomson, "Some comments on possibly cyclostationary series",
+  Asilomar Conference Proceedings) for simultaneous line components. 
 
 ### 2 Dimensional
 
-* 2 Dimensional Cartesian tapers supported on the square in space and 2D disk in time as described in 
-  Simons and Wang, 2011 
+* 2 Dimensional Cartesian tapers supported on the square in space and 2D disk in time
+  as described in Simons and Wang, 2011 
 
 ## Plots Recipes
 
-You will find plots recipes in the separate file ./Examples/plotsrecipes.jl. These provide a
-Plots.jl format for plotting multispec output structs with little effort.
+You will find plots recipes in the separate file ./Examples/plotsrecipes.jl. These
+provide a Plots.jl format for plotting multispec output structs with little effort.
 
 ## Main References 
 
@@ -113,6 +113,7 @@ This software is distributed under the GNU GPL v2 license.
 
 Kindly acknowledge `Multitaper.jl` in scientific publications as
 
-    “Haley, C.L. and Geoga, C.J. (2020), Multitaper.jl: a Julia library for multitaper nonparametric
-    spectrum analysis, http://bitbucket.org/clhaley/Multitaper.jl.”
+    “Haley, C.L. and Geoga, C.J. (2020), Multitaper.jl: a Julia library for
+    multitaper nonparametric spectrum analysis,
+    http://bitbucket.org/clhaley/Multitaper.jl.”
 

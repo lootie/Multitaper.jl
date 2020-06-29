@@ -5,7 +5,7 @@
 
 ##### Plots of multitaper spectra #####
 
-@recipe function plot(S::mtspec; cross = true,
+@recipe function plot(S::MtSpec; cross = true,
                       phase = false) 
   #
   yscale --> :log10
@@ -16,11 +16,14 @@
   xlab = (S.phase == nothing) ? "Frequency" : " "
   xlabel --> xlab
   ylab = (S.phase == nothing) ? "Spectrum" : "Cross-Spectrum"
-  if (S.params.nsegments > 1); ylab *= "Welsh "; end
+  if (S.params.nsegments > 1); ylab *= "Welch "; end
   ylabel --> ylab
-  label --> ylab
+  @series begin
+    S.f[2:end], S.S[2:end]
+  end 
   if S.jkvar != nothing
     @series begin
+      primary --> false
       label --> "Spectrum & 95% CI"
       fill := 1
       fillalpha --> 0.25
@@ -29,67 +32,16 @@
       vcat(S.f[2:end],S.f[end:-1:2]), vcat(S.S[2:end].*exp.(z*sqrt.(S.jkvar[2:end])), S.S[end:-1:2].*exp.(-z*sqrt.(S.jkvar[end:-1:2])))
     end
   end
-  @series begin
-    primary --> false
-    S.f[2:end], S.S[2:end]
-  end
   if cross
-    ejn = EJN((2*K)*S.params.nsegments)
+    EJN = ejn((2*K)*S.params.nsegments)
     cent = [0.10*S.f[end],maximum(S.S)*0.8]
     @series begin 
       primary --> false
-      cent[1] .+ BW(NW, N, dt)*[-1.0, 1.0], cent[2] .* [1.0, 1.0]
+      cent[1] .+ (NW/(N*dt))*[-1.0, 1.0], cent[2] .* [1.0, 1.0]
     end
     @series begin
       primary --> false
-      cent[1] .* [1.0,1.0] , cent[2].*exp.(ejn*[-1.0, 1.0])
-    end
-  end
-end
-
-@recipe function plot(S::Vector{mtspec}; cross = true,
-                      phase = false, xscaling = :lin) 
-  #
-  yscale --> :log10
-  xlab = (S[1].phase == nothing) ? "Frequency" : " "
-  xlabel --> xlab
-  ylab = (S[1].phase == nothing) ? "Spectrum" : "Cross-Spectrum"
-  ylabel --> ylab
-  J    = length(S)
-  #
-  for j = 1:J  
-    if S[j].jkvar != nothing
-      @series begin
-        label --> "Spectrum & 95% CI"
-        fill := 1
-        fillalpha --> 0.25
-        linealpha --> 0.25
-        z = norminvcdf(0,1,0.975)
-        vcat(S[j].f[2:end],S[j].f[end:-1:2]), vcat(S[j].S[2:end].*exp.(z*sqrt.(S[j].jkvar[2:end])), S[j].S[end:-1:2].*exp.(-z*sqrt.(S[j].jkvar[end:-1:2])))
-      end
-    end
-    @series begin
-      primary --> false
-      S[j].f[2:end], S[j].S[2:end]
-    end  
-    # If the cross is desired
-    if cross
-      dt   = S[j].params.dt
-      K    = S[j].params.K
-      NW   = S[j].params.NW
-      N    = S[j].params.N
-      ejn  = EJN(2*K*S[j].params.nsegments)
-      cent = [0.15*S[j].f[end],maximum(S[j].S)*0.8]
-      #
-      @series begin 
-        primary --> false
-        cent[1] .+ BW(NW, N, dt)*[-1.0, 1.0], cent[2] .* [1.0, 1.0]
-      end
-      #
-      @series begin
-        primary -->  false
-        cent[1] .* [1.0,1.0] , cent[2].*exp.(ejn*[-1.0, 1.0])
-      end
+      cent[1] .* [1.0,1.0] , cent[2].*exp.(EJN*[-1.0, 1.0])
     end
   end
 end
@@ -97,7 +49,7 @@ end
 ### Plots of multitaper autocovariances
 
 """ Simply plot the multitaper autocorrelation """
-@recipe function mtacfplt(A::Multitaper.mtacf)
+@recipe function acfplt(A::MtAcf)
   label --> "MT acf"
   title --> "Autocorrelation Function"
   ylabel --> "Autocorrelation"
@@ -110,7 +62,7 @@ end
 end
 
 """ Simply plot the multitaper autocovariance function """
-@recipe function mtacvfplt(A::Multitaper.mtacvf)
+@recipe function acvfplt(A::MtAcvf)
   label --> "MT acvf"
   title --> "Autocovariance Function"
   ylabel --> "Autocovariance"
@@ -123,7 +75,7 @@ end
 end
 
 """ Simply plot the multitaper cepstrum coefficients """
-@recipe function mtcepsplt(A::Multitaper.mtceps)
+@recipe function cepsplt(A::MtCeps)
   label --> "MT Cepstrum"
   title --> "Cepstrum"
   ylabel --> "Cepstrum coefficient"
@@ -136,7 +88,7 @@ end
 end
 
 """ Demodulate recipe """
-@recipe function mtdemodplt(cdm::Demodulate)
+@recipe function demodplt(cdm::Demodulate)
   layout --> (2,1)
   @series begin
     subplot := 1

@@ -3,7 +3,7 @@
 
 # Recipes for multivariate spectrum analysis, mostly coherences at this point.
 
-@recipe function plot(C::mtcoh; phase = false, sigMax = 0)
+@recipe function plot(C::MtCoh; phase = false, sigMax = 0)
   jk = (C.jkvar != nothing) 
   link := :xaxis 
   NW = C.params.NW
@@ -36,7 +36,7 @@
     end
   end
   # Label with significance levels
-  sigs = LogRange(1,sigMax,sigMax)
+  sigs = logRange(1,sigMax,sigMax)
   labs = jk ? map(x -> atanhtrans(sqrt(invmscsig(x, K)), K), sigs) : map(x -> invmscsig(x,K),sigs)
   #
   @series begin 
@@ -70,7 +70,7 @@
   end
 end
 
-@recipe function plot(C::mttransf; phase = false)
+@recipe function plot(C::MtTransf; phase = false)
   link := :xaxis 
   NW = C.params.NW
   K = C.params.K
@@ -98,12 +98,13 @@ end
   end
 end
 
-@recipe function plot(C::Matrix{mtcoh}; phase = false, jk = false, sigMax = 0)
+@recipe function plot(C::Matrix{MtCoh}; phase = false, jk = false, sigMax = 0)
   link := :xaxis 
   z = norminvcdf(0,1,0.975)    
   # Label with significance levels
-  sigs = LogRange(1,sigMax,sigMax)
-  labs = jk ? map(x -> atanhtrans(sqrt(invmscsig(x, C[1,2].params.K)), C[1,2].params.K), sigs) : map(x -> invmscsig(x,C[1,2].params.K),sigs)
+  sigs = logRange(1,sigMax,sigMax)
+  labs = jk ? map(x -> atanhtrans(sqrt(invmscsig(x, C[1,2].params.K)), C[1,2].params.K), sigs) : 
+              map(x -> invmscsig(x,C[1,2].params.K),sigs)
   if (C[1,2].jkvar != nothing) && jk
     for j in CartesianIndices(C)
       if (j[1] < j[2])*(j[1] != j[2])
@@ -186,11 +187,12 @@ end
 # Finally, suppose we want to plot the output of a coherence calculation. Currently the output is
 # spectra in the first index and coherences in the second. This is not fancy, and does not provide
 # CIs, you have to plot those separately to see detail. 
-@recipe function specCohMatrix(Spec::Tuple{Array{mtspec,1},Array{mtcoh,2},Nothing}; sigMax = 0) 
+@recipe function specCohMatrix(Spec::Tuple{Array{MtSpec{C,T,P},1},Array{MtCoh,2},Nothing}; 
+                                sigMax = 0) where C where T where P
   J = size(Spec[2],1)
   layout := (J,J)
   # Label with significance levels
-  sigs = LogRange(1,sigMax,sigMax)
+  sigs = logRange(1,sigMax,sigMax)
   labs = map(x -> invmscsig(x,Spec[1][1].params.K),sigs)
   ser = 1
   for j in CartesianIndices(Spec[2])
@@ -211,7 +213,7 @@ end
         label --> "Spectrum $(j[1])"
         subplot := ser
         ser += 1
-        Spec[1][j[1]].f, Spec[1][j[1]].S
+        Spec[1][j[1]].f[2:end], Spec[1][j[1]].S[2:end]
       end
     else
       # MSC case - superdiagonal
@@ -236,7 +238,7 @@ end
 #### Recipes related to cross-covariance and cross-correlation
 
 """ Plots the multitaper cross covariance function """
-@recipe function ccvfplot(A::mtccvf)
+@recipe function ccvfplot(A::MtCcvf)
   label --> "MT Cross-Covariance"
   title --> "Cross-Covariance Function"
   ylabel --> "Cross Covariance"
@@ -248,7 +250,7 @@ end
 end
 
 """ Plots the multitaper cross correlation function """
-@recipe function ccfplot(A::mtccf)
+@recipe function ccfplot(A::MtCcf)
   label --> "MT Cross-Correlation"
   title --> "Cross-Correlation Function"
   ylabel --> "Cross Correlation"

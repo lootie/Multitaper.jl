@@ -1,14 +1,14 @@
 
-# MT routines by Chave, adapted for Julia from Matlab by C Haley in 2020
-# Original Chave license text appended at the end of this doc. 
-# Credit is due to the original author: 
+# MT routines by Chave, adapted for Julia from Matlab by C Haley in 2020 Original
+# Chave license text appended at the end of this doc.  Credit is due to the original
+# author: 
 #
-# Chave, Alan D. "A multitaper spectral estimator for time-series with missing data." Geophysical
-# Journal International 218.3 (2019): 2165-2178.
+# Chave, Alan D. "A multitaper spectral estimator for time-series with missing data."
+# Geophysical Journal International 218.3 (2019): 2165-2178.
 #
-# NB: (i) This code removes the sample mean from the data by default, and additionally scales the 
-# spectrum by dt, when provided. 
-# (ii) Chave used a zero-finding routine to compute adaptive weights while here we use the iterative 
+# NB: (i) This code removes the sample mean from the data by default, and
+# additionally scales the spectrum by dt, when provided.  (ii) Chave used a
+# zero-finding routine to compute adaptive weights while here we use the iterative
 # method from Thomson, 82. 
 #
 
@@ -20,29 +20,25 @@ t arguments
    tt -- real vector of time (required)
    x -- real vector of data (required)
    bw -- bandwidth of estimate, kwarg 5/length(t) default
-   k -- number of slepian tapers, must be <=2*bw*length(x), kwarg 2*bw*length(x)-1 default
+   k -- number of slepian tapers, must be <=2*bw*length(x), kwarg 2*bw*length(x)-1 
+        default
    dt -- sampling frequency in time units (kwarg, default tt[2]-tt[1])
    nz -- zero padding factor, kwarg 0 default
    Ftest -- whether to compute the F-test (kwarg, default true)
    alpha -- probability level for reshaping, 1 if none, 1 default
    jk -- whether to compute jackknifed confidence intervals (kwarg, default true)
-   Tsq -- lines at which to compute a T^2 test for multiple line components, returns a list of p-values. 
-   dof -- whether to return the degrees of freedom for the adaptively weighted spectrum estimate
+   Tsq -- lines at which to compute a T^2 test for multiple line components, 
+          returns a list of p-values. 
+   dof -- whether to return the degrees of freedom for the adaptively weighted 
+          spectrum estimate
 output arguments 
-   output mtspec struct containing the spectrum and other results.
-   nu -- the optional degrees-of-freedom for the adaptively weighted spectrum estimate
+   output MtSpec struct containing the spectrum and other results.
+   nu -- the optional degrees-of-freedom for the adaptively weighted spectrum 
+        estimate
 """
-function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}}, 
-                x::Union{Vector{Float64}, Matrix{Float64}};
-                bw::Float64 = 5/length(tt),
-                k::Int64    = Int64(2*bw*size(x,1) - 1),
-                dt::Union{Int64, Float64} = tt[2] - tt[1],
-                nz::Union{Int64,Float64}   = 0, 
-                Ftest::Bool = true,
-                alpha::Float64 = 1.0,
-                jk::Bool = true, 
-                Tsq::Union{Vector{Float64},Vector{Vector{Float64}},Vector{Int64},Vector{Vector{Int64}},Nothing}=nothing, 
-                dof::Bool = false)
+function mdmwps(tt, x; bw=5/length(tt), k=Int64(2*bw*size(x,1)-1), 
+                dt=tt[2]-tt[1], nz=0, Ftest=true, alpha=1.0, jk=true,
+                Tsq=nothing, dof=false)
   x     .-= mean(x)
   n     = length(tt)
   nfft  = length(x)
@@ -56,8 +52,9 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
   s2    = var(x)
   e     = Array{Matrix{ComplexF64},1}(undef, nfft2)
   sxx   = zeros(nfft2)
+  d     = zeros(nfft2,k)
   ak    = 0.0im*zeros(nfft2,k)
-  lambda,u = MDslepian(bw, k, tt)
+  lambda,u = mdslepian(bw, k, tt)
   for i = 1:nfft2
       f      = (i - 1)/nfft
       e[i]   = transpose(u.*repeat(exp.(0.0 .- 2.0*pi*im*f*tt),outer=(1,k)))       
@@ -67,12 +64,13 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
       sk     = abs.(ak[i,:]).^2
       # Adaptive weighting 
       (old, new) = vcat(ones(2).*0.5, zeros(k-2)), zeros(k) 
-      sxx[i] = aweighted(old, new, k, sk, lambda, s2, 15,0.05)
+      d[i,:] = aweighted(old, new, k, sk, lambda, s2, 15, 0.05)
+      sxx[i] = _dot(d[i,:],sk)
   end
   sxx[2:nfft2-1] .*= 2
   d = sxx*sqrt.(lambda')./(sxx*lambda' .+ s2*(1.0 .- lambda'))
-  nu1   = 2*d.^2*lambda
-  coefswts = ecoef(ak,d.^2)
+  nu1      = 2*d.^2*lambda
+  coefswts = Ecoef(ak,d.^2)
   jv       = jk ? jknife(coefswts,nothing,:spec)[2] : nothing
   # F-test
   if Ftest
@@ -81,7 +79,7 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
     mu    = ak*dpsw0/dpsw02
     num   = (nu1 .- 2).*abs2.(mu)*dpsw02
     denom = 2*sum(abs2.(ak - mu*dpsw0'), dims = 2)
-    ft    = (num./denom)[:]
+    ft    = vec((num./denom))
     Fpval = 1.0 .- cdf.(FDist.(2,2*nu1 .- 2), ft)
   else
     Fpval = nothing
@@ -94,14 +92,15 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
     if (2*k < (true ? 1 : 2)*maximum(length.(Tsq)))
       error("There are too few tapers for the number of Tsq tests.")
     end
-    dcs = map(isodd,1:K).*sum(u,dims=1)[:]
-    Tv = map(x->Tsqtest_pval(dcs,ecoef(coefswts.coef[Tsq[x],:],nothing)),eachindex(Tsq)) 
+    dcs = vec(map(isodd,1:K).*sum(u,dims=1))
+    Tv = map(x->testTsq(dcs,Ecoef(coefswts.coef[Tsq[x],:],nothing)),
+              eachindex(Tsq)) 
   else
     Tv = nothing
   end
   # Package up the outputs
-  pkg = mtspec((1/dt)*LinRange(0,1,nfft)[1:nfft2], dt*sxx, nothing, 
-              mtparams(bw*n, k, n, tt[2]-tt[1], 2*(nfft2-1), 1, nothing),
+  pkg = MtSpec((1/dt)*range(0,1,length=nfft)[1:nfft2], dt*sxx, nothing, 
+              MtParams(bw*n, k, n, tt[2]-tt[1], 2*(nfft2-1), 1, nothing),
               coefswts, Fpval, jv, Tv)
   if dof 
       return pkg, nu1
@@ -110,7 +109,7 @@ function MDmwps(tt::Union{Vector{Int64}, Vector{Float64}},
   end
 end
 
-""" Helper function MDslepian computes generalized slepian function for 1D missing data problem
+""" Helper function mdslepian computes generalized slepian function for 1D missing data problem
   input variables
        w = analysis half bandwidth
        k = number of eigenvalue/vectors to compute
@@ -119,7 +118,7 @@ end
        lambda = eigenvalues
        u = eigenvectors
 """
-function MDslepian(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}})
+function mdslepian(w, k, t)
   # Random.seed!(2147483647)
   n           = length(t)
   a           = 2*w*ones(n,n)
