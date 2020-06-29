@@ -1,5 +1,5 @@
 ---
-title: 'Multitaper.jl: A Julia package for power spectrum analysis'
+title: 'Multitaper.jl: A Julia package for frequency domain analysis of time series'
 tags:
   - Julia
   - time series

@@ -44,8 +44,7 @@ As of version 0.0, 01/2020
 
 ### Univariate
 
-* Discrete Prolate Spheroidal sequences (Slepian 1974) and sine tapers (Riedel &
-  Sidorenko), and the former with gaps (Chave 2019) 
+* Discrete Prolate Spheroidal sequences (Slepian 1974) and with gaps (Chave 2019) 
 
 * Multitaper spectra that use dpss (multispec) tapers. 
 
