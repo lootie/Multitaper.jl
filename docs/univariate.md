@@ -30,8 +30,6 @@ function multispec(S1::Union{Vector{T}};
                    a_weight::Bool = true, 
                    Ftest::Bool = false, 
                    highres::Bool = false,
-                   reshape::Union{Bool, Float64, Int64, Vector{Float64}, 
-                            Vector{Int64}} = false,
                    jk::Bool = false, 
                    Tsq::Union{Vector{Float64},Vector{Vector{Float64}},
                       Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing, 
@@ -56,8 +54,6 @@ S1 is the time series, and you have the following keyword options:
   * a_weight, whether to use the adaptive weighting scheme described in Thomson, 1982
   * Ftest, whether to compute the harmonic F-test described in Thomson, 1982
   * highres, whether the estimate should be a high-resolution estimate, see Thomson 1982
-  * reshape, frequencies where reshaping is needed (line component removal and
-    reshaping near the peak)
   * jk, jackknifing to give a confidence interval for the spectrum
   * Tsq, T-squared test for multiple line components (Thomson Asilomar conference
     proceedings)
