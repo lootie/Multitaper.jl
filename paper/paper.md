@@ -38,19 +38,19 @@ univariate and bivariate time series analysis and provides routines for a number
 
 # Statement of need
 
-`Multitaper.jl` is a Julia package for spectrum analysis of time series,
-multivariate time series, and spatial or space-time processes. The high-level
-character of Julia allows for widely readable and extendible codes, while the
-low-level functionality provides speed and efficiency. The `Multitaper.jl` package
-provides a user-friendly implementation of many of the basic concepts such as
-spectrum analysis, F-testing for harmonic analysis [@T82], coherence and phase,
-jackknifed variance estimates [@TC91], and complex demodulation [@T07]; more advanced
-techniques such as dual-frequency spectra, cepstrum, multitaper for time series
-containing gaps [@chave2019multitaper], $T^2$ tests for multiple line components
-[@T11] implementations of higher-dimensional Slepian tapers on Cartesian domains
-[@SimonsWang2011] [@Geoga2018]; and others [@ThomsonHaley2014]. In addition, we
-provide tutorial-style notebooks to allow accessibility to those new to these
-concepts or to Julia in general.
+`Multitaper.jl` is a Julia package for spectrum analysis of time series, multivariate
+time series, and spatial or space-time processes. The high-level character of Julia
+allows for widely readable and extendible codes, while the low-level functionality
+provides speed and efficiency. The `Multitaper.jl` package provides a user-friendly
+implementation of many of the basic concepts such as spectrum analysis, F-testing for
+harmonic analysis [@T82], coherence and phase, jackknifed variance estimates [@TC91],
+and complex demodulation [@T07]; more advanced techniques such as dual-frequency
+spectra, cepstrum, multitaper for time series containing gaps [@chave2019multitaper],
+$T^2$ tests for multiple line components [@T11] implementations of higher-dimensional
+Slepian tapers on Cartesian domains [@SimonsWang2011] [@Geoga2018]; and others
+[@ThomsonHaley2014] [@HaleyAnitescu2017]. In addition, we provide tutorial-style
+notebooks to allow accessibility to those new to these concepts or to Julia in
+general.
 
 `Multitaper.jl` was designed to be useful to researchears in diverse fields,
 including geophysics (climate, seismology, limnology, and stratigraphy), cognitive
