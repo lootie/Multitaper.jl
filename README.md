@@ -1,6 +1,10 @@
 
 # Multitaper.jl
 
+A software suite for computing [multitaper spectral density
+estimators](https://en.wikipedia.org/wiki/Multitaper) and other related
+quantities leveraging Slepian functions in one and several dimensions.
+
 ## Installation
 
 This package is unregistered, so please install with
@@ -23,9 +27,9 @@ julia> S = multispec(x)
 
 ```
 
-at the prompt, where x is a real data vector. The default time-bandwidth product selection is `NW =
-4.0` while the number of tapers `K = 6`. If Plots.jl is being used, the resulting struct can be
-plotted via the recipe
+at the prompt, where x is a real data vector. The default time-bandwidth product
+selection is `NW = 4.0` while the number of tapers `K = 6`. If Plots.jl is being
+used, the resulting struct can be plotted via the recipe
 
 ```
 
@@ -35,16 +39,17 @@ julia> plot(S)
 
 ```  
 
-For further in-depth reading, consult the docs. For useful examples, see the notebooks in the
-Examples folder (requires IJulia.jl).
+**For further in-depth reading, consult the docs. For useful examples, see the
+notebooks in the Examples folder (requires IJulia.jl).**
 
 ## Quick Synopsis of Capabilities
 
-As of version 0.0, 01/2020
+As of version 1.0, 06/2020
 
 ### Univariate
 
-* Discrete Prolate Spheroidal sequences (Slepian 1974) and with gaps (Chave 2019) 
+* Discrete Prolate Spheroidal sequences (Slepian 1974) and sine tapers (Riedel &
+  Sidorenko), and the former with gaps (Chave 2019) 
 
 * Multitaper spectra that use dpss (multispec) tapers. 
 
@@ -73,8 +78,7 @@ As of version 0.0, 01/2020
 
 ## Plots Recipes
 
-You will find plots recipes in the separate file ./Examples/plotsrecipes.jl. These
-provide a Plots.jl format for plotting multispec output structs with little effort.
+Plots recipes are provided for several different ouputs. Refer to `./src/PlotsRecipes/`
 
 ## Main References 
 

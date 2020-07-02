@@ -104,7 +104,7 @@ A note on plotting: if you are using Plots.jl there recipes to directly plot the
 output of the above multivariate calculations, especially the tuples, in a gridded
 plot format. See the second jupyter notebook for more details. 
 
-## Time domain stuff
+## Time domain:
 
 # mt_ccvf
 
