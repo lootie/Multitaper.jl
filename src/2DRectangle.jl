@@ -61,11 +61,11 @@ function rectsleps(nslep, n, m, Kp, N, M; verbose = false)
   factd    = eigen(solvme) # formerly eigfact
 
   # Extract the slepians, show the concentrations if verbose:
-  goodind  = sortperm(factd.values, rev=true)[1:nslep]
+  highconcind  = sortperm(factd.values, rev=true)[1:nslep]
   if verbose
     println("The $(nslep) concentrations:")
     for j in 1:nslep
-      println(factd.values[goodind[j]])
+      println(factd.values[highconcind[j]])
     end
   end
 
@@ -78,10 +78,10 @@ function rectsleps(nslep, n, m, Kp, N, M; verbose = false)
     @simd for j in eachindex(points)
       @simd for k in eachindex(no)
         @inbounds newslep[j] += wtv[k]*dfun(no[k], points[j],
-                                Kp)*factd.vectors[:,goodind[l]][k]
+                                Kp)*factd.vectors[:,highconcind[l]][k]
       end
     end
-    push!(sleps, reshape(newslep, n, m)./factd.values[goodind[l]])
+    push!(sleps, reshape(newslep, n, m)./factd.values[highconcind[l]])
   end
 
   return sleps

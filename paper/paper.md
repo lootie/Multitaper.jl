@@ -17,7 +17,7 @@ affiliations:
    index: 1
  - name: Rutgers University
    index: 2
-date: 29 June, 2020
+date: 2 July, 2020
 bibliography: paper.bib
 
 ---
