@@ -6,7 +6,7 @@ __precompile__()
 module Multitaper
 
   using StatsFuns, FastGaussQuadrature, Statistics, FFTW 
-  using SparseArrays, LinearAlgebra, SpecialFunctions, RecipesBase, Arpack
+  using LinearAlgebra, SpecialFunctions, RecipesBase, Arpack
   using Distributions
 
   # Utiltity
