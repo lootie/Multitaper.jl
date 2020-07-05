@@ -86,4 +86,18 @@ communication.
 We acknowledge contributions from Mihai Anitescu, David J. Thomson, and
 Sally Dodson-Robinson during the writing of these codes.
 
+This work was supported by the U.S. Department of Energy, Office of Science, Advanced
+Scientific Computing Research, under contract number DE-AC02-06CH11357.
+
+The submitted manuscript has been created by UChicago Argonne, LLC, Operator of
+Argonne National Laboratory (“Argonne”). Argonne, a U.S. Department of Energy Office
+of Science laboratory, is operated under Contract No. DE-AC02-06CH11357. The U.S.
+Government retains for itself, and others acting on its behalf, a paid-up
+nonexclusive, irrevocable worldwide license in said article to reproduce, prepare
+derivative works, distribute copies to the public, and perform publicly and display
+publicly, by or on behalf of the Government. The Department of Energy will provide
+public access to these results of federally sponsored research in accordance with the
+DOE Public Access Plan. http://energy.gov/downloads/doe-public-access-plan
+
+
 # References
