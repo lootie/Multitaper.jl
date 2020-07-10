@@ -11,7 +11,7 @@ This package is unregistered, so please install with
 
 ```
 
-Pkg> add git://bitbucket.org/clhaley/Multitaper.jl.git
+Pkg> add https://bitbucket.org/clhaley/Multitaper.jl.git
 
 ```
 
