@@ -6,7 +6,6 @@
 """ Unwrap the phase """
 function unwrapphase(y, typ=:rad)
   lims         = (typ==:rad) ? pi : 180
-  y[1], y[end] = (0.0, 0.0)
   x            = copy(y)
   dy           = diff(y)
   for i = (length(y)-1):-1:1
@@ -23,8 +22,7 @@ function unwrapphase(y::Vector{Complex{T}},typ=:deg) where{T}
     error("Unwrapping must be done in either degrees (:deg) or radians (:rad)")
   end
   # Difference the phase angles
-  x = map(i->angle(y[i]/y[i-1]),2:length(y))
-  x = vcat(0.0,x)
+  x = map(i->angle(y[i]/y[i-1]),1:length(y))
   return cumsum(x)*((typ == :deg)*180.0/pi + (typ == :rad))
 end
 
