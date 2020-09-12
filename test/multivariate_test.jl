@@ -49,8 +49,8 @@ multiv = multispec(dat[:, 3:4], dt = dt, NW = NW, K = K, jk = true, Ftest = true
                                        5.18871118000256, 5.082716554324644]
 
   println("Testing the phase")
-  @test multiv[2][1,2].phase[1:5]   ≈ [0.0, 178.71279387445034, 178.30193928288293, 
-                                       177.60013658787375, 179.26526345068578]
+  @test multiv[2][1,2].phase[1:5]   ≈ [180.0, 178.71279387445034, 178.30193928288293,
+  177.60013658787375, 179.26526345068578]
 
   # Time-domain type tests
   println("Cross-covariance:")
