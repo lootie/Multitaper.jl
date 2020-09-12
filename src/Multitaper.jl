@@ -29,7 +29,7 @@ module Multitaper
   # Univariate multitaper on data with gaps 
 
   include("MDmwps.jl")
-    export mdslepian, mdmwps
+    export mdslepian, mdmultispec
 
   include("Demodulation.jl")
     export demodulate

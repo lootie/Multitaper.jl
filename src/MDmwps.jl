@@ -1,24 +1,57 @@
-
 # MT routines by Chave, adapted for Julia from Matlab by C Haley in 2020 Original
-# Chave license text appended at the end of this doc.  Credit is due to the original
-# author: 
+# Credit is due to 
 #
 # Chave, Alan D. "A multitaper spectral estimator for time-series with missing data."
 # Geophysical Journal International 218.3 (2019): 2165-2178.
 #
-# NB: (i) This code removes the sample mean from the data by default, and
-# additionally scales the spectrum by dt, when provided.  (ii) Chave used a
-# zero-finding routine to compute adaptive weights while here we use the iterative
-# method from Thomson, 82. 
+# Coherence routine is original
 #
 
-using Statistics, FFTW, Arpack, LinearAlgebra, Distributions
+using Statistics, Arpack, LinearAlgebra, Distributions, NFFT
+
+"""
+Find all of the necessary lengths
+"""
+function _pregap(tt, xx, nz)
+  n    = length(tt)
+  nfft = length(xx)
+  if mod(nfft,2) != 0 
+    nfft = nfft + 1
+  end
+  nfft  = Int64(round((nz + 1)*nfft))
+  nfft2 = Int64(round(nfft/2)) + 1
+  return n, nfft, nfft2 
+end
+
+""" Computes multitaper adaptive weighting """
+function multispec_aweight(eigcoefs, egval, cvar, maxit = 15, tol = 0.05)
+  halffreq,k   = size(eigcoefs)
+  dsq = (egval == nothing) ? nothing : zeros(size(eigcoefs))
+  if egval != nothing
+    (old, new) = vcat(ones(2).*0.5, zeros(k-2)), zeros(k)     
+      Threads.@threads for j in 1:halffreq
+      @inbounds dsq[j,:] = aweighted(old, new, k, abs2.(view(eigcoefs,j,:)), 
+                                   egval, cvar, maxit, tol)
+    end
+  end
+  return dsq
+end
+
+""" Computes multitaper eigencoefs """
+function multispec_coef(tt, x, u, n, nfft, nfft2)
+  x     .-= mean(x)
+  (length(x) != length(tt)) && error("The vector of data and the vector of times must have the same lengths.")
+  # plan the fft, compute eigencoefficients 
+  cent = (vcat(tt, tt[end] .+ collect(1:(nfft-n))) .- nfft/2)/nfft
+  p = NFFTPlan(cent, nfft)
+  return mapreduce(slep -> nfft_adjoint(p, vcat(slep.*x, zeros(nfft-n)) .+ 0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
+end
 
 """ Multi-taper power spectrum estimation with f-test and reshaping
 for time series with missing data
 t arguments 
    tt -- real vector of time (required)
-   x -- real vector of data (required)
+   x -- real vector of data or matrix (required)
    bw -- bandwidth of estimate, kwarg 5/length(t) default
    k -- number of slepian tapers, must be <=2*bw*length(x), kwarg 2*bw*length(x)-1 
         default
@@ -32,74 +65,48 @@ t arguments
    dof -- whether to return the degrees of freedom for the adaptively weighted 
           spectrum estimate
 output arguments 
-   output MtSpec struct containing the spectrum and other results.
+   output MtSpec struct containing the spectrum and other results (coherences if x is a matrix).
    nu -- the optional degrees-of-freedom for the adaptively weighted spectrum 
         estimate
 """
-function mdmwps(tt, x; bw=5/length(tt), k=Int64(2*bw*size(x,1)-1), 
+function mdmultispec(tt::Vector{Float64}, x::Vector{Float64}; 
+                bw=5/length(tt), k=Int64(2*bw*size(x,1)-1), 
                 dt=tt[2]-tt[1], nz=0, Ftest=true, alpha=1.0, jk=true,
                 Tsq=nothing, dof=false)
-  x     .-= mean(x)
-  n     = length(tt)
-  nfft  = length(x)
-  (n != nfft) && error("Time vector and data vector must have the same lengths.")
-  # Assuming that equal sampling occurs between the first two observations
-  if mod(nfft,2) != 0 
-    nfft = nfft + 1
-  end
-  nfft  = Int64(round((nz + 1)*nfft))
-  nfft2 = Int64(round(nfft/2)) + 1
-  s2    = var(x)
-  e     = Array{Matrix{ComplexF64},1}(undef, nfft2)
-  sxx   = zeros(nfft2)
-  d     = zeros(nfft2,k)
-  ak    = 0.0im*zeros(nfft2,k)
   lambda,u = mdslepian(bw, k, tt)
-  for i = 1:nfft2
-      f      = (i - 1)/nfft
-      e[i]   = transpose(u.*repeat(exp.(0.0 .- 2.0*pi*im*f*tt),outer=(1,k)))       
-      # eigencoefficients
-      ak[i,:] = e[i]*x
-      # eigenspectra at frequency index i
-      sk     = abs.(ak[i,:]).^2
-      # Adaptive weighting 
-      (old, new) = vcat(ones(2).*0.5, zeros(k-2)), zeros(k) 
-      d[i,:] = aweighted(old, new, k, sk, lambda, s2, 15, 0.05)
-      sxx[i] = _dot(d[i,:],sk)
+  s2    = var(x)
+  n, nfft, nfft2 = _pregap(tt, x, nz)
+  ak = multispec_coef(tt, x, u, n, nfft, nfft2)
+  sxx   = zeros(size(ak,1))
+  d = multispec_aweight(ak, lambda, s2)
+  Threads.@threads for j in 1:nfft2
+        sxx[j] = _dot(d[j,:],abs2.(view(ak,j,:)))
   end
-  sxx[2:nfft2-1] .*= 2
+  sxx[2:(nfft2-1)] .*= 2
   d = sxx*sqrt.(lambda')./(sxx*lambda' .+ s2*(1.0 .- lambda'))
   nu1      = 2*d.^2*lambda
   coefswts = Ecoef(ak,d.^2)
   jv       = jk ? jknife(coefswts,nothing,:spec)[2] : nothing
   # F-test
   if Ftest
-    dpsw0 = real.(sum(e[1],dims=2))
+    dpsw0 = sum(u,dims=1)'
     dpsw02= sum(dpsw0.^2)
     mu    = ak*dpsw0/dpsw02
     num   = (nu1 .- 2).*abs2.(mu)*dpsw02
     denom = 2*sum(abs2.(ak - mu*dpsw0'), dims = 2)
     ft    = vec((num./denom))
-    Fpval = 1.0 .- cdf.(FDist.(2,2*nu1 .- 2), ft)
+    try 
+        Fpval = 1.0 .- cdf.(FDist.(2,2*nu1 .- 2), ft)
+    catch
+        Fpval = nothing
+        println("Degrees of freedom get too small to assess F-test p-value.")
+    end
   else
     Fpval = nothing
   end
-  # T^2 test
-  if typeof(Tsq) != Nothing
-    Tsq      = (typeof(Tsq) <: Vector{Number}) ? [Tsq] : Tsq
-    map!(x -> freq_to_int(Tsq[x], n, dt), Tsq, eachindex(Tsq))
-    Tsq = Vector{Vector{Int64}}(Tsq)  
-    if (2*k < (true ? 1 : 2)*maximum(length.(Tsq)))
-      error("There are too few tapers for the number of Tsq tests.")
-    end
-    dcs = vec(map(isodd,1:K).*sum(u,dims=1))
-    Tv = map(x->testTsq(dcs,Ecoef(coefswts.coef[Tsq[x],:],nothing)),
-              eachindex(Tsq)) 
-  else
-    Tv = nothing
-  end
+  Tv = nothing
   # Package up the outputs
-  pkg = MtSpec((1/dt)*range(0,1,length=nfft)[1:nfft2], dt*sxx, nothing, 
+  pkg = MtSpec((1/dt)*range(0,1,length=nfft)[1:length(sxx)], dt*sxx, nothing, 
               MtParams(bw*n, k, n, tt[2]-tt[1], 2*(nfft2-1), 1, nothing),
               coefswts, Fpval, jv, Tv)
   if dof 
@@ -108,6 +115,95 @@ function mdmwps(tt, x; bw=5/length(tt), k=Int64(2*bw*size(x,1)-1),
       return pkg
   end
 end
+
+""" 
+Multitaper coherence estimation with nfft
+"""
+function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}}, 
+                x::Vector{Float64},
+                y::Vector{Float64};
+                bw::Float64 = 5/length(t),
+                k::Int64    = Int64(2*bw*size(x,1) - 1),
+                dt::Float64 = 1.0,
+                nz::Union{Int64,Float64}   = 0, 
+                alpha::Float64 = 1.0, Ftest::Bool = false,
+                lambdau::Union{Tuple{Array{Float64,1},
+                               Array{Float64,2}},Nothing} = nothing,
+                Tsq::Union{Vector{Float64},Vector{Vector{Float64}},
+                     Vector{Int64},Vector{Vector{Int64}},Nothing}=nothing)
+  (length(x) != length(y)) && error("The two series must have the same lengths.")
+  n, nfft, nfft2 = _pregap(t, x, nz)
+  lambda,u = (lambdau == nothing) ? mdslepian(bw, k, t) : lambdau
+    
+  x .-= mean(x)
+  y .-= mean(y)
+  sx2    = var(x)
+  sy2    = var(y)
+  sxy   = zeros(nfft2)
+    
+  cent = (vcat(t, t[end] .+ collect(1:(nfft-n))) .- nfft/2)/nfft
+  p   = NFFTPlan(cent, nfft)
+  axk = mapreduce(slep -> nfft_adjoint(p, vcat(slep.*x, zeros(nfft-n)) .+ 0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
+  ayk = mapreduce(slep -> nfft_adjoint(p, vcat(slep.*y, zeros(nfft-n)) .+ 0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
+  outputcoefs = [Ecoef(axk,nothing),Ecoef(ayk,nothing)]
+    
+  # Jacknife 
+  sxy, svar = jknife(outputcoefs..., :coh)
+  ph_xy, phvar = jknife_phase(outputcoefs...)
+  Tv = nothing
+
+  return MtCoh((1/dt)*range(0,1,length=nfft)[1:nfft2], sxy, ph_xy, 
+                MtParams(bw*n, k, n, dt, 2*(nfft2-1), 1, nothing),
+                outputcoefs, [svar, phvar], Tv)
+end
+
+""" 
+Multivariate version of the multispec call, data are in the columns of a matrix
+"""
+function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}}, 
+                xx::Matrix{Float64};
+                bw::Float64 = 5/length(t),
+                k::Int64    = Int64(2*bw*size(xx,1) - 1),
+                lambdau::Union{Tuple{Array{Float64,1},
+                               Array{Float64,2}},Nothing} = nothing,
+                dt::Float64 = 1.0,
+                nz::Union{Int64,Float64}   = 0, 
+                alpha::Float64 = 1.0,
+                jk::Bool = false, Ftest::Bool = false,
+                Tsq::Union{Vector{Float64},Vector{Vector{Float64}},
+                     Vector{Int64},Vector{Vector{Int64}},Nothing}=nothing) 
+
+  n, p = size(xx)
+  n, nfft, nfft2 = _pregap(t, xx[:,1], nz)
+  fgrid = range(0,1,length=nfft)[1:nfft2]
+  if p > 3
+    println("You are computing $(Int64((p)*(p+1)/2 - p)) cross-spectra/coherences.")
+  end
+
+  # Compute the array of dpss vectors if they aren't given.
+  lambdau = (lambdau == nothing) ? mdslepian(bw, k, t) : lambdau
+  
+  # Get the spectra
+  specs     = mapslices(x -> mdmultispec(t, x, bw = bw, k = k, dt = dt, nz = nz, 
+                        alpha = alpha, Ftest = false,
+                        lambdau = lambdau, 
+                        jk=jk, Tsq=Tsq), xx, dims=1)[:]
+ 
+  # Get the coherences
+  coherences = Array{MtCoh,2}(undef, p, p)
+  for x in CartesianIndex.(filter(x -> x[2]>x[1], 
+                Tuple.(eachindex(view(coherences,1:p,1:p)))))
+      # Jacknife 
+      sxy, svar = jknife(specs[x[1]].coef, specs[x[2]].coef,:coh)
+      ph_xy, phvar = jknife_phase(specs[x[1]].coef, specs[x[2]].coef)
+      coherences[x] = MtCoh((1/dt)*fgrid, sxy, ph_xy, 
+                MtParams(bw*n, k, n, dt, 2*(nfft2-1), 1, nothing),
+                nothing, [svar, phvar], nothing)
+  end
+  Tv = nothing
+  return (specs, coherences, Tv)
+end
+
 
 """ Helper function mdslepian computes generalized slepian function for 1D missing data problem
   input variables
@@ -141,31 +237,3 @@ function mdslepian(w, k, t)
   end
   return (lambda, u)
 end
-
-#= 
-Copyright (c) 2019, Alan Chave
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution
-* Neither the name of Woods Hole Oceanographic Institution nor the names of its
-  contributors may be used to endorse or promote products derived from this
-  software without specific prior written permission.
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-=#
