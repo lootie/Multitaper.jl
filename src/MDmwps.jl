@@ -188,7 +188,7 @@ Multitaper coherence estimation for multiple time series with the same missing d
  - `k::Int64 = 2*bw*length(x)-1`: number of slepian tapers, must be <=2*bw*length(x) 
  - `dt::T = tt[2]-tt[1]`: sampling rate in time units 
  - `nz::Float64 = 0.0`: zero padding factor
- - `Ftest::Bool = true`: Compute the F-test p-value
+ - `Ftest::Bool = false`: Compute the F-test p-value
  - `jk::Bool = true`: Compute jackknifed confidence intervals
  - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`: Slepians, if precomputed
 ...
@@ -217,7 +217,7 @@ function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}},
   
   # Get the spectra
   specs     = mapslices(x -> mdmultispec(t, x, bw = bw, k = k, dt = dt, nz = nz, 
-                        Ftest = false,
+                        Ftest = Ftest,
                         lambdau = lambdau, 
                         jk=jk), xx, dims=1)[:]
  
@@ -226,8 +226,8 @@ function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}},
   for x in CartesianIndex.(filter(x -> x[2]>x[1], 
                 Tuple.(eachindex(view(coherences,1:p,1:p)))))
       # Jacknife 
-      sxy, svar = jknife(specs[x[1]].coef, specs[x[2]].coef,:coh)
-      ph_xy, phvar = jknife_phase(specs[x[1]].coef, specs[x[2]].coef)
+      sxy, svar = jknife(specs[x[2]].coef, specs[x[1]].coef,:coh)
+      ph_xy, phvar = jknife_phase(specs[x[2]].coef, specs[x[1]].coef)
       coherences[x] = MtCoh((1/dt)*fgrid, sxy, ph_xy, 
                 MtParams(bw*n, k, n, dt, 2*(nfft2-1), 1, nothing),
                 nothing, [svar, phvar], nothing)
@@ -274,7 +274,7 @@ function mdslepian(w, k, t)
 end
 
 """
-    mdslepian(w, k, t, f; <keyword arguments>)
+    gpss(w, k, t, f; <keyword arguments>)
 
 Generalized prolate spheroidal sequences on an unequal grid
 
