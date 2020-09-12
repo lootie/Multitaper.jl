@@ -47,34 +47,38 @@ function multispec_coef(tt, x, u, n, nfft, nfft2)
   return mapreduce(slep -> nfft_adjoint(p, vcat(slep.*x, zeros(nfft-n)) .+ 0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
 end
 
-""" Multi-taper power spectrum estimation with f-test and reshaping
-for time series with missing data
-t arguments 
-   tt -- real vector of time (required)
-   x -- real vector of data or matrix (required)
-   bw -- bandwidth of estimate, kwarg 5/length(t) default
-   k -- number of slepian tapers, must be <=2*bw*length(x), kwarg 2*bw*length(x)-1 
-        default
-   dt -- sampling frequency in time units (kwarg, default tt[2]-tt[1])
-   nz -- zero padding factor, kwarg 0 default
-   Ftest -- whether to compute the F-test (kwarg, default true)
-   alpha -- probability level for reshaping, 1 if none, 1 default
-   jk -- whether to compute jackknifed confidence intervals (kwarg, default true)
-   Tsq -- lines at which to compute a T^2 test for multiple line components, 
-          returns a list of p-values. 
-   dof -- whether to return the degrees of freedom for the adaptively weighted 
+"""
+    mdmultispec(tt, x; <keyword arguments>)
+
+Multitaper power spectrum estimation for time series with missing data (gaps)
+
+...
+# Arguments
+ - `tt::Vector{T} where T<:Float64`: the vector containing the time indices
+ - `x::Vector{T}`: data vector or matrix
+ - `bw::Float64 = 5/length(tt)`: bandwidth of estimate
+ - `k::Int64 = 2*bw*length(x)-1`: number of slepian tapers, must be <=2*bw*length(x) 
+ - `dt::T = tt[2]-tt[1]`: sampling rate in time units 
+ - `nz::Float64 = 0.0`: zero padding factor
+ - `Ftest::Bool = true`: Compute the F-test p-value
+ - `jk::Bool = true`: Compute jackknifed confidence intervals
+ - `dof::Bool = false`: Compute degrees of freedom for the adaptively weighted 
           spectrum estimate
-output arguments 
-   output MtSpec struct containing the spectrum and other results (coherences if x is a matrix).
-   nu -- the optional degrees-of-freedom for the adaptively weighted spectrum 
-        estimate
+...
+
+# Examples
+```julia-repl
+julia> mdmultispec(vcat(collect(1:30),collect(40:50)), randn(40))
+```
+
+See also: [`multispec`](@ref), [`mdslepian`](@ref)
 """
 function mdmultispec(tt::Union{Vector{Int64},Vector{Float64}}, x::Vector{Float64}; 
                 bw=5/length(tt), k=Int64(2*bw*size(x,1)-1), 
                 lambdau::Union{Tuple{Array{Float64,1},
                                Array{Float64,2}},Nothing} = nothing,
-                dt=tt[2]-tt[1], nz=0, Ftest=true, alpha=1.0, jk=true,
-                Tsq=nothing, dof=false)
+                dt=tt[2]-tt[1], nz=0, Ftest=true, jk=true,
+                dof=false)
   lambda,u = (lambdau == nothing) ? mdslepian(bw, k, tt) : lambdau
   s2    = var(x)
   n, nfft, nfft2 = _pregap(tt, x, nz)
