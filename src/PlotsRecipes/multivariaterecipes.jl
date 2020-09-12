@@ -10,7 +10,7 @@
   K = C.params.K
   dt = (1/(2*C.f[end]))
   z = norminvcdf(0,1,0.975)
-  xlabel --> "Frequency"
+  xguide --> "Frequency"
   if jk
     @series begin
       subplot := 1
@@ -22,14 +22,14 @@
       vcat(C.f,C.f[end:-1:1]), vcat(C.coh .+ z*sqrt.(C.jkvar[1]), (C.coh .- z*sqrt.(C.jkvar[1]))[end:-1:1])
     end
     @series begin
-      ylabel --> "Transformed Squared Coherence"
+      yguide --> "Transformed Squared Coherence"
       subplot := 1
       primary --> false
       C.f, C.coh
     end
   else
     @series begin
-      ylabel --> "Squared Coherence"
+      yguide --> "Squared Coherence"
       subplot := 1
       label --> "MSC"
       C.f, tanhtrans.(C.coh, K)
@@ -53,7 +53,7 @@
         subplot := 2
         fill := 1
         fillalpha --> 0.25
-        ylabel --> "Phase (deg)" 
+        yguide --> "Phase (deg)" 
         linealpha --> 0.25
         label --> "Phase"
         vcat(C.f,C.f[end:-1:1]), vcat(C.phase .+ z*C.jkvar[2], (C.phase .- z*C.jkvar[2])[end:-1:1])
@@ -61,8 +61,8 @@
     end
     #
     @series begin
-      xlabel --> "Frequency"
-      ylabel --> "Phase (deg)"  
+      xguide --> "Frequency"
+      yguide --> "Phase (deg)"  
       primary --> false
       subplot := 2
       C.f, C.phase
@@ -76,12 +76,12 @@ end
   K = C.params.K
   dt = C.params.dt
   @series begin
-    ylabel --> "Transfer function"
+    yguide --> "Transfer function"
     subplot := 1
     yscale := :log10
     label --> "MSC"
     xlab = phase ? " " : "Frequency"
-    xlabel --> xlab
+    xguide --> xlab
     C.f, C.transf
   end
   #
@@ -89,8 +89,8 @@ end
     layout := (2,1)
     #
     @series begin
-      xlabel --> "Frequency"
-      ylabel --> "Phase (deg)"  
+      xguide --> "Frequency"
+      yguide --> "Phase (deg)"  
       primary --> false
       subplot := 2
       C.f, C.phase
@@ -118,7 +118,7 @@ end
         end
         # 
         @series begin
-          ylabel --> "Transformed Squared Coherence"
+          yguide --> "Transformed Squared Coherence"
           subplot := 1
           #  seriescolor --> colour
           label := "Sq. Coherence"
@@ -126,7 +126,7 @@ end
         end
         @series begin 
           subplot := 1
-          color := :red
+          seriescolor := :red
           label --> 100*sigs'
           [C[j].f[1], C[j].f[end]], ones(2,1)*labs'
         end
@@ -136,14 +136,14 @@ end
     for j in CartesianIndices(C)
       if (j[1] < j[2])*(j[1] != j[2])
         @series begin
-          ylabel --> "Squared Coherence"
+          yguide --> "Squared Coherence"
           subplot := 1
           label --> "Sq. Coherence"
           C[j].f, tanhtrans.(C[j].coh, C[j].params.K)
         end    
         @series begin 
           subplot := 1
-          color := :red
+          seriescolor := :red
           label --> 100*sigs'
           [C[j].f[1], C[j].f[end]], ones(2,1)*labs'
         end
@@ -158,7 +158,7 @@ end
         if (j[1] < j[2])*(j[1] != j[2])
           @series begin
             label --> "Phase (deg) & 95% CI"
-            xlabel --> "Frequency"
+            xguide --> "Frequency"
             subplot := 2
             fill := 1
             fillalpha --> 0.25
@@ -172,9 +172,9 @@ end
     for j in CartesianIndices(C)
       if (j[1]<j[2])*(j[1] != j[2])
         @series begin
-          ylabel --> "Phase (deg)"
+          yguide --> "Phase (deg)"
           label --> "Phase"
-          xlabel --> "Frequency"
+          xguide --> "Frequency"
           #  seriescolor --> colour
           subplot := 2
           C[j].f, C[j].phase
@@ -199,7 +199,7 @@ end
     if j[2] > j[1]
       # Phase case - subdiagonal
       @series begin
-        c --> :blue
+        seriescolor --> 1
         label --> "Phase ($(j[1]),$(j[2]))"
         subplot := ser
         ser += 1
@@ -209,7 +209,7 @@ end
       # Spectrum case - diagonal
       @series begin
         yscale --> :log10
-        c --> :red
+        seriescolor --> 2
         label --> "Spectrum $(j[1])"
         subplot := ser
         ser += 1
@@ -218,14 +218,14 @@ end
     else
       # MSC case - superdiagonal
       @series begin
-        c --> :black
+        seriescolor --> :black
         ylims --> [0,1.0]
         label --> "MSC ($(j[1]),$(j[2]))"
         subplot := ser
         Spec[2][j[2],j[1]].f, tanhtrans.(Spec[2][j[2],j[1]].coh,Spec[2][j[2],j[1]].params.K)
       end
       @series begin 
-        color := :red
+        seriescolor := 2
         label --> 100*sigs'
         subplot := ser
         ser += 1
@@ -241,8 +241,8 @@ end
 @recipe function ccvfplot(A::MtCcvf)
   label --> "MT Cross-Covariance"
   title --> "Cross-Covariance Function"
-  ylabel --> "Cross Covariance"
-  xlabel --> "Lag"
+  yguide --> "Cross Covariance"
+  xguide --> "Lag"
   l := :stem
   @series begin
     A.lags, A.ccvf
@@ -253,8 +253,8 @@ end
 @recipe function ccfplot(A::MtCcf)
   label --> "MT Cross-Correlation"
   title --> "Cross-Correlation Function"
-  ylabel --> "Cross Correlation"
-  xlabel --> "Lag"
+  yguide --> "Cross Correlation"
+  xguide --> "Lag"
   l := :stem
   @series begin
     A.lags, A.ccf

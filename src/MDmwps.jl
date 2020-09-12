@@ -69,11 +69,13 @@ output arguments
    nu -- the optional degrees-of-freedom for the adaptively weighted spectrum 
         estimate
 """
-function mdmultispec(tt::Vector{Float64}, x::Vector{Float64}; 
+function mdmultispec(tt::Union{Vector{Int64},Vector{Float64}}, x::Vector{Float64}; 
                 bw=5/length(tt), k=Int64(2*bw*size(x,1)-1), 
+                lambdau::Union{Tuple{Array{Float64,1},
+                               Array{Float64,2}},Nothing} = nothing,
                 dt=tt[2]-tt[1], nz=0, Ftest=true, alpha=1.0, jk=true,
                 Tsq=nothing, dof=false)
-  lambda,u = mdslepian(bw, k, tt)
+  lambda,u = (lambdau == nothing) ? mdslepian(bw, k, t) : lambdau
   s2    = var(x)
   n, nfft, nfft2 = _pregap(tt, x, nz)
   ak = multispec_coef(tt, x, u, n, nfft, nfft2)
@@ -124,7 +126,7 @@ function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}},
                 y::Vector{Float64};
                 bw::Float64 = 5/length(t),
                 k::Int64    = Int64(2*bw*size(x,1) - 1),
-                dt::Float64 = 1.0,
+                dt::Float64 = 1.0, jk::Bool = true,
                 nz::Union{Int64,Float64}   = 0, 
                 alpha::Float64 = 1.0, Ftest::Bool = false,
                 lambdau::Union{Tuple{Array{Float64,1},
@@ -186,8 +188,9 @@ function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}},
   # Get the spectra
   specs     = mapslices(x -> mdmultispec(t, x, bw = bw, k = k, dt = dt, nz = nz, 
                         alpha = alpha, Ftest = false,
-                        lambdau = lambdau, 
-                        jk=jk, Tsq=Tsq), xx, dims=1)[:]
+                        # lambdau = lambdau, 
+                        # jk=jk, 
+                        Tsq=Tsq), xx, dims=1)[:]
  
   # Get the coherences
   coherences = Array{MtCoh,2}(undef, p, p)

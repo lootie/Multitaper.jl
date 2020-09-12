@@ -14,10 +14,10 @@
   K    = S.params.K
   N    = S.params.N
   xlab = (S.phase == nothing) ? "Frequency" : " "
-  xlabel --> xlab
+  xguide --> xlab
   ylab = (S.phase == nothing) ? "Spectrum" : "Cross-Spectrum"
   if (S.params.nsegments > 1); ylab *= "Welch "; end
-  ylabel --> ylab
+  yguide --> ylab
   @series begin
     S.f[2:end], S.S[2:end]
   end 
@@ -52,8 +52,8 @@ end
 @recipe function acfplt(A::MtAcf)
   label --> "MT acf"
   title --> "Autocorrelation Function"
-  ylabel --> "Autocorrelation"
-  xlabel --> "Lag"
+  yguide --> "Autocorrelation"
+  xguide --> "Lag"
   xlims --> [0.0, A.lags[end]]
   l --> :stem
   @series begin
@@ -65,8 +65,8 @@ end
 @recipe function acvfplt(A::MtAcvf)
   label --> "MT acvf"
   title --> "Autocovariance Function"
-  ylabel --> "Autocovariance"
-  xlabel --> "Lag"
+  yguide --> "Autocovariance"
+  xguide --> "Lag"
   xlims --> [0.0, A.lags[end]]
   l --> :stem
   @series begin
@@ -78,8 +78,8 @@ end
 @recipe function cepsplt(A::MtCeps)
   label --> "MT Cepstrum"
   title --> "Cepstrum"
-  ylabel --> "Cepstrum coefficient"
-  xlabel --> "Lag"
+  yguide --> "Cepstrum coefficient"
+  xguide --> "Lag"
   xlims --> [0.0, A.lags[end]]
   l --> :stem
   @series begin
@@ -92,15 +92,15 @@ end
   layout --> (2,1)
   @series begin
     subplot := 1
-    ylabel --> "Magnitude"
+    yguide --> "Magnitude"
     label --> "Magnitude"
     cdm.time, cdm.mag
   end
   @series begin
     subplot := 2
-    ylabel --> "Phase"
+    yguide --> "Phase"
     label --> "Phase"
-    xlabel --> "Time"
+    xguide --> "Time"
     cdm.time, cdm.phase
   end
 end
