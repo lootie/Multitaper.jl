@@ -2,12 +2,12 @@
 # Example data for computing spectra with gaps
 
 fn  = "../Examples/data/temp.txt"
-dat = readdlm(fn,',')
+dat = readdlm(fn,'\t')
 
 # Spectrum tests
 println("Spectrum with gaps:")
 tt = dat[:,1]
-xx = dat[:,2]
+xx = dat[:,2:3]
 
 bw = 5/length(tt);
 k = Int64(round(2*bw*length(tt))) - 1;
@@ -16,7 +16,8 @@ nz = 0;
 alpha = 0.95;
 
 lams,ei = Multitaper.mdslepian(bw,k,tt)
-out = mdmwps(tt,xx,jk=true,Tsq=nothing,dof=true,alpha=0.95)
+out1 = mdmultispec(tt,xx[:,1],jk=true,dof=true)
+out = mdmultispec(tt,xx)
 
 @testset "Slepians with gaps, spectrum analysis with gaps." begin
  
@@ -26,18 +27,22 @@ out = mdmwps(tt,xx,jk=true,Tsq=nothing,dof=true,alpha=0.95)
               0.9185956480485494, 0.8611080144951507]
 
   println("Testing spectrum with gaps")
-  @test out[1].S[end-5:end] ≈ [ 0.1358023997817664, 0.12939199720491235, 0.13953326445088568, 
-              0.16563989397260973, 0.18402382557990213, 0.08885119971059109]
+  @test out[1][1].S[end-5:end] ≈ [0.14565610885883232, 0.13580424778417852,
+  0.1293182864247158, 0.1395702616312291, 0.1664040092175493, 0.09202992618124456]
 
   println("Testing dof")
-  @test out[2][end-5:end] ≈ [17.40825230897549, 17.382337634406642, 17.422357651541745, 
-              17.50493555937301, 17.550216141919826, 17.145772544877815]
+  @test out1[2][end-5:end] ≈ [17.444104148892166, 17.408259466237617,
+  17.382026447855413, 17.422494161582264, 17.506998428080035, 17.170675010806065]
 
   println("Testing F-test with gaps")
-  @test out[1].Fpval[end-5:end] ≈ [ 0.09822119696194964, 0.03416880618582274, 
-              0.49332546035901725, 0.9312765181262197, 0.7249977043925413, 0.8515331773112675]
+  @test out1[1].Fpval[end-5:end] ≈ [0.16807947246930965, 0.09822111646921738,
+  0.0341711343274661, 0.4933223598055142, 0.9312676978366197, 0.7307073177440282]
 
   println("Testing the number of lines found")
-  @test findall(out[1].Fpval .<0.05)[1:10] == [15, 25, 44, 49, 50, 67, 84, 93, 112, 125]
+  @test findall(out1[1].Fpval .<0.05)[1:10] == [16, 26, 45, 50, 51, 68, 85, 94, 113, 126] 
+
+  println("Testing coherence with gaps")
+  @test out[2][1,2].coh[end-5:end] ≈ [0.21020101113566358, 0.43985588013870025,
+  0.39732804488526385, 0.10864516699443383, 0.12246458417213957, 0.08184136299900113]
 
 end
