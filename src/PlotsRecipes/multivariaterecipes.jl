@@ -41,7 +41,7 @@
   #
   @series begin 
     subplot := 1
-    color := :red
+    seriescolor := :red
     label --> 100*sigs'
     [C.f[1], C.f[end]], ones(2,1)*labs'
   end

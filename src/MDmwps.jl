@@ -75,7 +75,7 @@ function mdmultispec(tt::Union{Vector{Int64},Vector{Float64}}, x::Vector{Float64
                                Array{Float64,2}},Nothing} = nothing,
                 dt=tt[2]-tt[1], nz=0, Ftest=true, alpha=1.0, jk=true,
                 Tsq=nothing, dof=false)
-  lambda,u = (lambdau == nothing) ? mdslepian(bw, k, t) : lambdau
+  lambda,u = (lambdau == nothing) ? mdslepian(bw, k, tt) : lambdau
   s2    = var(x)
   n, nfft, nfft2 = _pregap(tt, x, nz)
   ak = multispec_coef(tt, x, u, n, nfft, nfft2)
@@ -188,8 +188,8 @@ function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}},
   # Get the spectra
   specs     = mapslices(x -> mdmultispec(t, x, bw = bw, k = k, dt = dt, nz = nz, 
                         alpha = alpha, Ftest = false,
-                        # lambdau = lambdau, 
-                        # jk=jk, 
+                        lambdau = lambdau, 
+                        jk=jk, 
                         Tsq=Tsq), xx, dims=1)[:]
  
   # Get the coherences
