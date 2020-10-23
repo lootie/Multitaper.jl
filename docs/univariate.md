@@ -1,13 +1,34 @@
 
 ## Univariate time series functionality for Multitaper.jl
 
+The univariate functionality of this package computes multitaper estimates of the
+power spectrum, autocorrelation, cepstrum, and complex demodulation of a time series.
+One can also estimate the power spectrum when there is missing data.  
+
+An estimate of the power spectral density contains information about the sample
+variance of the time series, decomposed in terms of frequency. When the multitaper
+method is used, multiple tapering functions ensure that the statistical bias-variance
+tradeoff is optimized.  Discrete prolate spheroidal sequences, which are used as
+tapering functions, are finite-length sequences whose Fourier transforms contain most
+of their power on a narrow bandwidth. This property makes them optimal for reducing
+spectral leakage. The orthogonality of the tapering functions also means that one
+can compute empirical confidence intervals for the spectrum estimate by jackknifing,
+and estimate the significance of discrete sinusoids using an F-test.  Finally, one
+can compute the quantities above when time series are sampled on a regular grid for
+which there are missing data points. 
+
+Cepstrum analysis is widely used in speech processing applications and for
+deconvolution. Complex demodulation of a time series allows for examination of the
+amplitude and phase of a sinusoid at a frequency of interest to the time series being
+studied. 
+
 ## Quick Synopsis of Capabilities
 
 Univariate
 
 * Discrete Prolate Spheroidal sequences
 
-* Multitaper spectra that use either dpss (multispec) tapers
+* Multitaper spectra that use dpss (multispec) tapers
 
 * Jackknifing
 

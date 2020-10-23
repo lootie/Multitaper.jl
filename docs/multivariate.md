@@ -1,6 +1,15 @@
 
 ## Multivariate time series analysis in Multitaper.jl
 
+The multivariate capabilities of this package include cross-spectrum and coherence
+analysis, which contain information about the covariance properties (respectively,
+correlations) between two time series. As in the univariate case, multiple tapers are
+used to de-bias the estimates, and this results in individual estimates that can be
+used to get a jackknifed confidence interval for either quantity of interest.
+Trivially, one can obtain multitaper estimates for the cross-covariance and
+cross-correlation functions by inverse Fourier transforming the multitaper
+cross-spectrum and coherence. 
+
 ## Quick Synopsis of Capabilities
 
 Multivariate

@@ -1,9 +1,14 @@
 
 # Multitaper.jl
 
-A software suite for computing [multitaper spectral density
-estimators](https://en.wikipedia.org/wiki/Multitaper) and other related
-quantities leveraging Slepian functions in one and several dimensions.
+When doing exploratory analysis of time series, frequency domain methods, that is,
+statistical methods that display information about the temporal correlations of one
+or more time series in terms of frequencies, can be used to infer physical mechanisms
+for underlying process dynamics in e.g. geophysical time series, medical time series,
+etc.). The [multitaper method](https://en.wikipedia.org/wiki/Multitaper), which
+leverages Slepian functions to estimate power spectral densities, coherences, and so
+forth, is implemented here for application to univariate, multivariate, and
+higher-dimensional (e.g. space-time) processes.
 
 ## Installation
 
