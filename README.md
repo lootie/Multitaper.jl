@@ -20,6 +20,8 @@ Pkg> add https://bitbucket.org/clhaley/Multitaper.jl.git
 
 ```
 
+This package runs on julia v 1.4.2 and above.
+
 ## Quick Start
 
 If you want a quick-and-dirty univariate spectrum estimate, simply issue
