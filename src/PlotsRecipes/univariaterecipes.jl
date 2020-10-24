@@ -5,8 +5,7 @@
 
 ##### Plots of multitaper spectra #####
 
-@recipe function plot(S::MtSpec; cross = true,
-                      phase = false) 
+@recipe function plot(S::MtSpec; cross = true) 
   #
   yscale --> :log10
   dt   = S.params.dt
