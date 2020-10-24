@@ -55,6 +55,9 @@ As of version 1.0, 06/2020
 
 ### Univariate
 
+You'll find documentation for the univariate functionality of this package 
+[here](https://bitbucket.org/clhaley/multitaper.jl/src/master/docs/univariate.md).
+
 * Discrete Prolate Spheroidal sequences (Slepian 1974) and with gaps (Chave 2019) 
 
 * Multitaper spectra that use dpss (multispec) tapers, where time series can have
@@ -71,6 +74,9 @@ As of version 1.0, 06/2020
 
 ### Multivariate
 
+You'll find documentation for the multivariate functionality of this package 
+[here](https://bitbucket.org/clhaley/multitaper.jl/src/master/docs/multivariate.md).
+
 * Magnitude squared coherence, implemented in the spirit of Thomson and Chave, 1991.
 
 * Jackknife estimates of phase, unwrapped, similar to R's implementation. 
@@ -85,7 +91,9 @@ As of version 1.0, 06/2020
 
 ## Plots Recipes
 
-Plots recipes are provided for several different ouputs. Refer to `./src/PlotsRecipes/`
+Plots recipes are provided for several different ouputs. 
+You'll find documentation for usage of the plots recipes  
+[here](https://bitbucket.org/clhaley/multitaper.jl/src/master/docs/plotsrecipes.md).
 
 ## Main References 
 
