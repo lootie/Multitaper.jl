@@ -4,7 +4,13 @@
 # Chave, Alan D. "A multitaper spectral estimator for time-series with missing data."
 # Geophysical Journal International 218.3 (2019): 2165-2178.
 #
-# Coherence routine is original
+# Note that this code uses an iterative adaptive weighting approach, while the
+# original used a zero-finding algorithm. Additionally, this code uses the NFFT
+# library, while the original was hand-coded. As such, this code is not a carbon-copy
+# of the code shared by Chave, however it was modeled after it. Find the original
+# license for the two spectrum routines at the bottom of this file. 
+#
+# The coherence routine is original work.
 #
 
 using Statistics, Arpack, LinearAlgebra, Distributions, NFFT
@@ -344,3 +350,39 @@ function gpss(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}},
   end
   return (lambda, u, R)
 end
+
+# Original copyright notice
+# Matlab code is to be found at
+# https://www.mathworks.com/matlabcentral/fileexchange/71909-mdmwps
+# as of 10/24/2020
+
+#=
+
+Copyright (c) 2019, Alan Chave
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution
+* Neither the name of Woods Hole Oceanographic Institution nor the names of its
+  contributors may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=#
+
