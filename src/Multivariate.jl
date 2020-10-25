@@ -162,7 +162,6 @@ Inputs a MtCoh or MtSpec struct.
 
 See also: [`multispec`](@ref)
 """
-"""  """
 function mt_ccvf(S; typ=:ccvf)   
   if typeof(S) == MtCoh
     lags = S.params.dt*S.params.N*range(-1.0, 1.0, length=length(S.coh))
@@ -259,7 +258,6 @@ Ouput of middle arg depends on the selection of `outp` input.
 
 See also: [`dpss_tapers`](@ref), [`MtSpec`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
 """
-""""""
 function multispec(S1::Matrix{T}; outp=:coh, NW=4.0, K=6, dt=1.0, ctr=true,
                    pad=1.0, dpVec=nothing, guts=false, a_weight=true, jk=false,
                    Ftest=false, Tsq=nothing, alph=0.05) where{T}
