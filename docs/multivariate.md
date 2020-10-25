@@ -157,6 +157,39 @@ A note on plotting: if you are using Plots.jl there recipes to directly plot the
 output of the above multivariate calculations, especially the tuples, in a gridded
 plot format. See the second jupyter notebook for more details. 
 
+# Missing-data coherences
+
+Extending the missing-data spectrum estimation of Chave from the univariate case to
+the bivariate case, one can compute coherences using the function with signature
+
+```
+function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}}, 
+                x::Vector{Float64},
+                y::Vector{Float64};
+                bw::Float64 = 5/length(t),
+                k::Int64    = Int64(2*bw*size(x,1) - 1),
+                dt::Float64 = 1.0, jk::Bool = true,
+                nz::Union{Int64,Float64}   = 0, 
+                Ftest::Bool = false,
+                lambdau::Union{Tuple{Array{Float64,1},
+                               Array{Float64,2}},Nothing} = nothing)
+```
+
+The inputs are the following:
+  * t -- real vector of time
+  * x -- first missing-data time series
+  * y -- second missing-data time series
+  * bw -- bandwidth of estimate, 5/length(t) default
+  * k -- number of slepian tapers, must be <=2 bw length(x), 2 bw length(x)-1 default
+  * dt -- sampling in time
+  * jk -- whether or not to compute jackknife variance estimates
+  * nz -- zero padding factor, 0 default
+  * Ftest -- whether or not to compute the F-test p-value at all frequencies
+  * lambdau -- missing data Slepian tapers and their concentrations, if precomputed
+
+The output is 
+  * sxx -- MtCoh coherence estimate 
+
 ## Time domain:
 
 # mt_ccvf

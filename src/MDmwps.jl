@@ -115,7 +115,7 @@ function mdmultispec(tt::Union{Vector{Int64},Vector{Float64}}, x::Vector{Float64
     catch
         Fpval = nothing
         println("Degrees of freedom get too small to assess F-test p-value.")
-    end
+    end 
   else
     Fpval = nothing
   end
@@ -315,6 +315,13 @@ Generalized prolate spheroidal sequences on an unequal grid
  - `t::Vector{Int64}`: vector containing the time indices
  - `f::Float64`: frequency at which the tapers are to be computed
  - `beta::Float64 = 0.5`: analysis half-bandwidth (similar to Nyquist rate)
+...
+
+...
+# Outputs
+ - `lambda::Vector{Float64}` the concentrations of the generalized prolate spheroidal sequences
+ - `u::Matrix{Float64}` the matrix containing the sequences themselves
+ - `R` the Cholesky factor for the generalized eigenvalue problem
 ...
 
 This function is currently not exported, use `Multitaper.gpss`.

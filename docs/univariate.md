@@ -225,34 +225,87 @@ in the Examples directory for usage.
 
 # Data with gaps
 
-Recently, Chave wrote a paper in GJI that shows how to compute dpss's on data with
-gaps and we have rewritten the code in julia so that it can be used here. The
+## Spectrum estimation for data with gaps
+
+Chave wrote a paper in GJI that shows how to compute dpss's on data with
+gaps and we have rewritten the code in Julia so that it can be used here. The
 function signature is 
 
-
 ```
-function mdmwps(tt::Union{Vector{Int64}, Vector{Float64}}, 
-                xx::Union{Vector{Float64}, Matrix{Float64}};
-                bw::Float64 = 5/length(tt),
-                k::Int64    = Int64(2*bw*size(xx,1) - 1),
-                nz::Int64   = 0, 
-                alpha::Float64 = 1.0)
+function mdmultispec(tt::Union{Vector{Int64},Vector{Float64}}, x::Vector{Float64}; 
+                bw=5/length(tt), k=Int64(2*bw*size(x,1)-1), 
+                lambdau::Union{Tuple{Array{Float64,1},
+                               Array{Float64,2}},Nothing} = nothing,
+                dt=tt[2]-tt[1], nz=0, Ftest=true, jk=true,
+                dof=false)
 ```
 
 The inputs are the following:
   * tt -- real vector of time (required)
-  * xx -- real vector of data (required)
+  * x -- real vector of data (required)
   * bw -- bandwidth of estimate, 5/length(t) default
   * k -- number of slepian tapers, must be <=2 bw length(x), 2 bw length(x)-1 default
+  * lambdau -- missing data Slepian tapers and their concentrations, if precomputed
+  * dt -- sampling in time
   * nz -- zero padding factor, 0 default
-  * alpha -- probability level for reshaping, 1 if none, 1 default
+  * Ftest -- whether or not to compute the F-test p-value at all frequencies
+  * jk -- whether or not to compute jackknife variance estimates
+  * dof -- whether or not to output the degrees of freedom of the estimate
 
 The outputs are simply a list of the following 
   * sxx -- MtSpec spectrum 
-One can also simply generate Slepian tapers using the mdslepian function.
+  * nu1 -- Degrees of freedom, if dof is set to true
 
-If you make use of this script, kindly cite the original work: Chave, Alan D. "A
-multitaper spectral estimator for time-series with missing data." Geophysical Journal
-International 218.3 (2019): 2165-2178.
+## Missing-data Slepian tapers
+
+One can also simply generate Slepian tapers using the mdslepian function. Its
+function signature is 
+
+```
+function mdslepian(w, k, t)
+``` 
+
+The inputs are the following:
+  * w -- the bandwidth of the taper
+  * k -- the number of Slepian tapers
+  * t -- the vector containing the time indicees
+
+The outputs are
+  * lambda -- the concentrations of the missing-data Slepians
+  * u -- length(t) times k matrix containing the missing-data Slepians
+
+## Generalized prolate spheroidal sequences
+
+Following the work of Bronez in 1988, one can compute optimally concentrated data
+tapers on a general, uneven, temporal grid. The function with the following signature
+computes these
+
+```
+function gpss(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}, 
+        f::Float64; beta::Float64 = 0.5)
+```
+
+The inputs are the following:
+  * w -- the bandwidth of the taper
+  * k -- the number of Slepian tapers
+  * t -- the vector containing the time indicees
+  * f -- the frequency of interest, between 0 and beta
+  * beta -- the unequal sampling equivalent to the Nyquist rate
+
+The outputs are
+  * lambda -- the concentrations of the missing-data Slepians
+  * u -- length(t) times k matrix containing the missing-data Slepians
+  * R -- Cholesky factor for the generalized eigenvalue problem
+
+Note that this function is unexported, so one needs to use `Multitaper.gpss(...)` to
+call it. This function is known to occasionally have numerical errors in computing
+the Cholesky factors of the genealized eigenvalue problem, so use at own risk. For
+the cases we tested, however, this function generally returns the expected result.
+
+
+If you make use of the functions in this "Data with gaps" section, kindly
+cite: Chave, Alan D. "A multitaper spectral estimator for
+time-series with missing data." Geophysical Journal International 218.3 (2019):
+2165-2178.
 
 
