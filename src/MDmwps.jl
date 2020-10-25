@@ -67,6 +67,13 @@ Multitaper power spectrum estimation for time series with missing data (gaps)
  - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`: Slepians, if precomputed
 ...
 
+...
+# Outputs
+ - `pkg::MtSpec` struct containing the spectrum
+ - `nu1::Vector{Float64}` optional vector containing the degrees of freedom, given
+ if the `dof` kwarg is set to `true`.
+...
+
 See also: [`multispec`](@ref), [`mdslepian`](@ref)
 """
 function mdmultispec(tt::Union{Vector{Int64},Vector{Float64}}, x::Vector{Float64}; 
@@ -137,6 +144,11 @@ Multitaper coherence estimation for time series with missing data (gaps)
  - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`: Slepians, if precomputed
 ...
 
+...
+# Outputs
+ - `pkg::MtCoh` struct containing the coherence
+...
+
 See also: [`multispec`](@ref), [`mdslepian`](@ref)
 """
 function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}}, 
@@ -191,6 +203,12 @@ Multitaper coherence estimation for multiple time series with the same missing d
  - `Ftest::Bool = false`: Compute the F-test p-value
  - `jk::Bool = true`: Compute jackknifed confidence intervals
  - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`: Slepians, if precomputed
+...
+
+...
+# Outputs
+ - `Tuple{Vector{MtSpec},Matrix{MtCoh},Nothing}` struct containing the spectra, 
+coherences, and T^2 test significances (currently set to return nothing)
 ...
 
 See also: [`multispec`](@ref), [`mdslepian`](@ref)
@@ -248,6 +266,12 @@ Generalized prolate spheroidal sequences for the 1D missing data problem
  - `t::Vector{Int64}`: vector containing the time indices
 ...
 
+...
+# Outputs
+ - `lambda,u::Tuple{Vector{Float64}, Vector{Float64}}`: tuple containing the 
+ concentrations and the tapers
+...
+
 See also: [`mdmultispec`](@ref), [`gpss`](@ref)
 """
 function mdslepian(w, k, t)
@@ -286,6 +310,8 @@ Generalized prolate spheroidal sequences on an unequal grid
  - `f::Float64`: frequency at which the tapers are to be computed
  - `beta::Float64 = 0.5`: analysis half-bandwidth (similar to Nyquist rate)
 ...
+
+This function is currently not exported, use `Multitaper.gpss`.
 
 See also: [`mdmultispec`](@ref), [`mdslepian`](@ref)
 """

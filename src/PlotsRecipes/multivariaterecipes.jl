@@ -70,34 +70,6 @@
   end
 end
 
-@recipe function plot(C::MtTransf; phase = false)
-  link := :xaxis 
-  NW = C.params.NW
-  K = C.params.K
-  dt = C.params.dt
-  @series begin
-    yguide --> "Transfer function"
-    subplot := 1
-    yscale := :log10
-    label --> "MSC"
-    xlab = phase ? " " : "Frequency"
-    xguide --> xlab
-    C.f, C.transf
-  end
-  #
-  if phase
-    layout := (2,1)
-    #
-    @series begin
-      xguide --> "Frequency"
-      yguide --> "Phase (deg)"  
-      primary --> false
-      subplot := 2
-      C.f, C.phase
-    end
-  end
-end
-
 @recipe function plot(C::Matrix{MtCoh}; phase = false, jk = false, sigMax = 0)
   link := :xaxis 
   z = norminvcdf(0,1,0.975)    

@@ -19,7 +19,35 @@ function testTsq(dcs,tap::Ecoef)
   end
 end
 
-""" Computes multitaper cross-spectrum or coherence with a handful of extra gadgets.
+"""
+    multispec(S1, S2; <keyword arguments>)
+
+Computes multitaper cross-spectrum or coherence when given two time series with same sampling.
+
+...
+# Arguments
+ - `S1::Union{Vector{T},Ecoef} where T<:Float64`: the vector containing the first time series
+ - `S2::Union{Vector{T},Ecoef} where T<:Float64`: the vector containing the second time series
+ - `outp::Symbol`: output can be either :coh for coherence, :spec for cross-spectrum, or :transf for transfer function
+ - `NW::Float64 = 4.0`: time-bandwidth product of estimate
+ - `K::Int64 = 6`: number of slepian tapers, must be <= 2*NW
+ - `offset::Union{Float64,Int64} = 0` set to nonzero value if offset coherence or cross-spectrum is desired. If Float64 is used, this will be converted to nearest FFT bin.
+ - `dt::Float64`: sampling rate in time units 
+ - `ctr::Bool`: whether or not to remove the mean before computing the multitaper spectrum
+ - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will be pad times length of the time series.
+ - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have been precomputed
+ - `guts::Bool = false`: whether or not to return the eigencoefficients in the output struct
+ - `jk::Bool = true`: Compute jackknifed confidence intervals
+ - `Tsq::Union{Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing`: which frequency indices to compute the T-squared test for multiple line components. Defaults to none.
+ - `alph::Float64 = 0.05`: significance cutoff for the Tsquared test
+...
+
+...
+# Outputs
+ - `MtSpec`, `MtCoh`, or `MtTransf` struct containing the spectrum, coherence or transfer function, depending on the selection of `outp` input. 
+...
+
+See also: [`dpss_tapers`](@ref), [`MtSpec`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
 """
 function multispec(S1::Union{Vector{T},Ecoef}, S2::Union{Vector{T},Ecoef}; 
                    outp=:coh, NW=4.0, K=6, offset=0, dt=1.0, ctr=true, pad=1.0,
@@ -115,9 +143,27 @@ function multispec(S1::Union{Vector{T},Ecoef}, S2::Union{Vector{T},Ecoef};
 
 end
 
-""" Computes univariate multitaper cross-covariance/cross-correlation function.
-Inputs a MtCoh or MtCeps struct. """
-function mt_ccvf(S::MtSpec; typ=:ccvf)   
+"""
+    mt_ccvf(S; <keyword arguments>)
+
+Computes univariate multitaper cross-covariance/cross-correlation function.
+Inputs a MtCoh or MtSpec struct.
+
+...
+# Arguments
+ - `S::Union{MtCoh,MtSpec}`: the vector containing the result of an multiivariate call to `multispec`
+ - `typ::Symbol = :ccvf`: whether to compute cross-correlation function (:ccf) or cross-covariance function (:ccvf)
+...
+
+...
+# Outputs
+ - `MtCcvf`, `MtCcf` depending on the selection of `typ` input above.
+...
+
+See also: [`multispec`](@ref)
+"""
+"""  """
+function mt_ccvf(S; typ=:ccvf)   
   if typeof(S) == MtCoh
     lags = S.params.dt*S.params.N*range(-1.0, 1.0, length=length(S.coh))
     if typ == :ccvf
@@ -139,8 +185,35 @@ function mt_ccvf(S::MtSpec; typ=:ccvf)
   end
 end
 
-""" Computes bivariate multitaper cross-covariance/cross-correlation function if you
-haven't already computed the MT cross-spectrum. """
+"""
+    mt_ccvf(S1, S2; <keyword arguments>)
+
+Computes bivariate multitaper cross-covariance/cross-correlation function from two time series
+
+...
+# Arguments
+ - `S1::Vector{T} where T<:Number`: the vector containing the first time series
+ - `S2::Vector{T} where T<:Number`: the vector containing the second time series
+ - `typ::Symbol`: whether to compute cross-covariance function (:ccvf), or cross-correlation function (:ccf)
+ - `NW::Float64 = 4.0`: time-bandwidth product of estimate
+ - `K::Int64 = 6`: number of slepian tapers, must be <= 2*NW
+ - `dt::Float64`: sampling rate in time units 
+ - `ctr::Bool`: whether or not to remove the mean before computing the multitaper spectrum
+ - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will be pad times length of the time series.
+ - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have been precomputed
+ - `guts::Bool = false`: whether or not to return the eigencoefficients in the output struct
+ - `jk::Bool = true`: Compute jackknifed confidence intervals
+ - `Tsq::Union{Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing`: which frequency indices to compute the T-squared test for multiple line components. Defaults to none.
+ - `alph::Float64 = 0.05`: significance cutoff for the Tsquared test
+...
+
+...
+# Outputs
+ - `MtCcvf` struct, depending on the selection of `typ` input above.
+...
+
+See also: [`multispec`](@ref)
+"""
 function mt_ccvf(S1::Vector{T}, S2::Vector{T}; typ=:ccvf, NW=4.0, K=6, dt=1.0,
                  ctr=true, pad=1.0, dpVec=nothing, guts=false, jk=false,
                  Tsq=nothing, alph=0.05) where{T}
@@ -152,12 +225,41 @@ function mt_ccvf(S1::Vector{T}, S2::Vector{T}; typ=:ccvf, NW=4.0, K=6, dt=1.0,
                 NW = NW, K = K, dt = dt, ctr = ctr, pad = pad, dpVec = dpVec, 
                 guts = false, 
                 jk = false, Tsq = nothing, alph = alph) 
-  #return MtCcvf(S, typ = typ)
-  return MtCcvf(S.f, S.S, MtParams(NW, K, length(S1), dt, pad, 1, nothing))
+  return mt_ccvf(S; typ = typ) 
 end
 
-""" Multivariate version of the multispec call, data are in the columns of a
-matrix"""
+"""
+    multispec(S1; <keyword arguments>)
+
+Multivariate version of the multispec call, data are in the columns of a matrix
+...
+# Arguments
+ - `S1::Matrix{T} where T<:Float64`: the vector containing the first time series
+ - `outp::Symbol`: output can be either :coh for coherence, :justspeccs to compute just the spectra, or :cross for cross-spectra
+ - `NW::Float64 = 4.0`: time-bandwidth product of estimate
+ - `K::Int64 = 6`: number of slepian tapers, must be <= 2*NW
+ - `dt::Float64`: sampling rate in time units 
+ - `ctr::Bool`: whether or not to remove the mean before computing the multitaper spectrum
+ - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will be pad times length of the time series.
+ - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have been precomputed
+ - `guts::Bool = false`: whether or not to return the eigencoefficients in the output struct
+ - `a_weight::Bool = true`: whether or not to adaptively weight the spectra
+ - `jk::Bool = false`: Compute jackknifed confidence intervals
+ - `Ftest:Bool = false`: Compute F-test for line components
+ - `Tsq::Union{Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing`: which frequency indices to compute the T-squared test for multiple line components. Defaults to none.
+ - `alph::Float64 = 0.05`: significance cutoff for the Tsquared test
+...
+
+...
+# Outputs
+ - `Tuple{Vector{MtSpec},Vector{P},Union{Float64,Vector{Float64}}} where P = Union{MtCoh,MtSpec}` 
+struct containing the spectra, coherence or crossspectra, and Tsquared test p-values. 
+Ouput of middle arg depends on the selection of `outp` input. 
+...
+
+See also: [`dpss_tapers`](@ref), [`MtSpec`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
+"""
+""""""
 function multispec(S1::Matrix{T}; outp=:coh, NW=4.0, K=6, dt=1.0, ctr=true,
                    pad=1.0, dpVec=nothing, guts=false, a_weight=true, jk=false,
                    Ftest=false, Tsq=nothing, alph=0.05) where{T}

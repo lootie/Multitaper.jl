@@ -59,7 +59,23 @@ function int_to_freq(int, lengt, dt=1.0)
   (typeof(int) == Vector{Float64}) ? int : collect((int .- 1)/(lengt*dt))
 end
 
-""" Expected Jackknife variance """
+"""
+    ejn(DoF)
+
+Expected jackknife variance of an univariate multitaper spectrum estimate with DoF tapers
+
+...
+# Arguments
+ - `DoF::Int64`: the number of tapers use to compute the spectrum
+...
+
+...
+# Outputs
+ - The output is a `Float64` indicating the expected jackknife variance.
+...
+
+See also: [`multispec`](@ref)
+"""
 function ejn(DoF)
   Kft = Float64(DoF)/2
   return (Kft-1)^3*(Kft-3)/((Kft-0.5)*Kft*(Kft-2)^3)
@@ -96,21 +112,65 @@ end
 
 # Transformed coherences
 
-""" Magnitude squared coherence variance stabilizing transform"""
+"""
+    atanhtrans(c,ntf)
+
+Magnitude squared coherence variance stabilizing transform
+
+...
+# Arguments
+ - `c::Float64`: the value of the coherence
+ - `ntf::Int64`: the number of tapers use to compute the coherence
+...
+
+...
+# Outputs
+ - The output is a `Float64` indicating the transformed MSC
+...
+
+See also: [`multispec`](@ref)
+"""
 function atanhtrans(c, ntf)
   y = try atanh(abs(c)^2); catch;  atanh(1.0-1e-15); end
   return sqrt(2*ntf-2)*y
 end
 
-""" Sort-of-inverse of the MSC variance-stabilizing transform"""
+"""
+    tanhtrans(trcsq,ntf)
+
+Inverse of the magnitude squared coherence variance stabilizing transform
+
+...
+# Arguments
+ - `trcsq::Float64`: The transformed squared coherence
+ - `ntf::Int64`: the number of tapers use to compute the coherence
+...
+
+...
+# Outputs
+ - The output is a `Float64` indicating the reverse-transformed MSC
+...
+
+# Example
+
+If the transformed coherence is 7.3 and 6 dof, the significance is
+
+```julia-repl
+julia> invmscsig(tanhtrans(7.3,6),6)
+```
+
+If the significance is 0.9 and 6 dof the transformed msc is
+```julia-repl    
+julia> atanhtrans(sqrt(mscsig(0.9,6)),6)
+```
+
+See also: [`multispec`](@ref)
+"""
 function tanhtrans(trcsq, ntf) 
   return tanh(trcsq/sqrt(2*ntf-2))
 end
 
-# For example, if the transformed coherence is 7.3 and 6 dof, the significance is
-# invmscsig(tanhtrans(7.3,6),6)
-# if the significance is 0.9 and 6 dof the transformed msc is
-# atanhtrans(sqrt(mscsig(0.9,6)),6)
+
 
 function get_plan(n)
   work1 = zeros(ComplexF64, n)

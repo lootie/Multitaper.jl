@@ -87,25 +87,34 @@ function rectsleps(nslep, n, m, Kp, N, M; verbose = false)
   return sleps
 end
 
-""" 
+"""
+    multispec2_Rectangle(Md, K, ntaper; <keyword arguments>)
+
 Function for computing the 2D multitaper spectrum estimate
 
-Inputs: Md - data matrix
-        K - squared radius (bandwidth) of the region of concentration in spectrum
-        ntaper - number of tapers
-        padn - number of samples to pad to in the x-direction
-        padm - number of samples to pad to in the y-direction
-        nquad - number of quadrature nodes in the x-direction (default 72)
-        mquad - number of quadrature nodes in the y-direction (default 72)
-        center - boolean whether to subtract the mean or not (default true)
-        sleps - if you have already computed the tapers, can use them as input here
-                (default nothing)
+...
+# Arguments
+ - `Md::Matrix{T} where T<:Float64`: data matrix 
+ - `K::Float64`: squared radius (bandwidth) of the region of concentration in spectrum
+ - `ntaper::Int64`: number of tapers
+ - `padn::Int64 = 0`: number of samples to pad to in the x-direction 
+ - `padm::Int64 = 0`: number of samples to pad to in the y-direction
+ - `nquad::Int64 = 72`: number of quadrature nodes in the x-direction
+ - `mquad::Int64 = 72`: number of quadrature nodes in the y-direction
+ - `center::Bool = true`: whether to subtract the mean or not
+ - `sleps::Union{Matrix{T},Nothing} = nothing`: if you have already computed the tapers, input them here
+...
 
-Outputs: Matrix containing the 2D multitaper spectrum (simple averaging used)
+...
+# Outputs
 
-If this function runs slowly for the size of your input matrix, reducing the number
+ - Matrix containing the 2D multitaper spectrum (simple averaging used)
+
+Note: If this function runs slowly for the size of your input matrix, reducing the number
 of quadrature nodes for computing the tapers, or alternatively precomputing the
 tapers may help.
+...
+
 """
 function multispec2_Rectangle(Md, K, ntaper, padn=0, padm=0, nquad=72, 
                               mquad=72; center=true, sleps=nothing)

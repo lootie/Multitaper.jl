@@ -216,7 +216,36 @@ function multspec_guts(S1, dpVec, fftleng, halffreq,
   return Ecoef(eigcoefs[1:halffreq,:], dsq)
 end
 
-""" Computes univariate multitaper spectra with a handful of extra gadgets. """
+"""
+    multispec(S1; <keyword arguments>)
+
+Computes univariate multitaper spectra with a handful of extra gadgets. 
+
+...
+# Arguments
+ - `S1::Vector{T} where T<:Float64`: the vector containing the time series
+ - `NW::Float64 = 4.0`: time-bandwidth product of estimate
+ - `K::Int64 = 6`: number of slepian tapers, must be <= 2*NW
+ - `dt::Float64`: sampling rate in time units 
+ - `ctr::Bool`: whether or not to remove the mean before computing the multitaper spectrum
+ - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will be pad times length of the time series.
+ - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have been precomputed
+ - `egval::Union{Vector{Float64},Nothing} = nothing`: Vector of concentratins of said dpss's
+ - `guts::Bool = false`: whether or not to return the eigencoefficients in the output struct
+ - `a_weight::Bool = true`: whether or not to use adaptive weighting
+ - `Ftest::Bool = true`: Compute the F-test p-value
+ - `highres::Bool = false`: Whether to return a "high resolution" spectrum estimate
+ - `jk::Bool = true`: Compute jackknifed confidence intervals
+ - `Tsq::Union{Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing`: which frequency indices to compute the T-squared test for multiple line components. Defaults to none.
+...
+
+...
+# Outputs
+ - `MtSpec` struct containing the spectrum
+...
+
+See also: [`dpss_tapers`](@ref), [`MtSpec`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
+"""
 function multispec(S1; NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0, dpVec=nothing,
                    egval=nothing, guts=false, a_weight=true, Ftest=false,
                    highres=false, jk=false, Tsq=nothing, alph=0.05)
@@ -267,7 +296,26 @@ function multispec(S1; NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0, dpVec=nothing,
   return MtSpec(freq, S, phase, params, coef_out, fv, jv, Tv) 
 end
 
-""" Blocker code to divide the data into segments """
+""" 
+    blockerr(lengt, nsegmentts; <keyword arguments>)
+
+Blocker code to divide the data into segments 
+
+...
+# Arguments
+ - `lengt::Int64`: input length of a time series
+ - `nsegments::Int64`: number of segments
+ - `overlap::Float64 = 0.0`: fraction of overlap between segments, between 0.0 and 1.0
+...
+
+...
+# Outputs
+ - `seq::Vector{Int64}`: Beginning index for each segment
+ - `seg_len::Int64`: length of the segments
+ - `ov::Float64`: overlap that actually resulted (≈`overlap`, above)
+...
+
+"""
 function blockerr(lengt, nsegments; overlap=0.0)
   if (overlap < 1.0)&&(overlap >= 0.0)
     seg_len = Int64(ceil((lengt-1)/((nsegments-1)*(1-overlap)+1)))
@@ -289,8 +337,25 @@ function blockerr(lengt, nsegments; overlap=0.0)
   return seq, seg_len, ov
 end
 
-""" Computes univariate multitaper autocovariance/autocorrelation function. Inputs a
-MtSpec struct. """
+"""
+    mt_acvf(S; <keyword arguments>)
+
+Computes univariate multitaper autocovariance/autocorrelation function. Inputs a
+MtSpec struct.
+
+...
+# Arguments
+ - `S::MtSpec`: the vector containing the result of an univariate call to `multispec`
+ - `typ::Symbol`: whether to compute autocovariance function (:acvf), autocorrelation function (:acf), or cepstrum (:ceps)
+...
+
+...
+# Outputs
+ - `MtAcvf`, `MtAcf`, or `MtCeps` struct, depending on the selection of `typ` input above.
+...
+
+See also: [`multispec`](@ref)
+"""
 function mt_acvf(S::MtSpec; typ::Symbol = :acvf)   
   lags = S.params.dt*S.params.N*range(0.0, 1.0, length=S.params.N+1)[1:length(S.S)]
   spec = mod(S.params.N, 2) == 0 ? vcat(S.S, S.S[end-1:-1:2]) : vcat(S.S,
@@ -308,8 +373,31 @@ function mt_acvf(S::MtSpec; typ::Symbol = :acvf)
   end
 end
 
-""" Computes univariate multitaper autocovariance/autocorrelation function if you
-haven't already computed the MT spectrum. """
+"""
+    mt_acvf(S1; <keyword arguments>)
+
+Computes univariate multitaper autocovariance/autocorrelation function starting with an input time series.
+...
+# Arguments
+ - `S1::Vector{T} where T<:Number`: the vector containing the time series
+ - `typ::Symbol`: whether to compute autocovariance function (:acvf), autocorrelation function (:acf), or cepstrum (:ceps)
+ - `NW::Float64 = 4.0`: time-bandwidth product of estimate
+ - `K::Int64 = 6`: number of slepian tapers, must be <= 2*NW
+ - `dt::Float64`: sampling rate in time units 
+ - `ctr::Bool`: whether or not to remove the mean before computing the multitaper spectrum
+ - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will be pad times length of the time series.
+ - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have been precomputed
+ - `egval::Union{Vector{Float64},Nothing} = nothing`: Vector of concentratins of said dpss's
+ - `a_weight::Bool = true`: whether or not to use adaptive weighting
+...
+
+...
+# Outputs
+ - `MtAcvf`, `MtAcf`, or `MtCeps` struct, depending on the selection of `typ` input above.
+...
+
+See also: [`multispec`](@ref)
+"""
 function mt_acvf(S1; typ=:acvf, NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0,
                  dpVec=nothing, egval=nothing, a_weight=true)
   S = multispec(S1, NW = NW, K = K, dt = dt, ctr = ctr, pad = pad, dpVec = dpVec, 
@@ -318,9 +406,41 @@ function mt_acvf(S1; typ=:acvf, NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0,
   return mt_acvf(S, typ = typ)
 end
 
-""" Because of the mapreduce function, this tidy piece of code can be used to get either
-(a) the MT welch spectrum, and (b) the spectrogram """
-function welch(S1, nsegments, overlap=0.5, ws=:welch; outp=:spec, NW=4.0, K=6,
+"""
+    welch(S1, nsegments; <keyword arguments>)
+
+Computes univariate multitaper Welch specrum starting with an input time series.
+
+...
+# Arguments
+ - `S1:Union{Matrix{T},Vector{T}} where T<:Number`: the vector containing the time series
+ - `nsegments::Int64`: the number of segments into which to divide the time series
+ - `overlap::Float64 = 0.5`: number between 0 and 1 which accounts for the amount of overlap between the segments
+ - `outp::Symbol = :spec`: either :spec for spectrum, :cross for cross-spectra, or :coh for coherence
+ - `NW::Float64 = 4.0`: time-bandwidth product of estimate
+ - `K::Int64 = 6`: number of slepian tapers, must be <= 2*NW
+ - `dt::Float64`: sampling rate in time units
+ - `ctr::Bool`: whether or not to remove the mean before computing the multitaper spectrum
+ - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will be pad times length of the time series.
+ - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have been precomputed
+ - `egval::Union{Vector{Float64},Nothing} = nothing`: Vector of concentratins of said dpss's
+ - `guts::Bool = false`: whether or not to return the eigencoefficients in the output struct
+ - `a_weight::Bool = true`: whether or not to use adaptive weighting
+ - `Ftest::Bool = true`: Compute the F-test p-value
+ - `jk::Bool = true`: Compute jackknifed confidence intervals
+ - `Tsq::Union{Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing`: which frequency indices to compute the T-squared test for multiple line components. Defaults to none.
+ - `alph::Float64`: significance level, between 0 and 1, for F-test and T-squared test.
+...
+
+...
+# Outputs
+ - `MtSpec` struct, depending on the selection of `outp` above
+ - `Float64` containing the effective bandwidth
+...
+
+See also: [`multispec`](@ref)
+"""
+function welch(S1, nsegments, overlap=0.5; outp=:spec, NW=4.0, K=6,
                dt=1.0, ctr=true, pad=1.0, dpVec=nothing, egval=nothing,
                guts=false, a_weight=true, Ftest=false, jk=false, Tsq=nothing,
                alph=0.05) 
