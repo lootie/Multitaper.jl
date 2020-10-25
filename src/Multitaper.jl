@@ -22,7 +22,7 @@ module Multitaper
   # Univariate 
 
   include("Univariate.jl")
-    export multispec, mt_acvf, welsh, blockerr
+    export multispec, mt_acvf, welch, blockerr
 
   include("PlotsRecipes/univariaterecipes.jl")
 
