@@ -25,42 +25,72 @@ end
 Computes multitaper cross-spectrum or coherence when given two time series with same sampling.
 
 ...
+
 # Arguments
- - `S1::Union{Vector{T},Ecoef} where T<:Float64`: the vector containing the first time series
- - `S2::Union{Vector{T},Ecoef} where T<:Float64`: the vector containing the second time series
- - `outp::Symbol`: output can be either :coh for coherence, :spec for cross-spectrum, or :transf for transfer function
+
+ - `S1::Union{Vector{T},Ecoef} where T<:Number`: the vector containing the first time
+series
+
+ - `S2::Union{Vector{P},Ecoef} where P<:Number`: the vector containing the second
+time series
+
+ - `outp::Symbol`: output can be either :coh for coherence, :spec for cross-spectrum,
+or :transf for transfer function
+
  - `NW::Float64 = 4.0`: time-bandwidth product of estimate
+
  - `K::Int64 = 6`: number of slepian tapers, must be <= 2*NW
- - `offset::Union{Float64,Int64} = 0` set to nonzero value if offset coherence or cross-spectrum is desired. If Float64 is used, this will be converted to nearest FFT bin.
+
+ - `offset::Union{Float64,Int64} = 0` set to nonzero value if offset coherence or
+cross-spectrum is desired. If Float64 is used, this will be converted to nearest FFT
+bin.
+
  - `dt::Float64`: sampling rate in time units 
- - `ctr::Bool`: whether or not to remove the mean before computing the multitaper spectrum
- - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will be pad times length of the time series.
- - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have been precomputed
- - `guts::Bool = false`: whether or not to return the eigencoefficients in the output struct
+
+ - `ctr::Bool`: whether or not to remove the mean before computing the multitaper
+spectrum
+
+ - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will
+be pad times length of the time series.
+
+ - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have
+been precomputed
+
+ - `guts::Bool = false`: whether or not to return the eigencoefficients in the output
+struct
+
  - `jk::Bool = true`: Compute jackknifed confidence intervals
- - `Tsq::Union{Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing`: which frequency indices to compute the T-squared test for multiple line components. Defaults to none.
+
+ - `Tsq::Union{Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing`: which
+frequency indices to compute the T-squared test for multiple line components.
+Defaults to none.
+
  - `alph::Float64 = 0.05`: significance cutoff for the Tsquared test
 ...
 
 ...
+
 # Outputs
- - `MtSpec`, `MtCoh`, or `MtTransf` struct containing the spectrum, coherence or transfer function, depending on the selection of `outp` input. 
+
+ - `MtSpec`, `MtCoh`, or `MtTransf` struct containing the spectrum, coherence or
+transfer function, depending on the selection of `outp` input. 
+
 ...
 
 See also: [`dpss_tapers`](@ref), [`MtSpec`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
+
 """
-function multispec(S1::Union{Vector{T},Ecoef}, S2::Union{Vector{T},Ecoef}; 
+function multispec(S1::Union{Vector{T},Ecoef}, S2::Union{Vector{P},Ecoef}; 
                    outp=:coh, NW=4.0, K=6, offset=0, dt=1.0, ctr=true, pad=1.0,
-                   dpVec=nothing, guts=false, jk=false, Tsq=nothing, alph=0.05) where{T}
+                   dpVec=nothing, guts=false, jk=false, Tsq=nothing, 
+                   alph=0.05) where{T<:Number,P<:Number}
   
   if (typeof(S1) == Ecoef) && (typeof(S2) == Ecoef)
     coefswts = [S1, S2]
     halffreq = size(S1.coef,1)
     fftleng  = 2*halffreq - 1 # This is only for real data
     lengt    = Int64(round(fftleng/pad))
-  elseif ((typeof(S1) == Vector{Float64}) && (typeof(S2) == Vector{Float64})) || 
-          ((typeof(S1) == Vector{ComplexF64}) && 
-         (typeof(S2) == Vector{ComplexF64}))
+  else
     # Make sure vectors are compatible
     if (length(S1) != length(S2))
       error("Vectors must be the same length")
