@@ -180,14 +180,8 @@ end
 """ Compute the output length of the spectrum """
 function output_len(S1, pad=1.0)
   lengt     = length(S1)
-  if typeof(pad) == Float64
-    @assert pad >= 1.0 "Must pad by a factor >= 1.0"
-    fftleng = Int64(round(pad*lengt))
-  elseif typeof(pad) == Int64
-    @assert pad >= length(S1) "Must pad to a number greater than the length of the
-      input vector."
-    fftleng = pad
-  end
+  @assert pad >= 1.0 "Must pad by a factor >= 1.0"
+  fftleng = Int64(round(pad*lengt))
   # If the series is complex, return all frequencies, if real return only half
   if (typeof(S1)==Vector{ComplexF64})
     halffreq =  fftleng 

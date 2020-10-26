@@ -47,9 +47,7 @@ function.
   * `offset`, the frequency offset, if desired (else 0.0)
   * `dt`, the temporal sampling frequency (in, say, seconds)
   * `ctr`, whether or not to remove the mean from the data series, default is true
-  * `pad`, default is not to pad, but if this is a float then the padded length will be
-    pad times the length of S1 and if it is an int greater than the length of S1 that
-    will be the FFT length. 
+  * `pad`, the padded length will be pad times the length of S1.  
   * `dpVec`, you can choose to supply the dpss's or not (speeds things up if you're
     calling the function many times)
   * `guts`, whether you'd like the eigencoefficients as output. They will come in an
@@ -126,9 +124,7 @@ function multispec(S1::Matrix{T}; outp=:coh, NW=4.0, K=6, dt=1.0, ctr=true,
   * `offset`, the frequency offset, if desired (else 0.0)
   * `dt`, the temporal sampling frequency (in, say, seconds)
   * `ctr`, whether or not to remove the mean from the data series, default is true
-  * `pad`, default is not to pad, but if this is a float then the padded length will be
-    pad times the length of S1 and if it is an int greater than the length of S1 that
-    will be the FFT length. 
+  * `pad`, the padded length will be pad times the length of S1.  
   * `dpVec`, you can choose to supply the dpss's or not (speeds things up if you're
     calling the function many times)
   * `guts`, whether you'd like the eigencoefficients as output. They will come in an
