@@ -406,48 +406,72 @@ end
 Computes univariate multitaper Welch specrum starting with an input time series.
 
 ...
+
 # Arguments
- - `S1:Union{Matrix{T},Vector{T}} where T<:Number`: the vector containing the time series
+
+ - `S1:Vector{T} where T<:Number`: the vector containing the time series
+
  - `nsegments::Int64`: the number of segments into which to divide the time series
- - `overlap::Float64 = 0.5`: number between 0 and 1 which accounts for the amount of overlap between the segments
- - `outp::Symbol = :spec`: either :spec for spectrum, :cross for cross-spectra, or :coh for coherence
+
+ - `overlap::Float64 = 0.5`: number between 0 and 1 which accounts for the amount of
+overlap between the segments
+
  - `NW::Float64 = 4.0`: time-bandwidth product of estimate
+
  - `K::Int64 = 6`: number of slepian tapers, must be <= 2*NW
+
  - `dt::Float64`: sampling rate in time units
- - `ctr::Bool`: whether or not to remove the mean before computing the multitaper spectrum
- - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will be pad times length of the time series.
- - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have been precomputed
- - `egval::Union{Vector{Float64},Nothing} = nothing`: Vector of concentratins of said dpss's
- - `guts::Bool = false`: whether or not to return the eigencoefficients in the output struct
+
+ - `ctr::Bool`: whether or not to remove the mean before computing the multitaper
+spectrum
+
+ - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will
+be pad times length of the time series.
+
+ - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have
+been precomputed
+
+ - `egval::Union{Vector{Float64},Nothing} = nothing`: Vector of concentratins of said
+dpss's
+
+ - `guts::Bool = false`: whether or not to return the eigencoefficients in the output
+struct
+
  - `a_weight::Bool = true`: whether or not to use adaptive weighting
+
  - `Ftest::Bool = true`: Compute the F-test p-value
+
  - `jk::Bool = true`: Compute jackknifed confidence intervals
- - `Tsq::Union{Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing`: which frequency indices to compute the T-squared test for multiple line components. Defaults to none.
- - `alph::Float64`: significance level, between 0 and 1, for F-test and T-squared test.
-...
+
+ - `Tsq::Union{Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing`: which
+frequency indices to compute the T-squared test for multiple line components.
+Defaults to none.
+
+ - `alph::Float64`: significance level, between 0 and 1, for F-test and T-squared
+test.  ...
 
 ...
 # Outputs
+
  - `MtSpec` struct, depending on the selection of `outp` above
+
  - `Float64` containing the effective bandwidth
+
 ...
 
 See also: [`multispec`](@ref)
+
 """
-function welch(S1, nsegments, overlap=0.5; outp=:spec, NW=4.0, K=6,
+function welch(S1, nsegments, overlap=0.5; NW=4.0, K=6,
                dt=1.0, ctr=true, pad=1.0, dpVec=nothing, egval=nothing,
                guts=false, a_weight=true, Ftest=false, jk=false, Tsq=nothing,
                alph=0.05) 
 
-  multiv    = (typeof(S1) <: Matrix)
-  lengt,p   = multiv ? size(S1) : (length(S1),nothing) 
-  if multiv && (p > 2)
-    error("Can compute cross-spectrograms and cross-welch spectra for no more than two 
-          series at a time.")
-  end
+  !(typeof(S1) <: Vector) && error("S1 should be a vector")
+  lengt = length(S1)
 
   # Get the sizes of the data chunks, note that overlap gets overwritten
-  seq,seg_len,overlap = blockerr(lengt,nsegments,overlap=overlap) 
+  seq,seg_len,overlap = blockerr(lengt, nsegments, overlap=overlap) 
 
   # Effective bandwidth (2.13 in T&C91)
   bw        = NW*(1 + (lengt - 1)*(mean(diff(seq))/seg_len))/(lengt*dt) 
@@ -457,33 +481,17 @@ function welch(S1, nsegments, overlap=0.5; outp=:spec, NW=4.0, K=6,
     egval   = a_weight ? dpss_tapers(seg_len, NW, K, :vals) : nothing
   end
 
-  # Cross-spectra and coherences are a possibility for a future version of this code.
-  # That would require the substitution of the jackknife estimate. 
-  if multiv
-    if (outp != :spec)&&(outp != :coh)
-      error("Output is either cross-spectrum or coherence")
-    end
-    # get the eigencoefficients over each of the segments and jackknife those to
-    # get a single estimate. 
-    coefswts1 = mapreduce(x->multspec_guts(S1[x:(x+seg_len-1),1],dpVec,
-                          fftleng,halffreq,var(x),ctr,nothing).coef,
-                          hcat,seq)
-    coefswts2 = mapreduce(x->multspec_guts(S1[x:(x+seg_len-1),2],dpVec,
-                          fftleng,halffreq,var(x),ctr,nothing).coef,
-                          hcat,seq)
-    v = jknife(Ecoef(coefswts1, nothing), Ecoef(coefswts2, nothing), outp)[1]
-    v .*= (outp == :cross) ? dt : 1.0
-  else
-    v = sum(x -> multispec(S1[x:(x+seg_len-1)],NW = NW, K = K, dt = dt, ctr = ctr, 
-                           pad = pad, dpVec = dpVec, guts = false, Ftest = false, 
-                           jk = false, alph = 0.05, egval = egval, 
-                           a_weight = a_weight).S, seq)
-    fftleng, halffreq = output_len(S1[seq[1]:(seg_len+seq[1]-1)],pad)[2:3]
-  end   
+  v = sum(x -> multispec(S1[x:(x+seg_len-1)],NW = NW, K = K, dt = dt, ctr = ctr, 
+                         pad = pad, dpVec = dpVec, guts = false, Ftest = false, 
+                         jk = false, alph = 0.05, egval = egval, 
+                         a_weight = a_weight).S, seq)
+  
+  fftleng, halffreq = output_len(S1[seq[1]:(seg_len+seq[1]-1)],pad)[2:3]
   params = MtParams(NW, K, lengt, dt, fftleng, nsegments, overlap)   
   freq = range(0,1.0,length=fftleng+1)[1:halffreq]*(1.0/dt)
 
-  return (MtSpec(freq, v/nsegments, nothing, params, nothing), bw)
+  return (MtSpec(freq, v/nsegments, nothing, params, nothing, nothing, nothing, 
+          nothing), bw)
 
 end
 
