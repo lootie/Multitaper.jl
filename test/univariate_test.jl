@@ -2,7 +2,7 @@
 
 # Example data for computing spectra
 
-fn  = "../Examples/data/soirecruitment.dat"
+fn  = @__DIR__()*"/../Examples/data/soirecruitment.dat"
 dat = readdlm(fn)
 
 # Spectrum tests

@@ -1,7 +1,7 @@
 
 # Example data for computing spectra with gaps
 
-fn  = "../Examples/data/temp.txt"
+fn  = @__DIR__()*"/../Examples/data/temp.txt"
 dat = readdlm(fn,'\t')
 
 # Spectrum tests
