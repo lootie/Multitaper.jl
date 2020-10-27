@@ -1,0 +1,10 @@
+image: julia:latest
+
+pipelines:
+  default:
+    - step:
+        name: tests
+        script:
+            - export JULIA_PROJECT=@.
+            - julia -e 'using Pkg; Pkg.instantiate(); Pkg.build()'
+            - julia test/runtests.jl
