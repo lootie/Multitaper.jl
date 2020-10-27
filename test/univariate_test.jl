@@ -56,7 +56,8 @@ acvfspec = mt_acvf(univ)
 ceps = mt_acvf(dat[:,3], NW = NW, K = K, dt = dt, typ = :ceps)
 cepsspec = mt_acvf(univ, typ = :ceps)
 
-cet = readdlm("../Examples/data/CETmonthly.dat")
+cet_path = @__DIR__()*"/../Examples/data/CETmonthly.dat"
+cet = readdlm(cet_path)
 cdm = demodulate(cet[:,3], 1.0, 2.0, 15*12, true, 1.0/12, 0.0)
 
 @testset "Autocorrelation, Cepstrum, Demodulation" begin
