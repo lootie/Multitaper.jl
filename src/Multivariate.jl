@@ -173,6 +173,7 @@ function multispec(S1::Union{Vector{T},Ecoef}, S2::Union{Vector{P},Ecoef};
 
 end
 
+
 """
     mt_ccvf(S; <keyword arguments>)
 
@@ -192,25 +193,26 @@ Inputs a MtCoh or MtSpec struct.
 
 See also: [`multispec`](@ref)
 """
-function mt_ccvf(S; typ=:ccvf)   
-  if typeof(S) == MtCoh
-    lags = S.params.dt*S.params.N*range(-1.0, 1.0, length=length(S.coh))
-    if typ == :ccvf
-      error("Cannot compute cross covariance from coherence.")
-    elseif typ == :ccf
-      return MtCcf(lags, fftshift(real.(ifft(S.coh))), S.params)
-    end
-  elseif typeof(S) == MtSpec
-  lags = S.params.dt*S.params.N*range(-1.0, 1.0, length=length(S.S))
-    if typ == :ccvf
-      return MtCcvf(lags, fftshift(real.(ifft(S.S))), S.params)
-    elseif typ == :ccf
-      ccvf = real.(ifft(S.S))[1:length(S.S)]
-      return MtCcf(lags, fftshift(ccvf)/ccvf[1], S.params)
-    end
+function mt_ccvf(S::MtCoh; typ=:ccvf)
+  lags = S.params.dt*S.params.N*range(-1.0, 1.0, length=length(S.coh))
+  if typ == :ccvf
+    error("Cannot compute cross covariance from coherence.")
+  elseif typ == :ccf
+    return MtCcf(lags, fftshift(real.(ifft(S.coh))), S.params)
   else
-    error("Select one of :ccvf (cross covariance), :ccf (cross correlation) for
-           output")
+    throw(error("Select one of :ccvf (cross covariance), :ccf (cross correlation) for output"))
+  end
+end
+
+function mt_ccvf(S::MtSpec; typ=:ccvf)
+  lags = S.params.dt*S.params.N*range(-1.0, 1.0, length=length(S.S))
+  if typ == :ccvf
+    return MtCcvf(lags, fftshift(real.(ifft(S.S))), S.params)
+  elseif typ == :ccf
+    ccvf = real.(ifft(S.S))[1:length(S.S)]
+    return MtCcf(lags, fftshift(ccvf)/ccvf[1], S.params)
+  else
+    throw(error("Select one of :ccvf (cross covariance), :ccf (cross correlation) for output"))
   end
 end
 
@@ -246,14 +248,12 @@ See also: [`multispec`](@ref)
 function mt_ccvf(S1::Vector{T}, S2::Vector{T}; typ=:ccvf, NW=4.0, K=6, dt=1.0,
                  ctr=true, pad=1.0, dpVec=nothing, guts=false, jk=false,
                  Tsq=nothing, alph=0.05) where{T}
-  if (typ != :ccvf)&&(typ != :ccf)
-    error("Output type must be one of cross-covariance (:ccvf) or cross-correlation 
-          (:ccf).")
+  if !in(typ, (:ccvf, :ccf))
+    error("Output type must be one of cross-covariance (:ccvf) or cross-correlation (:ccf).")
   end
   S = multispec(S1, S2, outp = :spec, 
                 NW = NW, K = K, dt = dt, ctr = ctr, pad = pad, dpVec = dpVec, 
-                guts = false, 
-                jk = false, Tsq = nothing, alph = alph) 
+                guts = false, jk = false, Tsq = nothing, alph = alph) 
   return mt_ccvf(S; typ = typ) 
 end
 
