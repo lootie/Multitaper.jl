@@ -4,7 +4,7 @@ K = 7
 NW = 4.0
 tab, lab = Multitaper.uctable(K, NW, num_Ray = 512, sig=sig)
 
-@testset "17-19. Testing Thomson Haley 2014 crossing code" begin 
+@testset "Thomson Haley 2014 crossing code" begin 
   
   @test tab[:,2] ≈ [0.46933081312781033, 0.9528052963642532, 1.5045817294997899, 
                     2.0815169814766286, 2.580233834314152, 3.041377782365235]

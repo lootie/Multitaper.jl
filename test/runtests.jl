@@ -10,7 +10,7 @@ printstyled("Running tests:\n", color=:blue)
 tests = ["univariate", "crossings", "mdmwps", "multivariate"]
 
 for t in tests
-    @testset "Test $t multitaper" begin
+    @testset "$t multitaper" begin
       include("$(t)_test.jl")
     end
 end
