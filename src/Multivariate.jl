@@ -254,7 +254,8 @@ function mt_ccvf(S1::Vector{T}, S2::Vector{T}; typ=:ccvf, NW=4.0, K=6, dt=1.0,
   S = multispec(S1, S2, outp = :spec, 
                 NW = NW, K = K, dt = dt, ctr = ctr, pad = pad, dpVec = dpVec, 
                 guts = false, jk = false, Tsq = nothing, alph = alph) 
-  return mt_ccvf(S; typ = typ) 
+  # return mt_ccvf(S; typ = typ)
+  return MtCcvf(S.f, S.S, MtParams(NW, K, length(S1), dt, pad, 1, nothing)) 
 end
 
 """
