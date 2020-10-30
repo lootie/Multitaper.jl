@@ -45,13 +45,13 @@ end
 
 """ Computes multitaper eigencoefs """
 function multispec_coef(tt, x, u, n, nfft, nfft2)
-  x     .-= mean(x)
+  x̂ = x .- mean(x)
   (length(x) != length(tt)) && error("The vector of data and the vector of times must
                                       have the same lengths.")
   # plan the fft, compute eigencoefficients 
   cent = (vcat(tt, tt[end] .+ collect(1:(nfft-n))) .- nfft/2)/nfft
   p = NFFTPlan(cent, nfft)
-  return mapreduce(slep -> nfft_adjoint(p, vcat(slep.*x, zeros(nfft-n)) .+ 
+  return mapreduce(slep -> nfft_adjoint(p, vcat(slep.*x̂, zeros(nfft-n)) .+ 
                     0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
 end
 
