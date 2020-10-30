@@ -3,7 +3,25 @@
 
 # GNU GPL v2 licenced to C. Haley and C. Geoga 12/2019
 
-""" Unwrap the phase """
+""" 
+    unwrapphase(y, typ)
+
+Unwrap the phase 
+
+... 
+# Arguments
+
+ - `y::Vector{Float64}`: The vector of phases
+
+ - `typ::Symbol`: Whether to compute the unwrapped phase in degrees or radians
+...
+
+...
+# Outputs
+
+ - `x::Vector{Float64}`: The vector of unwrapped phases
+...
+"""
 function unwrapphase(y, typ=:rad)
   lims         = (typ==:rad) ? pi : 180
   x            = copy(y)

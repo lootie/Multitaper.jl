@@ -17,12 +17,12 @@ module Multitaper
     export Demodulate
 
   include("Utils.jl")
-    export tanhtrans, atanhtrans, ejn
+    export tanhtrans, atanhtrans, ejn, unwrapphase
 
   # Univariate 
 
   include("Univariate.jl")
-    export multispec, mt_acvf, welch, blockerr
+    export dpss_tapers, multispec, mt_acvf, welch, blockerr
 
   include("PlotsRecipes/univariaterecipes.jl")
 
@@ -35,6 +35,7 @@ module Multitaper
     export demodulate
 
   include("crossings.jl")
+    export  Pgram_upcrossings, MT_Upcrossings, uctable
 
   # Multivariate
 
@@ -45,7 +46,7 @@ module Multitaper
 
   # Two-dimensional 
   include("2DRectangle.jl")
-    export multispec2_Rectangle
+    export rectsleps, multispec2_Rectangle
 
 end
 
