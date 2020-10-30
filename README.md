@@ -1,6 +1,9 @@
 
 # Multitaper.jl
 
+[![Build Status](https://travis-ci.com/clhaley/multitaper.jl.svg?branch=temp)](https://travis-ci.com/clhaley/multitaper.jl)
+[![Coverage Status](https://coveralls.io/repos/bitbucket/clhaley/multitaper.jl/badge.svg?branch=temp)](https://coveralls.io/bitbucket/clhaley/multitaper.jl?branch=temp)
+
 When doing exploratory analysis of time series, frequency domain methods, that is,
 statistical methods that display information about the temporal correlations of one
 or more time series in terms of frequencies, can be used to infer physical mechanisms
