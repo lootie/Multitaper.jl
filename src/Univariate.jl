@@ -11,7 +11,36 @@ function dpss_eigval(dpVecs, n, nw, ntapers)
 end
 
 
-""" Simply compute dpss tapers, eigenvalues """
+""" 
+
+    dpss_tapers(n,w,k,tap_or_egval)
+
+Simply compute discrete prolate spheroidal sequence tapers, eigenvalues 
+
+...
+
+# Arguments
+
+ - `n::Int64`: Length of the taper
+
+ - `nw::Float64`: Time-bandwidth product
+
+ - `k::Int64`: Number of tapers
+
+ - `tap_or_egval::Symbol = :tap`: Either :tap, :egval, or :both
+...
+
+...
+
+# Outputs
+
+ - `vv::Vector{Float64}`: The matrix of eigenvalues, if tap_or_egval is set to :tap
+
+ - `dpss_eigval`: Struct conaining the dpss tapers
+
+...
+
+"""
 function dpss_tapers(n, nw, k, tap_or_egval::Symbol=:tap) 
   stdm  = SymTridiagonal([cos(2*pi*(nw/n))*abs2(0.5*(n-1)-(j-1)) for j in 1:n],
                           [0.5*j*(n-j) for j in 1:(n-1)])

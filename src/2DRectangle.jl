@@ -34,17 +34,30 @@ function dmatrix(Kp, pts1, pts2)
 end
 
 """
+
+    rectsleps(nslep,n,m,Kp,N,M, <keyword arguments>)=)
+
 Slepian functions concentrated in 2 dimensions on a rectangle in 
 physical space and a circle in spectral space. 
-Inputs: nslep - number of output slepians
-        n - number of GL nodes in the x-direction
-        m - number of GL nodes in the y-direction
-        Kp - the radius of the circle in spectral space
-        N - number of Gauss-Legendre nodes in the first dimension
-        M - number of Gauss-Legendre nodes in the second dimension
-        verbose - select true if you would like to see the concentrations.
-Outputs:
-        sleps - an array of 2D tapers 
+
+...
+# Arguments
+ - `nslep::Int64`: number of output slepians
+ - `n::Int64`: number of GL nodes in the x-direction
+ - `m::Int64`: number of GL nodes in the y-direction
+ - `Kp::Float64`: the radius of the circle in spectral space
+ - `N::Int64`: number of Gauss-Legendre nodes in the first dimension
+ - `M::Int64`: number of Gauss-Legendre nodes in the second dimension
+ - `verbose::Boo`: select true if you would like to see the concentrations
+...
+
+...
+
+# Outputs
+
+ - `sleps::Array{Matrix{Float64},1}` - an array of 2D tapers 
+
+...
 """
 function rectsleps(nslep, n, m, Kp, N, M; verbose = false)
 

@@ -46,11 +46,13 @@ end
 """ Computes multitaper eigencoefs """
 function multispec_coef(tt, x, u, n, nfft, nfft2)
   x     .-= mean(x)
-  (length(x) != length(tt)) && error("The vector of data and the vector of times must have the same lengths.")
+  (length(x) != length(tt)) && error("The vector of data and the vector of times must
+                                      have the same lengths.")
   # plan the fft, compute eigencoefficients 
   cent = (vcat(tt, tt[end] .+ collect(1:(nfft-n))) .- nfft/2)/nfft
   p = NFFTPlan(cent, nfft)
-  return mapreduce(slep -> nfft_adjoint(p, vcat(slep.*x, zeros(nfft-n)) .+ 0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
+  return mapreduce(slep -> nfft_adjoint(p, vcat(slep.*x, zeros(nfft-n)) .+ 
+                    0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
 end
 
 """
@@ -60,24 +62,43 @@ Multitaper power spectrum estimation for time series with missing data (gaps)
 
 ...
 # Arguments
+
+## Positional Arguments
+
  - `tt::Vector{T} where T<:Float64`: the vector containing the time indices
+
  - `x::Vector{T}`: data vector
+
+## Keyword Arguments
+
  - `bw::Float64 = 5/length(tt)`: bandwidth of estimate
- - `k::Int64 = 2*bw*length(x)-1`: number of slepian tapers, must be <=2*bw*length(x) 
+
+ - `k::Int64 = 2*bw*length(x)-1`: number of Slepian tapers, must be `<=
+2*bw*length(x)` 
+
  - `dt::T = tt[2]-tt[1]`: sampling rate in time units 
+
  - `nz::Float64 = 0.0`: zero padding factor
+
  - `Ftest::Bool = true`: Compute the F-test p-value
+
  - `jk::Bool = true`: Compute jackknifed confidence intervals
- - `dof::Bool = false`: Compute degrees of freedom for the adaptively weighted 
-          spectrum estimate
- - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`: Slepians, if precomputed
+
+ - `dof::Bool = false`: Compute degrees of freedom for the adaptively weighted
+spectrum estimate
+
+ - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`:
+Slepians, if precomputed
 ...
 
 ...
 # Outputs
+
  - `pkg::MtSpec` struct containing the spectrum
+
  - `nu1::Vector{Float64}` optional vector containing the degrees of freedom, given
  if the `dof` kwarg is set to `true`.
+
 ...
 
 See also: [`multispec`](@ref), [`mdslepian`](@ref)
@@ -137,21 +158,41 @@ end
 Multitaper coherence estimation for time series with missing data (gaps)
 
 ...
+
 # Arguments
+
+## Positional Arguments 
+
  - `tt::Vector{T} where T<:Float64`: the vector containing the time indices
+
  - `x::Vector{T}`: data vector 1
+
  - `y::Vector{T}`: data vector 2
+
+## Keyword Arguments
+
  - `bw::Float64 = 5/length(tt)`: bandwidth of estimate
- - `k::Int64 = 2*bw*length(x)-1`: number of Slepian tapers, must be <=2*bw*length(x) 
+
+ - `k::Int64 = 2*bw*length(x)-1`: number of Slepian tapers, must be `<=
+2*bw*length(x)`
+
  - `dt::T = tt[2]-tt[1]`: sampling rate in time units 
+
  - `nz::Float64 = 0.0`: zero padding factor
+
  - `Ftest::Bool = true`: Compute the F-test p-value
+
  - `jk::Bool = true`: Compute jackknifed confidence intervals
- - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`: Slepians, if precomputed
+
+ - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`:
+Slepians, if precomputed
+
 ...
 
 ...
+
 # Outputs
+
  - `pkg::MtCoh` struct containing the coherence
 ...
 
@@ -179,8 +220,10 @@ function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}},
     
   cent = (vcat(t, t[end] .+ collect(1:(nfft-n))) .- nfft/2)/nfft
   p   = NFFTPlan(cent, nfft)
-  axk = mapreduce(slep -> nfft_adjoint(p, vcat(slep.*x, zeros(nfft-n)) .+ 0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
-  ayk = mapreduce(slep -> nfft_adjoint(p, vcat(slep.*y, zeros(nfft-n)) .+ 0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
+  axk = mapreduce(slep -> nfft_adjoint(p, vcat(slep.*x, zeros(nfft-n)) .+ 
+                    0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
+  ayk = mapreduce(slep -> nfft_adjoint(p, vcat(slep.*y, zeros(nfft-n)) .+ 
+                    0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
   outputcoefs = [Ecoef(axk,nothing),Ecoef(ayk,nothing)]
     
   # Jacknife 
@@ -196,25 +239,46 @@ end
 """
     mdmultispec(tt, x; <keyword arguments>)
 
-Multitaper coherence estimation for multiple time series with the same missing data (gaps)
+Multitaper coherence estimation for multiple time series with the same missing data
+(gaps)
 
 ...
+
 # Arguments
+
+## Keyword Arguments
+
  - `tt::Vector{T} where T<:Float64`: the vector containing the time indices
+
  - `x::Matrix{T}`: time series in the columns of a matrix
+
+## Positional Arguments
+
  - `bw::Float64 = 5/length(tt)`: bandwidth of estimate
- - `k::Int64 = 2*bw*length(x)-1`: number of slepian tapers, must be <=2*bw*length(x) 
+
+ - `k::Int64 = 2*bw*length(x)-1`: number of Slepian tapers, must be `<=
+2*bw*length(x)` 
+
  - `dt::T = tt[2]-tt[1]`: sampling rate in time units 
+
  - `nz::Float64 = 0.0`: zero padding factor
+
  - `Ftest::Bool = false`: Compute the F-test p-value
+
  - `jk::Bool = true`: Compute jackknifed confidence intervals
- - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`: Slepians, if precomputed
+
+ - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`:
+Slepians, if precomputed
+
 ...
 
 ...
+
 # Outputs
+
  - `Tuple{Vector{MtSpec},Matrix{MtCoh},Nothing}` struct containing the spectra, 
 coherences, and T^2 test significances (currently set to return nothing)
+
 ...
 
 See also: [`multispec`](@ref), [`mdslepian`](@ref)
@@ -266,19 +330,30 @@ end
 Generalized prolate spheroidal sequences for the 1D missing data problem
 
 ...
+
 # Arguments
+
+## Positional Arguments
+
  - `w::Float64`: the bandwidth
+
  - `k::Int64`: number of Slepian tapers, must be <=2*bw*length(x) 
+
  - `t::Vector{Int64}`: vector containing the time indices
+
 ...
 
 ...
+
 # Outputs
+
  - `lambda,u::Tuple{Vector{Float64}, Vector{Float64}}`: tuple containing the 
  concentrations and the tapers
+
 ...
 
 See also: [`mdmultispec`](@ref), [`gpss`](@ref)
+
 """
 function mdslepian(w, k, t)
   n           = length(t)
@@ -310,23 +385,40 @@ Generalized prolate spheroidal sequences on an unequal grid
 
 ...
 # Arguments
+
+## Positional Arguments
+
  - `w::Float64`: the bandwidth
+
  - `k::Int64`: number of Slepian tapers, must be <=2*bw*length(x) 
+
  - `t::Vector{Int64}`: vector containing the time indices
+
  - `f::Float64`: frequency at which the tapers are to be computed
+
+## Keyword Arguments
+
  - `beta::Float64 = 0.5`: analysis half-bandwidth (similar to Nyquist rate)
+
 ...
 
 ...
+
 # Outputs
- - `lambda::Vector{Float64}` the concentrations of the generalized prolate spheroidal sequences
+
+ - `lambda::Vector{Float64}` the concentrations of the generalized prolate spheroidal
+sequences
+
  - `u::Matrix{Float64}` the matrix containing the sequences themselves
+
  - `R` the Cholesky factor for the generalized eigenvalue problem
+
 ...
 
 This function is currently not exported, use `Multitaper.gpss`.
 
 See also: [`mdmultispec`](@ref), [`mdslepian`](@ref)
+
 """
 function gpss(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}, 
         f::Float64; beta::Float64 = 0.5)
@@ -337,7 +429,8 @@ function gpss(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}},
   for i = 1:n
       for j in (i+1):n
           a[i,j]  = sin.(2*pi*w*(t[i] .- t[j]))./(pi*(t[i] .- t[j]))
-          b[i,j]  = exp.(-2*pi*1.0im*f*(t[i] .- t[j])).*sin.(2*pi*beta*(t[i] .- t[j]))./(pi*(t[i] .- t[j])) 
+          b[i,j]  = exp.(-2*pi*1.0im*f*(t[i] .- t[j])).*
+                      sin.(2*pi*beta*(t[i] .- t[j]))./(pi*(t[i] .- t[j])) 
       end
   end
   R = cholesky(Hermitian(b))
