@@ -53,8 +53,8 @@ end
 acvf = mt_acvf(dat[:,3], NW = NW, K = K, dt = dt)
 acvfspec = mt_acvf(univ)
 
-ceps = mt_acvf(dat[:,3], NW = NW, K = K, dt = dt, typ = :ceps)
-cepsspec = mt_acvf(univ, typ = :ceps)
+ceps = mt_cepstrum(dat[:,3], NW = NW, K = K, dt = dt)
+cepsspec = mt_cepstrum(univ)
 
 cet_path = @__DIR__()*"/../Examples/data/CETmonthly.dat"
 cet = readdlm(cet_path)

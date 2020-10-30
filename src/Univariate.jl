@@ -361,49 +361,36 @@ function blockerr(lengt, nsegments; overlap=0.0)
 end
 
 """
-    mt_acvf(S; <keyword arguments>)
+    mt_acvf(S)
 
-Computes univariate multitaper autocovariance/autocorrelation function. Inputs a
-MtSpec struct.
+Computes univariate multitaper autocovariance function. Inputs a MtSpec struct.
 
 ...
 # Arguments
  - `S::MtSpec`: the vector containing the result of an univariate call to `multispec`
- - `typ::Symbol`: whether to compute autocovariance function (:acvf), autocorrelation function (:acf), or cepstrum (:ceps)
 ...
 
 ...
 # Outputs
- - `MtAcvf`, `MtAcf`, or `MtCeps` struct, depending on the selection of `typ` input above.
+ - `MtAcvf` struct containing the autocovariance function.
 ...
 
 See also: [`multispec`](@ref)
 """
-function mt_acvf(S::MtSpec; typ::Symbol = :acvf)   
+function mt_acvf(S::MtSpec)   
   lags = S.params.dt*S.params.N*range(0.0, 1.0, length=S.params.N+1)[1:length(S.S)]
   spec = mod(S.params.N, 2) == 0 ? vcat(S.S, S.S[end-1:-1:2]) : vcat(S.S,
           S.S[end:-1:2])
-  if typ == :acvf
-    return MtAcvf(lags, real.(ifft(spec))[1:length(S.S)], S.params)
-  elseif typ == :acf
-    acvf = real.(ifft(spec))[1:length(S.S)]
-    return MtAcf(lags, acvf/acvf[1], S.params)
-  elseif typ == :ceps
-    return MtCeps(lags, real.(ifft(log.(spec)))[1:length(S.S)], S.params)
-  else
-    error("Select one of :acvf (autocovariance), :acf (autocorrelation), :ceps
-          (cepstrum) for output")
-  end
+  return MtAcvf(lags, real.(ifft(spec))[1:length(S.S)], S.params)
 end
 
 """
     mt_acvf(S1; <keyword arguments>)
 
-Computes univariate multitaper autocovariance/autocorrelation function starting with an input time series.
+Computes univariate multitaper autocovariance function starting with an input time series.
 ...
 # Arguments
  - `S1::Vector{T} where T<:Number`: the vector containing the time series
- - `typ::Symbol`: whether to compute autocovariance function (:acvf), autocorrelation function (:acf), or cepstrum (:ceps)
  - `NW::Float64 = 4.0`: time-bandwidth product of estimate
  - `K::Int64 = 6`: number of slepian tapers, must be <= 2*NW
  - `dt::Float64`: sampling rate in time units 
@@ -416,17 +403,130 @@ Computes univariate multitaper autocovariance/autocorrelation function starting 
 
 ...
 # Outputs
- - `MtAcvf`, `MtAcf`, or `MtCeps` struct, depending on the selection of `typ` input above.
+ - `MtAcvf` struct containing the autocovariance function
 ...
 
 See also: [`multispec`](@ref)
 """
-function mt_acvf(S1; typ=:acvf, NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0,
+function mt_acvf(S1; NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0,
                  dpVec=nothing, egval=nothing, a_weight=true)
   S = multispec(S1, NW = NW, K = K, dt = dt, ctr = ctr, pad = pad, dpVec = dpVec, 
                 egval = egval, guts = false, a_weight = a_weight, Ftest = false, 
                 jk = false, Tsq = nothing) 
-  return mt_acvf(S, typ = typ)
+  return mt_acvf(S)
+end
+
+"""
+    mt_acf(S)
+
+Computes univariate multitaper autocorrelation function. Inputs a MtSpec struct.
+
+...
+# Arguments
+ - `S::MtSpec`: the vector containing the result of an univariate call to `multispec`
+...
+
+...
+# Outputs
+ - `MtAcf` struct containing the autocorrelation function
+...
+
+See also: [`multispec`](@ref)
+"""
+function mt_acf(S::MtSpec)   
+  lags = S.params.dt*S.params.N*range(0.0, 1.0, length=S.params.N+1)[1:length(S.S)]
+  spec = mod(S.params.N, 2) == 0 ? vcat(S.S, S.S[end-1:-1:2]) : vcat(S.S,
+          S.S[end:-1:2])
+  acvf = real.(ifft(spec))[1:length(S.S)]
+  return MtAcf(lags, acvf/acvf[1], S.params)
+end
+
+"""
+    mt_acf(S1; <keyword arguments>)
+
+Computes univariate multitaper autocorrelation function starting with an input time series.
+...
+# Arguments
+ - `S1::Vector{T} where T<:Number`: the vector containing the time series
+ - `NW::Float64 = 4.0`: time-bandwidth product of estimate
+ - `K::Int64 = 6`: number of slepian tapers, must be <= 2*NW
+ - `dt::Float64`: sampling rate in time units 
+ - `ctr::Bool`: whether or not to remove the mean before computing the multitaper spectrum
+ - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will be pad times length of the time series.
+ - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have been precomputed
+ - `egval::Union{Vector{Float64},Nothing} = nothing`: Vector of concentratins of said dpss's
+ - `a_weight::Bool = true`: whether or not to use adaptive weighting
+...
+
+...
+# Outputs
+ - `MtAcf` struct containing the autocorrelation function
+...
+
+See also: [`multispec`](@ref)
+"""
+function mt_acf(S1; NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0,
+                 dpVec=nothing, egval=nothing, a_weight=true)
+  S = multispec(S1, NW = NW, K = K, dt = dt, ctr = ctr, pad = pad, dpVec = dpVec, 
+                egval = egval, guts = false, a_weight = a_weight, Ftest = false, 
+                jk = false, Tsq = nothing) 
+  return mt_acf(S)
+end
+
+"""
+    mt_cepstrum(S)
+
+Computes multitaper cepstrum. Inputs a MtSpec struct.
+
+...
+# Arguments
+ - `S::MtSpec`: the vector containing the result of an univariate call to `multispec`
+...
+
+...
+# Outputs
+ - `MtCeps` struct containing the cepstrum
+...
+
+See also: [`multispec`](@ref)
+"""
+function mt_cepstrum(S::MtSpec)   
+  lags = S.params.dt*S.params.N*range(0.0, 1.0, length=S.params.N+1)[1:length(S.S)]
+  spec = mod(S.params.N, 2) == 0 ? vcat(S.S, S.S[end-1:-1:2]) : vcat(S.S,
+          S.S[end:-1:2])
+  return MtCeps(lags, real.(ifft(log.(spec)))[1:length(S.S)], S.params)
+end
+
+"""
+    mt_cepstrum(S1; <keyword arguments>)
+
+Computes multitaper cepstrum starting with an input time series.
+...
+# Arguments
+ - `S1::Vector{T} where T<:Number`: the vector containing the time series
+ - `NW::Float64 = 4.0`: time-bandwidth product of estimate
+ - `K::Int64 = 6`: number of slepian tapers, must be <= 2*NW
+ - `dt::Float64`: sampling rate in time units 
+ - `ctr::Bool`: whether or not to remove the mean before computing the multitaper spectrum
+ - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will be pad times length of the time series.
+ - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have been precomputed
+ - `egval::Union{Vector{Float64},Nothing} = nothing`: Vector of concentratins of said dpss's
+ - `a_weight::Bool = true`: whether or not to use adaptive weighting
+...
+
+...
+# Outputs
+ - `MtCeps` struct containing the cepstrum
+...
+
+See also: [`multispec`](@ref)
+"""
+function mt_cepstrum(S1; NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0,
+                 dpVec=nothing, egval=nothing, a_weight=true)
+  S = multispec(S1, NW = NW, K = K, dt = dt, ctr = ctr, pad = pad, dpVec = dpVec, 
+                egval = egval, guts = false, a_weight = a_weight, Ftest = false, 
+                jk = false, Tsq = nothing) 
+  return mt_cepstrum(S)
 end
 
 """
