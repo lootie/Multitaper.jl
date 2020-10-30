@@ -36,6 +36,10 @@ Univariate
 
 ### multispec
 
+```@docs
+multispec(S1)
+```
+
 This command does a lot of the univariate stuff. Its signature is:
 
 ```
