@@ -5,7 +5,7 @@
 
 ##### Plots of multitaper spectra #####
 
-@recipe function plot(S::MtSpec; cross = true) 
+@recipe function plot(S::MTSpectrum; cross = true) 
   #
   yscale --> :log10
   dt   = S.params.dt
@@ -48,7 +48,7 @@ end
 ### Plots of multitaper autocovariances
 
 """ Simply plot the multitaper autocorrelation """
-@recipe function acfplt(A::MtAcf)
+@recipe function acfplt(A::MTAutocorrelationFunction)
   label --> "MT acf"
   title --> "Autocorrelation Function"
   yguide --> "Autocorrelation"
@@ -61,7 +61,7 @@ end
 end
 
 """ Simply plot the multitaper autocovariance function """
-@recipe function acvfplt(A::MtAcvf)
+@recipe function acvfplt(A::MTAutocovarianceFunction)
   label --> "MT acvf"
   title --> "Autocovariance Function"
   yguide --> "Autocovariance"
@@ -74,7 +74,7 @@ end
 end
 
 """ Simply plot the multitaper cepstrum coefficients """
-@recipe function cepsplt(A::MtCeps)
+@recipe function cepsplt(A::MTCepstrum)
   label --> "MT Cepstrum"
   title --> "Cepstrum"
   yguide --> "Cepstrum coefficient"

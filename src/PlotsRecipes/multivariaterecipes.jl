@@ -3,7 +3,7 @@
 
 # Recipes for multivariate spectrum analysis, mostly coherences at this point.
 
-@recipe function plot(C::MtCoh; phase = false, sigMax = 0)
+@recipe function plot(C::MTCoherence; phase = false, sigMax = 0)
   jk = (C.jkvar != nothing) 
   link := :xaxis 
   NW = C.params.NW
@@ -70,7 +70,7 @@
   end
 end
 
-@recipe function plot(C::Matrix{MtCoh}; phase = false, jk = false, sigMax = 0)
+@recipe function plot(C::Matrix{MTCoherence}; phase = false, jk = false, sigMax = 0)
   link := :xaxis 
   z = norminvcdf(0,1,0.975)    
   # Label with significance levels
@@ -159,7 +159,7 @@ end
 # Finally, suppose we want to plot the output of a coherence calculation. Currently the output is
 # spectra in the first index and coherences in the second. This is not fancy, and does not provide
 # CIs, you have to plot those separately to see detail. 
-@recipe function specCohMatrix(Spec::Tuple{Array{MtSpec{C,T,P},1},Array{MtCoh,2},Nothing}; 
+@recipe function specCohMatrix(Spec::Tuple{Array{MTSpectrum{C,T,P},1},Array{MTCoherence,2},Nothing}; 
                                 sigMax = 0) where C where T where P
   J = size(Spec[2],1)
   layout := (J,J)
@@ -210,7 +210,7 @@ end
 #### Recipes related to cross-covariance and cross-correlation
 
 """ Plots the multitaper cross covariance function """
-@recipe function ccvfplot(A::MtCcvf)
+@recipe function ccvfplot(A::MtCrossCovarianceFunction)
   label --> "MT Cross-Covariance"
   title --> "Cross-Covariance Function"
   yguide --> "Cross Covariance"
@@ -222,7 +222,7 @@ end
 end
 
 """ Plots the multitaper cross correlation function """
-@recipe function ccfplot(A::MtCcf)
+@recipe function ccfplot(A::MTCrossCorrelationFunction)
   label --> "MT Cross-Correlation"
   title --> "Cross-Correlation Function"
   yguide --> "Cross Correlation"

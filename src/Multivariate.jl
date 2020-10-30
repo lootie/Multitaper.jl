@@ -1,6 +1,6 @@
 
 """ T squared test for simultaneous line components """ 
-function testTsq(dcs,tap::Ecoef)
+function testTsq(dcs,tap::EigenCoefficient)
   ell, k    = (Float64(size(tap.coef,1)), Float64(size(tap.coef,2)))
   if (ell > k)
     println("Tsq test error: you have K = $k tapers and L = $ell eigencoefficients,
@@ -28,10 +28,10 @@ Computes multitaper cross-spectrum or coherence when given two time series with 
 
 # Arguments
 
- - `S1::Union{Vector{T},Ecoef} where T<:Number`: the vector containing the first time
+ - `S1::Union{Vector{T},EigenCoefficient} where T<:Number`: the vector containing the first time
 series
 
- - `S2::Union{Vector{P},Ecoef} where P<:Number`: the vector containing the second
+ - `S2::Union{Vector{P},EigenCoefficient} where P<:Number`: the vector containing the second
 time series
 
  - `outp::Symbol`: output can be either :coh for coherence, :spec for cross-spectrum,
@@ -72,20 +72,20 @@ Defaults to none.
 
 # Outputs
 
- - `MtSpec`, `MtCoh`, or `MtTransf` struct containing the spectrum, coherence or
+ - `MTSpectrum`, `MTCoherence`, or `MTTransferFunction` struct containing the spectrum, coherence or
 transfer function, depending on the selection of `outp` input. 
 
 ...
 
-See also: [`dpss_tapers`](@ref), [`MtSpec`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
+See also: [`dpss_tapers`](@ref), [`MTSpectrum`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
 
 """
-function multispec(S1::Union{Vector{T},Ecoef}, S2::Union{Vector{P},Ecoef}; 
+function multispec(S1::Union{Vector{T},EigenCoefficient}, S2::Union{Vector{P},EigenCoefficient}; 
                    outp=:coh, NW=4.0, K=6, offset=0, dt=1.0, ctr=true, pad=1.0,
                    dpVec=nothing, guts=false, jk=false, Tsq=nothing, 
                    alph=0.05) where{T<:Number,P<:Number}
   
-  if (typeof(S1) == Ecoef) && (typeof(S2) == Ecoef)
+  if (typeof(S1) == EigenCoefficient) && (typeof(S2) == EigenCoefficient)
     coefswts = [S1, S2]
     halffreq = size(S1.coef,1)
     fftleng  = 2*halffreq - 1 # This is only for real data
@@ -117,7 +117,7 @@ function multispec(S1::Union{Vector{T},Ecoef}, S2::Union{Vector{P},Ecoef};
                  collect(1:halffreq))[(halffreq+offset):(2*halffreq+offset-1)]
     end
     # Shift the first set of eigencoefficients forward or backwards accordingly
-    coefswts[1] = Ecoef(coefswts[1].coef[ind,:], 
+    coefswts[1] = EigenCoefficient(coefswts[1].coef[ind,:], 
                    (coefswts[1].wts == nothing ? nothing : coefswts[1].wts[ind,:]))
     foffset = int_to_freq([offset],lengt,dt)[1]
     freq = (1/dt)*range(foffset, 0.5 + foffset, length=halffreq)  
@@ -152,22 +152,22 @@ function multispec(S1::Union{Vector{T},Ecoef}, S2::Union{Vector{P},Ecoef};
       error("There are too few tapers for the number of Tsq tests.")
     end
     Tv = map(x->testTsq(dcs,
-             Ecoef(vcat(coefswts[1].coef[Tsq[x],:],coefswts[2].coef[Tsq[x],:]),
+             EigenCoefficient(vcat(coefswts[1].coef[Tsq[x],:],coefswts[2].coef[Tsq[x],:]),
              nothing)),eachindex(Tsq)) 
   else
     Tv = nothing
   end
 
-  params = MtParams(NW, K, lengt, dt, fftleng, 1, nothing)   
+  params = MTParameters(NW, K, lengt, dt, fftleng, 1, nothing)   
   if outp == :spec
-    return MtSpec(freq, S, phase, params, (guts ? coefswts : nothing), 
+    return MTSpectrum(freq, S, phase, params, (guts ? coefswts : nothing), 
                 nothing, (jk ?  [jv, jphase] : nothing), Tv) 
   elseif outp == :coh
-    return MtCoh(freq, S, phase, params, (guts ? coefswts : nothing), 
+    return MTCoherence(freq, S, phase, params, (guts ? coefswts : nothing), 
                      (jk ?  [jv,jphase] : nothing), Tv) 
     # frequency, spec/crosspec, coef & weights, jackknife, Tsq test.
   elseif outp == :transf
-    return MtTransf(freq, abs.(B).^2, unwrapphase(angle.(vec(B))*180/pi,:deg), 
+    return MTTransferFunction(freq, abs.(B).^2, unwrapphase(angle.(vec(B))*180/pi,:deg), 
                     params, (guts ? coefswts : nothing), nothing)
   end
 
@@ -178,39 +178,39 @@ end
     mt_ccvf(S; <keyword arguments>)
 
 Computes univariate multitaper cross-covariance/cross-correlation function.
-Inputs a MtCoh or MtSpec struct.
+Inputs a MTCoherence or MTSpectrum struct.
 
 ...
 # Arguments
- - `S::Union{MtCoh,MtSpec}`: the vector containing the result of an multiivariate call to `multispec`
+ - `S::Union{MTCoherence,MTSpectrum}`: the vector containing the result of an multiivariate call to `multispec`
  - `typ::Symbol = :ccvf`: whether to compute cross-correlation function (:ccf) or cross-covariance function (:ccvf)
 ...
 
 ...
 # Outputs
- - `MtCcvf`, `MtCcf` depending on the selection of `typ` input above.
+ - `MtCrossCovarianceFunction`, `MTCrossCorrelationFunction` depending on the selection of `typ` input above.
 ...
 
 See also: [`multispec`](@ref)
 """
-function mt_ccvf(S::MtCoh; typ=:ccvf)
+function mt_ccvf(S::MTCoherence; typ=:ccvf)
   lags = S.params.dt*S.params.N*range(-1.0, 1.0, length=length(S.coh))
   if typ == :ccvf
     error("Cannot compute cross covariance from coherence.")
   elseif typ == :ccf
-    return MtCcf(lags, fftshift(real.(ifft(S.coh))), S.params)
+    return MTCrossCorrelationFunction(lags, fftshift(real.(ifft(S.coh))), S.params)
   else
     throw(error("Select one of :ccvf (cross covariance), :ccf (cross correlation) for output"))
   end
 end
 
-function mt_ccvf(S::MtSpec; typ=:ccvf)
+function mt_ccvf(S::MTSpectrum; typ=:ccvf)
   lags = S.params.dt*S.params.N*range(-1.0, 1.0, length=length(S.S))
   if typ == :ccvf
-    return MtCcvf(lags, fftshift(real.(ifft(S.S))), S.params)
+    return MtCrossCovarianceFunction(lags, fftshift(real.(ifft(S.S))), S.params)
   elseif typ == :ccf
     ccvf = real.(ifft(S.S))[1:length(S.S)]
-    return MtCcf(lags, fftshift(ccvf)/ccvf[1], S.params)
+    return MTCrossCorrelationFunction(lags, fftshift(ccvf)/ccvf[1], S.params)
   else
     throw(error("Select one of :ccvf (cross covariance), :ccf (cross correlation) for output"))
   end
@@ -240,7 +240,7 @@ Computes bivariate multitaper cross-covariance/cross-correlation function from t
 
 ...
 # Outputs
- - `MtCcvf` struct, depending on the selection of `typ` input above.
+ - `MtCrossCovarianceFunction` struct, depending on the selection of `typ` input above.
 ...
 
 See also: [`multispec`](@ref)
@@ -255,7 +255,7 @@ function mt_ccvf(S1::Vector{T}, S2::Vector{T}; typ=:ccvf, NW=4.0, K=6, dt=1.0,
                 NW = NW, K = K, dt = dt, ctr = ctr, pad = pad, dpVec = dpVec, 
                 guts = false, jk = false, Tsq = nothing, alph = alph) 
   # return mt_ccvf(S; typ = typ)
-  return MtCcvf(S.f, S.S, MtParams(NW, K, length(S1), dt, pad, 1, nothing)) 
+  return MtCrossCovarianceFunction(S.f, S.S, MTParameters(NW, K, length(S1), dt, pad, 1, nothing)) 
 end
 
 """
@@ -282,12 +282,12 @@ Multivariate version of the multispec call, data are in the columns of a matrix
 
 ...
 # Outputs
- - `Tuple{Vector{MtSpec},Vector{P},Union{Float64,Vector{Float64}}} where P = Union{MtCoh,MtSpec}` 
+ - `Tuple{Vector{MTSpectrum},Vector{P},Union{Float64,Vector{Float64}}} where P = Union{MTCoherence,MTSpectrum}` 
 struct containing the spectra, coherence or crossspectra, and Tsquared test p-values. 
 Ouput of middle arg depends on the selection of `outp` input. 
 ...
 
-See also: [`dpss_tapers`](@ref), [`MtSpec`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
+See also: [`dpss_tapers`](@ref), [`MTSpectrum`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
 """
 function multispec(S1::Matrix{T}; outp=:coh, NW=4.0, K=6, dt=1.0, ctr=true,
                    pad=1.0, dpVec=nothing, guts=false, a_weight=true, jk=false,
@@ -317,8 +317,8 @@ e end
  
   # Get the cross-spectra
   if (outp != :justspecs)
-    crosspecs = (outp == :cross) ? Array{MtSpec,2}(undef, p, p) : 
-                                  Array{MtCoh,2}(undef, p, p)
+    crosspecs = (outp == :cross) ? Array{MTSpectrum,2}(undef, p, p) : 
+                                  Array{MTCoherence,2}(undef, p, p)
     for x in CartesianIndex.(filter(x -> x[2]>x[1], 
                              Tuple.(eachindex(view(crosspecs,1:p,1:p)))))
       crosspecs[x] = multispec(specs[x[1]].coef, specs[x[2]].coef, 
@@ -344,7 +344,7 @@ e end
     Tv = zeros(length(Tsq)) 
     for x = eachindex(Tsq) 
         temp  = mapreduce(y -> y[Tsq[x],:], vcat, (specs[j].coef.coef for j = 1:p))
-        Tv[x] = testTsq(dcs, Ecoef(temp,nothing))
+        Tv[x] = testTsq(dcs, EigenCoefficient(temp,nothing))
     end
   else
     Tv = nothing

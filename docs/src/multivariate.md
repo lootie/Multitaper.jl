@@ -28,7 +28,7 @@ However, there are a few differences now. You can either use the first, simpler
 version, of the multivariate call: 
 
 ```
-function multispec(S1::Union{Vector{T},Ecoef}, S2::Union{Vector{T},Ecoef}; 
+function multispec(S1::Union{Vector{T},EigenCoefficient}, S2::Union{Vector{T},EigenCoefficient}; 
                    outp=:coh, NW=4.0, K=6, offset=0, dt=1.0, ctr=true, pad=1.0,
                    dpVec=nothing, guts=false, jk=false, Tsq=nothing, alph=0.05) where{T}
 ```
@@ -60,14 +60,14 @@ function.
 
 The output struct you get will be determined by what `outp` is, namely one of 
 
-- `MtSpec` struct which will contain the following fields (in
+- `MTSpectrum` struct which will contain the following fields (in
 the following order):
 
   * frequency (f), as a LinRange
   * cross-spectrum (S), a vector giving half the spectrum up to the Nyquist if the input is
     real
   * phase, 
-  * chosen values of the multitaper time bandwidth product etc of type MtParams
+  * chosen values of the multitaper time bandwidth product etc of type `MTParameters`
     (params) This makes its own parameter struct that contains NW, K, N, dt, M (padded
   length), nsegments (number of segments of data to averae), overlap (if the sample was
   divided into overlapping chunks) and it gets carried around for future reference and
@@ -78,12 +78,12 @@ the following order):
   * Tsquared test results (Tsq_pval, optional).This struct was described
   earlier, in this case the `phase` output field will be filled in.
 
-* `MtCoh` coherence struct. Its fields are 
+* `MTCoherence` coherence struct. Its fields are 
 
 - frequency (f)
 - coh, a vector giving the squared coherence up to the Nyquist if the input is real
 - phase, 
-- chosen values of the multitaper time bandwidth product etc of type MtParams
+- chosen values of the multitaper time bandwidth product etc of type `MTParameters`
   (params) This makes its own parameter struct that contains NW, K, N, dt, M (padded
   length), nsegments (number of segments of data to averae), overlap (if the sample 
   was divided into overlapping chunks) and it gets carried around for future reference 
@@ -92,12 +92,12 @@ the following order):
 - jackknife output (jkvar, optional), and
 - Tsquared test results (Tsq_pval, optional). 
 
-* `MtTransf` transfer function struct. Its fields are
+* `MTTransferFunction` transfer function struct. Its fields are
 - frequency (f)
 - transf, a vector giving the transfer function up to the Nyquist if the input is
   real
 - phase, 
-- chosen values of the multitaper time bandwidth product etc of type MtParams
+- chosen values of the multitaper time bandwidth product etc of type `MTParameters`
   (params) This makes its own parameter struct that contains NW, K, N, dt, M (padded
 length), nsegments (number of segments of data to averae), overlap (if the sample was
 divided into overlapping chunks) and it gets carried around for future reference and
@@ -138,7 +138,7 @@ function multispec(S1::Matrix{T}; outp=:coh, NW=4.0, K=6, dt=1.0, ctr=true,
 The output of this command, depending on the desired output type, is one of three
 things:
 
-* `outp = :justspecs` is a vector of MtSpec structs containing the spectra alone. 
+* `outp = :justspecs` is a vector of MTSpectrum structs containing the spectra alone. 
 
 * `outp = :coh` is a tuple containing the spectra, a matrix filled with coherences on
   the super-diagonal (so if the result was called out, you'd access it by using
@@ -184,7 +184,7 @@ The inputs are the following:
   * lambdau -- missing data Slepian tapers and their concentrations, if precomputed
 
 The output is 
-  * sxx -- MtCoh coherence estimate 
+  * sxx -- MTCoherence coherence estimate 
 
 ## Time domain:
 
@@ -194,7 +194,7 @@ This function computes multitaper estimates of the cross-covariance and
 cross-correlation by way of inverse-FFT of a multitaper spectrum estimate. Its
 signature is either
 
-``` function mt_ccvf(S::MtSpec; typ::Symbol = :ccvf) ```
+``` function mt_ccvf(S::MTSpectrum; typ::Symbol = :ccvf) ```
 
 or
 
@@ -210,18 +210,18 @@ mt_ccvf(S1::Vector{T}, S2::Vector{T}; typ::Symbol = :ccvf, NW::Real = 4.0, K::In
                    alph::Float64 = 0.05) where T<:Number
 ```
 
-In the first, we assume that you have the MtSpec struct handy (must be cross-spectra,
+In the first, we assume that you have the MTSpectrum struct handy (must be cross-spectra,
 coherences won't work), and in the second you give the two time series, similar to
 above.  The `typ` kwarg can take values in (`:ccvf` and `:ccf`) with `:ccvf` being
 the default value. Depending on the value of typ, you will get one of two different
 structs
 
-* MtCcf: Contains lags, cross correlation function, and a params struct (mentioned
+* MTCrossCorrelationFunction: Contains lags, cross correlation function, and a params struct (mentioned
   above) that carries around the relevant multitaper options. 
 
-* MtCcvf: Contains lags, cross covariance function, and a params struct.
+* `MtCrossCovarianceFunction`: Contains lags, cross covariance function, and a params struct.
 
-when you plot one of the `MtCcf` or `MtCcvf` structs using the recipe, you'll get a
+when you plot one of the `MTCrossCorrelationFunction` or `MtCrossCovarianceFunction` structs using the recipe, you'll get a
 stem plot. 
 
 

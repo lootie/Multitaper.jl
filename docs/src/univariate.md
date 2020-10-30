@@ -82,14 +82,14 @@ S1 is the time series, and you have the following keyword options:
     proceedings)
   * alph, confidence level for jackknife confidence intervals and Tsq tests.
 
-The output of this command is a MtSpec struct which contains the following fields (in
+The output of this command is a MTSpectrum struct which contains the following fields (in
 the following order):
 
   * frequency (f), as a LinRange
   * spectrum (S), a vector giving half the spectrum up to the Nyquist if the input is
     real
   * phase (optional), 
-  * chosen values of the multitaper time bandwidth product etc of type MtParams
+  * chosen values of the multitaper time bandwidth product etc of type MTParameters
     (params) This makes its own parameter struct that contains NW, K, N, dt, M (padded
   length), nsegments (number of segments of data to averae), overlap (if the sample was
   divided into overlapping chunks) and it gets carried around for future reference and
@@ -115,7 +115,7 @@ up if the function is going to be called many times.  The option `a_weight` uses
 adaptive weighting. 
 
 A note on plotting: if you are using Plots.jl there are pre-loaded recipes that make
-plotting of MtSpec structs completely trivial. Simply plot your MtSpec structs as if
+plotting of MTSpectrum structs completely trivial. Simply plot your MTSpectrum structs as if
 they were vectors, and you'll get a bunch of preformatting for free. Consult the
 jupyter notebooks for examples of some of the recipes.
 
@@ -155,14 +155,13 @@ cepstrum, by way of inverse-FFT of a multitaper spectrum estimate. Its signature
 either
 
 ``` 
-function mt_acvf(S::MtSpec; typ::Symbol = :acvf)
+function mt_acvf(S::MTSpectrum)
 ```
 
 or
 
 ```
 function mt_acvf(S1::Union{Vector{T}}; 
-                 typ::Symbol = :acvf, 
                  NW::Real = 4.0, 
                  K::Int = 6, 
                  dt::Float64=1.0, 
@@ -176,32 +175,91 @@ function mt_acvf(S1::Union{Vector{T}};
                  ) where T<:Number
 ```
 
-The first method is used if you've already computed the spectrum and have the MtSpec
+The first method is used if you've already computed the spectrum and have the MTSpectrum
 struct handy.  If not, you can use the second version, putting in the time series,
 and using any other relevant input arguments mentioned in the multispec call above.
 
+The output is
 
-The only other toggle is `typ` which can take values in (`:acvf`, `:acf`, and
-`:ceps`) with `:acvf` being the default value. Depending on the value of typ, you
-will get one of three different structs
-
-  * MtAcf: Contains lags, autocorrelation function, and a params struct (mentioned
+  * MTAutocorrelationFunction: Contains lags, autocorrelation function, and a params struct (mentioned
     above) that carries around the relevant multitaper options. 
 
-  * MtAcvf: Contains lags, autocovariance function, and a params struct.
+# mt_acf
 
-  * MtCeps: Contains lags (quefrency), a cepstrum estimate, and a params struct. The
+This function computes multitaper estimates of the correlation by way of inverse-FFT
+of a multitaper spectrum estimate. Its signature is either
+
+``` 
+function mt_acf(S::MTSpectrum)
+```
+
+or
+
+```
+function mt_acf(S1::Union{Vector{T}}; 
+                 NW::Real = 4.0, 
+                 K::Int = 6, 
+                 dt::Float64=1.0, 
+                 ctr::Bool = true, 
+                 pad::Union{Int,Float64} = 1.0, 
+                 dpVec::Union{Vector{Float64},Matrix{Float64},Nothing} = nothing,
+                 egval::Union{Vector{Float64},Nothing} = nothing,
+                 a_weight::Bool = true, 
+                 reshape::Union{Bool, Float64, Int64, Vector{Float64}, 
+                          Vector{Int64}} = false,
+                 ) where T<:Number
+```
+
+The first method is used if you've already computed the spectrum and have the MTSpectrum
+struct handy.  If not, you can use the second version, putting in the time series,
+and using any other relevant input arguments mentioned in the multispec call above.
+
+The output is
+  * MTAutocovarianceFunction: Contains lags, autocovariance function, and a params struct.
+
+# mt_cepstrum
+
+This function computes multitaper estimate of the cepstrum, by way of inverse-FFT of
+the logarithm of a multitaper spectrum estimate. Its signature is either
+
+``` 
+function mt_cepstrum(S::MTSpectrum)
+```
+
+or
+
+```
+function mt_cepstrum(S1::Union{Vector{T}}; 
+                 NW::Real = 4.0, 
+                 K::Int = 6, 
+                 dt::Float64=1.0, 
+                 ctr::Bool = true, 
+                 pad::Union{Int,Float64} = 1.0, 
+                 dpVec::Union{Vector{Float64},Matrix{Float64},Nothing} = nothing,
+                 egval::Union{Vector{Float64},Nothing} = nothing,
+                 a_weight::Bool = true, 
+                 reshape::Union{Bool, Float64, Int64, Vector{Float64}, 
+                          Vector{Int64}} = false,
+                 ) where T<:Number
+```
+
+The first method is used if you've already computed the spectrum and have the MTSpectrum
+struct handy.  If not, you can use the second version, putting in the time series,
+and using any other relevant input arguments mentioned in the multispec call above.
+
+The output is
+  * MTCepstrum: Contains lags (quefrency), a cepstrum estimate, and a params struct. The
     cepstrum is the inverse-FFT (or cosine transform, when the signal is real) of the
   logarithm of the spectrum. 
 
-when you plot one of the `MtAcf`, `MtAcvf`, or `MtCeps` structs using the recipe,
-you'll get a stem plot. 
+When you plot one of the `MTAutocorrelationFunction`, `MTAutocovarianceFunction`, or
+`MTCepstrum` structs using the recipe, you'll get a stem plot. 
 
 # demodulate
 
 This function computes the multitaper estimate of the complex demodulate. Note that
 there are several published implementations of this, but this one uses a single
-zeroth order slepian taper as a filter. Note that this is identical to the
+zeroth order Slepian taper as a filter. Note that this is identical to the
 implementation in the R multitaper package. The function signature is 
 
 ```
@@ -255,7 +313,7 @@ The inputs are the following:
   * dof -- whether or not to output the degrees of freedom of the estimate
 
 The outputs are simply a list of the following 
-  * sxx -- MtSpec spectrum 
+  * sxx -- MTSpectrum spectrum 
   * nu1 -- Degrees of freedom, if dof is set to true
 
 ## Missing-data Slepian tapers

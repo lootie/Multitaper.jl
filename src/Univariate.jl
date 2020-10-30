@@ -86,7 +86,7 @@ function aweighted(old, new, len, estimates, evalues, evar, maxit, tol)
 end
 
 """ Guts function for jackknifing spectra """
-function jknife_spec(tap::Ecoef, tap2::Union{Ecoef,Nothing} = nothing,
+function jknife_spec(tap::EigenCoefficient, tap2::Union{EigenCoefficient,Nothing} = nothing,
                      loo_or_psv::Symbol = :loo) 
   # Jackknife the spectra
   if tap2 == nothing
@@ -110,7 +110,7 @@ function jknife_spec(tap::Ecoef, tap2::Union{Ecoef,Nothing} = nothing,
 end
 
 """ Guts function for jackknifing coherences, leave one out values are returned"""
-function jknife_coh(tap::Ecoef, tap2::Ecoef, loo_or_psv::Symbol = :loo)
+function jknife_coh(tap::EigenCoefficient, tap2::EigenCoefficient, loo_or_psv::Symbol = :loo)
   loo_coh   = exp.(jknife_spec(tap, tap2, :loo)) 
   loo_coh ./= sqrt.(exp.(jknife_spec(tap, nothing,
                     :loo)).*exp.(jknife_spec(tap2,nothing,:loo)))
@@ -127,7 +127,7 @@ function jknife_coh(tap::Ecoef, tap2::Ecoef, loo_or_psv::Symbol = :loo)
 end
 
 """ Guts function for jackknifing the phase, where eigencoefficients are given """
-function jknife_phase(tap::Ecoef, tap2::Ecoef) 
+function jknife_phase(tap::EigenCoefficient, tap2::EigenCoefficient) 
   loos    = tap.coef.*conj(tap2.coef)
   allin   = vec(sum(loos,dims=2))
   loos  .-= repeat(allin,1,size(tap.coef,2))
@@ -152,7 +152,7 @@ end
 Tquant(K,alpha::Float64=0.05) = StatsFuns.tdistinvcdf(K-1, 1.0-alpha)
 
 """ Function that jackknifes spectra and/or coherences """
-function jknife(tap::Ecoef, tap2::Union{Ecoef,Nothing}=nothing, 
+function jknife(tap::EigenCoefficient, tap2::Union{EigenCoefficient,Nothing}=nothing, 
                 typ::Symbol = :spec) 
   K      = size(tap.coef,2)
   # pseudovalues come pre-transformed
@@ -194,7 +194,7 @@ end
 """ F-test for line components at every frequency. Can select raw statistic or test
 p-value. """
 function testF(dc, tap, stat_or_p::Symbol = :pval)
-  tap    = (typeof(tap) == Ecoef) ? tap.coef : tap
+  tap    = (typeof(tap) == EigenCoefficient) ? tap.coef : tap
   k      = Float64(size(tap, 2))
   sum2dc = sum(abs2, dc)
   uf     = tap*dc/sum2dc
@@ -236,7 +236,7 @@ function multspec_guts(S1, dpVec, fftleng, halffreq,
                                    egval, cvar, maxit, tol)
     end
   end
-  return Ecoef(eigcoefs[1:halffreq,:], dsq)
+  return EigenCoefficient(eigcoefs[1:halffreq,:], dsq)
 end
 
 """
@@ -264,10 +264,10 @@ Computes univariate multitaper spectra with a handful of extra gadgets.
 
 ...
 # Outputs
- - `MtSpec` struct containing the spectrum
+ - `MTSpectrum` struct containing the spectrum
 ...
 
-See also: [`dpss_tapers`](@ref), [`MtSpec`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
+See also: [`dpss_tapers`](@ref), [`MTSpectrum`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
 """
 function multispec(S1; NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0, dpVec=nothing,
                    egval=nothing, guts=false, a_weight=true, Ftest=false,
@@ -308,15 +308,15 @@ function multispec(S1; NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0, dpVec=nothing,
     if (2*K < (true ? 1 : 2)*maximum(length.(Tsq)))
       error("There are too few tapers for the number of Tsq tests.")
     end
-    Tv = map(x->Tsqtest_pval(dcs,Ecoef(coefswts.coef[Tsq[x],:],nothing)),
+    Tv = map(x->Tsqtest_pval(dcs,EigenCoefficient(coefswts.coef[Tsq[x],:],nothing)),
              eachindex(Tsq)) 
   else
     Tv = nothing
   end
-  params = MtParams(NW, K, lengt, dt, fftleng, 1, nothing)   
+  params = MTParameters(NW, K, lengt, dt, fftleng, 1, nothing)   
   phase = nothing
   coef_out = (guts ? coefswts : nothing)
-  return MtSpec(freq, S, phase, params, coef_out, fv, jv, Tv) 
+  return MTSpectrum(freq, S, phase, params, coef_out, fv, jv, Tv) 
 end
 
 """ 
@@ -363,25 +363,25 @@ end
 """
     mt_acvf(S)
 
-Computes univariate multitaper autocovariance function. Inputs a MtSpec struct.
+Computes univariate multitaper autocovariance function. Inputs a MTSpectrum struct.
 
 ...
 # Arguments
- - `S::MtSpec`: the vector containing the result of an univariate call to `multispec`
+ - `S::MTSpectrum`: the vector containing the result of an univariate call to `multispec`
 ...
 
 ...
 # Outputs
- - `MtAcvf` struct containing the autocovariance function.
+ - `MTAutocovarianceFunction` struct containing the autocovariance function.
 ...
 
 See also: [`multispec`](@ref)
 """
-function mt_acvf(S::MtSpec)   
+function mt_acvf(S::MTSpectrum)   
   lags = S.params.dt*S.params.N*range(0.0, 1.0, length=S.params.N+1)[1:length(S.S)]
   spec = mod(S.params.N, 2) == 0 ? vcat(S.S, S.S[end-1:-1:2]) : vcat(S.S,
           S.S[end:-1:2])
-  return MtAcvf(lags, real.(ifft(spec))[1:length(S.S)], S.params)
+  return MTAutocovarianceFunction(lags, real.(ifft(spec))[1:length(S.S)], S.params)
 end
 
 """
@@ -403,7 +403,7 @@ Computes univariate multitaper autocovariance function starting with an input ti
 
 ...
 # Outputs
- - `MtAcvf` struct containing the autocovariance function
+ - `MTAutocovarianceFunction` struct containing the autocovariance function
 ...
 
 See also: [`multispec`](@ref)
@@ -419,26 +419,26 @@ end
 """
     mt_acf(S)
 
-Computes univariate multitaper autocorrelation function. Inputs a MtSpec struct.
+Computes univariate multitaper autocorrelation function. Inputs a MTSpectrum struct.
 
 ...
 # Arguments
- - `S::MtSpec`: the vector containing the result of an univariate call to `multispec`
+ - `S::MTSpectrum`: the vector containing the result of an univariate call to `multispec`
 ...
 
 ...
 # Outputs
- - `MtAcf` struct containing the autocorrelation function
+ - `MTAutocorrelationFunction` struct containing the autocorrelation function
 ...
 
 See also: [`multispec`](@ref)
 """
-function mt_acf(S::MtSpec)   
+function mt_acf(S::MTSpectrum)   
   lags = S.params.dt*S.params.N*range(0.0, 1.0, length=S.params.N+1)[1:length(S.S)]
   spec = mod(S.params.N, 2) == 0 ? vcat(S.S, S.S[end-1:-1:2]) : vcat(S.S,
           S.S[end:-1:2])
   acvf = real.(ifft(spec))[1:length(S.S)]
-  return MtAcf(lags, acvf/acvf[1], S.params)
+  return MTAutocorrelationFunction(lags, acvf/acvf[1], S.params)
 end
 
 """
@@ -460,7 +460,7 @@ Computes univariate multitaper autocorrelation function starting with an input t
 
 ...
 # Outputs
- - `MtAcf` struct containing the autocorrelation function
+ - `MTAutocorrelationFunction` struct containing the autocorrelation function
 ...
 
 See also: [`multispec`](@ref)
@@ -476,25 +476,25 @@ end
 """
     mt_cepstrum(S)
 
-Computes multitaper cepstrum. Inputs a MtSpec struct.
+Computes multitaper cepstrum. Inputs a MTSpectrum struct.
 
 ...
 # Arguments
- - `S::MtSpec`: the vector containing the result of an univariate call to `multispec`
+ - `S::MTSpectrum`: the vector containing the result of an univariate call to `multispec`
 ...
 
 ...
 # Outputs
- - `MtCeps` struct containing the cepstrum
+ - `MTCepstrum` struct containing the cepstrum
 ...
 
 See also: [`multispec`](@ref)
 """
-function mt_cepstrum(S::MtSpec)   
+function mt_cepstrum(S::MTSpectrum)   
   lags = S.params.dt*S.params.N*range(0.0, 1.0, length=S.params.N+1)[1:length(S.S)]
   spec = mod(S.params.N, 2) == 0 ? vcat(S.S, S.S[end-1:-1:2]) : vcat(S.S,
           S.S[end:-1:2])
-  return MtCeps(lags, real.(ifft(log.(spec)))[1:length(S.S)], S.params)
+  return MTCepstrum(lags, real.(ifft(log.(spec)))[1:length(S.S)], S.params)
 end
 
 """
@@ -516,7 +516,7 @@ Computes multitaper cepstrum starting with an input time series.
 
 ...
 # Outputs
- - `MtCeps` struct containing the cepstrum
+ - `MTCepstrum` struct containing the cepstrum
 ...
 
 See also: [`multispec`](@ref)
@@ -582,7 +582,7 @@ test.  ...
 ...
 # Outputs
 
- - `MtSpec` struct, depending on the selection of `outp` above
+ - `MTSpectrum` struct, depending on the selection of `outp` above
 
  - `Float64` containing the effective bandwidth
 
@@ -616,10 +616,10 @@ function welch(S1, nsegments, overlap=0.5; NW=4.0, K=6,
                          a_weight = a_weight).S, seq)
   
   fftleng, halffreq = output_len(S1[seq[1]:(seg_len+seq[1]-1)],pad)[2:3]
-  params = MtParams(NW, K, lengt, dt, fftleng, nsegments, overlap)   
+  params = MTParameters(NW, K, lengt, dt, fftleng, nsegments, overlap)   
   freq = range(0,1.0,length=fftleng+1)[1:halffreq]*(1.0/dt)
 
-  return (MtSpec(freq, v/nsegments, nothing, params, nothing, nothing, nothing, 
+  return (MTSpectrum(freq, v/nsegments, nothing, params, nothing, nothing, nothing, 
           nothing), bw)
 
 end

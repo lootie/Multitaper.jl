@@ -94,7 +94,7 @@ Slepians, if precomputed
 ...
 # Outputs
 
- - `pkg::MtSpec` struct containing the spectrum
+ - `pkg::MTSpectrum` struct containing the spectrum
 
  - `nu1::Vector{Float64}` optional vector containing the degrees of freedom, given
  if the `dof` kwarg is set to `true`.
@@ -121,7 +121,7 @@ function mdmultispec(tt::Vector{T}, x::Vector{P};
   sxx[2:(nfft2-1)] .*= 2
   d = sxx*sqrt.(lambda')./(sxx*lambda' .+ s2*(1.0 .- lambda'))
   nu1      = 2*d.^2*lambda
-  coefswts = Ecoef(ak,d.^2)
+  coefswts = EigenCoefficient(ak,d.^2)
   jv       = jk ? jknife(coefswts,nothing,:spec)[2] : nothing
   # F-test
   if Ftest
@@ -142,8 +142,8 @@ function mdmultispec(tt::Vector{T}, x::Vector{P};
   end
   Tv = nothing
   # Package up the outputs
-  pkg = MtSpec((1/dt)*range(0,1,length=nfft)[1:length(sxx)], dt*sxx, nothing, 
-              MtParams(bw*n, k, n, tt[2]-tt[1], 2*(nfft2-1), 1, nothing),
+  pkg = MTSpectrum((1/dt)*range(0,1,length=nfft)[1:length(sxx)], dt*sxx, nothing, 
+              MTParameters(bw*n, k, n, tt[2]-tt[1], 2*(nfft2-1), 1, nothing),
               coefswts, Fpval, jv, Tv)
   if dof 
       return pkg, nu1
@@ -193,7 +193,7 @@ Slepians, if precomputed
 
 # Outputs
 
- - `pkg::MtCoh` struct containing the coherence
+ - `pkg::MTCoherence` struct containing the coherence
 ...
 
 See also: [`multispec`](@ref), [`mdslepian`](@ref)
@@ -224,15 +224,15 @@ function mdmultispec(t::Vector{T},
                     0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
   ayk = mapreduce(slep -> nfft_adjoint(p, vcat(slep.*y, zeros(nfft-n)) .+ 
                     0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
-  outputcoefs = [Ecoef(axk,nothing),Ecoef(ayk,nothing)]
+  outputcoefs = [EigenCoefficient(axk,nothing),EigenCoefficient(ayk,nothing)]
     
   # Jacknife 
   sxy, svar = jknife(outputcoefs..., :coh)
   ph_xy, phvar = jknife_phase(outputcoefs...)
   Tv = nothing
 
-  return MtCoh((1/dt)*range(0,1,length=nfft)[1:nfft2], sxy, ph_xy, 
-                MtParams(bw*n, k, n, dt, 2*(nfft2-1), 1, nothing),
+  return MTCoherence((1/dt)*range(0,1,length=nfft)[1:nfft2], sxy, ph_xy, 
+                MTParameters(bw*n, k, n, dt, 2*(nfft2-1), 1, nothing),
                 outputcoefs, [svar, phvar], Tv)
 end
 
@@ -276,7 +276,7 @@ Slepians, if precomputed
 
 # Outputs
 
- - `Tuple{Vector{MtSpec},Matrix{MtCoh},Nothing}` struct containing the spectra, 
+ - `Tuple{Vector{MTSpectrum},Matrix{MTCoherence},Nothing}` struct containing the spectra, 
 coherences, and T^2 test significances (currently set to return nothing)
 
 ...
@@ -310,14 +310,14 @@ function mdmultispec(t::Vector{T},
                         jk=jk), xx, dims=1)[:]
  
   # Get the coherences
-  coherences = Array{MtCoh,2}(undef, p, p)
+  coherences = Array{MTCoherence,2}(undef, p, p)
   for x in CartesianIndex.(filter(x -> x[2]>x[1], 
                 Tuple.(eachindex(view(coherences,1:p,1:p)))))
       # Jacknife 
       sxy, svar = jknife(specs[x[2]].coef, specs[x[1]].coef,:coh)
       ph_xy, phvar = jknife_phase(specs[x[2]].coef, specs[x[1]].coef)
-      coherences[x] = MtCoh((1/dt)*fgrid, sxy, ph_xy, 
-                MtParams(bw*n, k, n, dt, 2*(nfft2-1), 1, nothing),
+      coherences[x] = MTCoherence((1/dt)*fgrid, sxy, ph_xy, 
+                MTParameters(bw*n, k, n, dt, 2*(nfft2-1), 1, nothing),
                 nothing, [svar, phvar], nothing)
   end
   Tv = nothing

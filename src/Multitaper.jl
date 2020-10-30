@@ -12,8 +12,10 @@ module Multitaper
   # Utiltity
 
   include("StructsTypes.jl")
-    export Ecoef, MtParams, MtSpec, Demodulate, MtAcf, MtAcvf, MtCeps
-    export MtCcvf, MtCcf, MtTransf, MtCoh 
+    export EigenCoefficient, MTParameters, MTSpectrum, Demodulate
+    export MTAutocorrelationFunction, MTAutocovarianceFunction, MTCepstrum
+    export MtCrossCovarianceFunction, MTCrossCorrelationFunction, MTTransferFunction
+    export MTCoherence 
     export Demodulate
 
   include("Utils.jl")

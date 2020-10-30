@@ -3,7 +3,7 @@ using StatsFuns, Multitaper, Plots, RecipesBase
 
 @userplot mtcoh
 
-@recipe function f(h::MtCoh; siglines = true, msclines = true, sigMax = 4, legtext = false, 
+@recipe function f(h::MTCoherence; siglines = true, msclines = true, sigMax = 4, legtext = false, 
         force_ylims = nothing, mscaxis = true, sigaxis = true, jk = true)
     
     # Layout, ylabels, etc

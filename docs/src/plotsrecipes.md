@@ -8,26 +8,26 @@ structs given by the base functions.
 
 One can plot univariate structs
 
-* `MtSpec` structs, which are outputs of the `multispec` function. These are ordinary
+* `MTSpectrum` structs, which are outputs of the `multispec` function. These are ordinary
   power spectrum estimates.
 
-* `MtAcf`, `Mtacvf` structs, which are outputs of the `mtacf` and `mtacvf` function.
+* `MTAutocorrelationFunction`, `Mtacvf` structs, which are outputs of the `mtacf` and `mtacvf` function.
   These are autocorrelation or autocovariance estimates, respectively. 
 
-* `MtCeps` structs, which are multitaper cepstra.
+* `MTCepstrum` structs, which are multitaper cepstra.
 
 * `Demodulate` structs, which contain complex demodulates.
 
 And multivariate structs
 
-* `MtCoh` structs, which are outputs of the multivariate `multispec` function. These
+* `MTCoherence` structs, which are outputs of the multivariate `multispec` function. These
   are coherence estimates. 
 
 * Outputs of coherence calculations are often given as
-  `Tuple{Array{MtSpec{C,T,P,1},Array{MtCoh,2},Nothing}`, and the corresponding recipe
+  `Tuple{Array{MTSpectrum{C,T,P,1},Array{MTCoherence,2},Nothing}`, and the corresponding recipe
 will plot all of the spectra, coherences, and phases on a grid. 
 
-* `MtCcvf` and `Mtccf` structs, which are outputs of the `mtccvf` and `mtccf` 
+* `MtCrossCovarianceFunction` and `Mtccf` structs, which are outputs of the `mtccvf` and `mtccf` 
 functions, respectively. These are plots of the multitaper cross-covariance function
 or cross-correlation function.
 
@@ -38,18 +38,18 @@ or cross-correlation function.
 To plot a univariate spectrum estimate, use the recipe with signature
 
 ```
-@recipe function plot(S::MtSpec; cross = true)
+@recipe function plot(S::MTSpectrum; cross = true)
 ``` 
 
 The following arguments are necessary
 
-* `MtSpec` struct is the output of a call to `multispec` where only a single time
+* `MTSpectrum` struct is the output of a call to `multispec` where only a single time
   series has been given, or two time series were given and the output desired is a 
   cross-spectrum.
 
 With the vanilla call to the plot recipe, one will get the power spectrum plotted on
 a logarithmic base 10 scale in the y-axis and appropriately labeled axes. If the
-jackknifed variance field (jkvar) in the `MtSpec` struct contains values, then 95
+jackknifed variance field (jkvar) in the `MTSpectrum` struct contains values, then 95
 percent confidence intervals will be shown as shaded bands around the spectrum. If
 the phase field contains values, then the y-axis will say "Cross-Spectrum" instead of
 "Spectrum".  
@@ -64,12 +64,12 @@ The optional keyword argument specifies
 To plot a multitaper estimate of autocorrelation, use the recipe with signature
 
 ```
-@recipe function acfplt(A::MtAcf)
+@recipe function acfplt(A::MTAutocorrelationFunction)
 ```
 
 The following arguments are necessary
 
-* `MtAcf` struct is the output of a call to `mtacf` with a single time series given. 
+* `MTAutocorrelationFunction` struct is the output of a call to `mtacf` with a single time series given. 
 
 The resulting plot will be a stem plot labeled as lags on the x-axis and
 autocorrelations on the y-axis. 
@@ -79,12 +79,13 @@ autocorrelations on the y-axis.
 To plot a multitaper estimate of autocovariance, use the recipe with signature
 
 ```
-@recipe function acvfplt(A::MtAcvf)
+@recipe function acvfplt(A::MTAutocovarianceFunction)
 ```
 
 The following arguments are necessary
 
-* `MtAcvf` struct is the output of a call to `mtacvf` with a single time series given. 
+* `MTAutocovarianceFunction` struct is the output of a call to `mt_acvf` with a
+  single time series given. 
 
 The resulting plot will be a stem plot labeled as lags on the x-axis and
 autocovariances on the y-axis. 
@@ -94,12 +95,12 @@ autocovariances on the y-axis.
 To plot the cepstrum, use the recipe with signature 
 
 ```
-@recipe function cepsplt(A::MtCeps)
+@recipe function cepsplt(A::MTCepstrum)
 ```
 
 The following arguments are necessary
 
-* `MtCeps` which is the output of a `mtceps` function call.
+* `MTCepstrum` which is the output of a `mt_ceps` function call.
 
 The resulting plot will show the cepstrum coefficient as a stem plot in terms of
 lags. 
@@ -127,12 +128,12 @@ the magnitude and one for the phase of the complex quantity.
 To plot a multitaper estimate of the coherence, use
 
 ```
-@recipe function plot(C::MtCoh; phase = false, sigMax = 0)
+@recipe function plot(C::MTCoherence; phase = false, sigMax = 0)
 ```
 
 The following arguments are necessary
 
-* `MtCoh` which is the output of a `multispec` call with more than one time series as
+* `MTCoherence` which is the output of a `multispec` call with more than one time series as
   input and coherence as output. 
 
 The resulting plot shows the magnitude squared coherences on a scale from 0 to 1, if
@@ -155,12 +156,12 @@ To plot multiple estimates of the coherence together on the same axes for compar
 use
 
 ```
-@recipe function plot(C::Matrix{MtCoh}; phase = false, jk = false, sigMax = 0)
+@recipe function plot(C::Matrix{MTCoherence}; phase = false, jk = false, sigMax = 0)
 ```
 
 The following arguments are necessary
 
-* `MtCoh` is as above.
+* `MTCoherence` is as above.
 
 The following keyword arguments can be set
 
@@ -175,7 +176,7 @@ two or more time series, one uses the recipe with the following signature:
 
 ```
 @recipe function
-specCohMatrix(Spec::Tuple{Array{MtSpec{C,T,P},1},Array{MtCoh,2},Nothing}; 
+specCohMatrix(Spec::Tuple{Array{MTSpectrum{C,T,P},1},Array{MTCoherence,2},Nothing}; 
                                 sigMax = 0) where C where T where P
 ```
 
@@ -185,7 +186,7 @@ plot, and phases are on the lower triagonal panels of the plot.
 
 The required input is 
 
-* `Spec` which is of type `Tuple{Array{MtSpec{C,T,P},1},Array{MtCoh,2},Nothing}`;
+* `Spec` which is of type `Tuple{Array{MTSpectrum{C,T,P},1},Array{MTCoherence,2},Nothing}`;
   which is the result one gets when one calls `multispec` on two or more time series. 
 
 The keywork argument
@@ -206,11 +207,11 @@ The main function in this piece of code has the
 following signature:
 
 ```
-@recipe function f(h::MtCoh; siglines = true, msclines = true, sigMax = 4, legtext = false, 
+@recipe function f(h::MTCoherence; siglines = true, msclines = true, sigMax = 4, legtext = false, 
         force_ylims = nothing, mscaxis = true, sigaxis = true, jk = true)
 ```
 
-The `MtCoh` type input is explanatory (it is as above), but one has the additional
+The `MTCoherence` type input is explanatory (it is as above), but one has the additional
 keyword arguments as follows
 
 * `siglines` allows one to put a selected number of horizontal lines on the plot
@@ -239,15 +240,15 @@ one obtains lines at 0.9, 0.99, 0.999, 0.9999.
 The following two recipe signatures:
 
 ```
-@recipe function ccvfplot(A::MtCcvf)
+@recipe function ccvfplot(A::MtCrossCovarianceFunction)
 ```
 
 and 
 
 ```
-@recipe function ccfplot(A::MtCcf)
+@recipe function ccfplot(A::MTCrossCorrelationFunction)
 ```
 
-will show either the cross-covariance estimate (if the input is of type `MtCcvf`) or
-the cross-correlation estimate (if the input is of type `MtCcf`) as a stem plot.
+will show either the cross-covariance estimate (if the input is of type `MtCrossCovarianceFunction`) or
+the cross-correlation estimate (if the input is of type `MTCrossCorrelationFunction`) as a stem plot.
 
