@@ -65,20 +65,20 @@ Multitaper power spectrum estimation for time series with missing data (gaps)
 
 ## Positional Arguments
 
- - `tt::Vector{T} where T<:Float64`: the vector containing the time indices
+ - `tt::Vector{T} where T<:Real`: the vector containing the time indices
 
- - `x::Vector{T}`: data vector
+ - `x::Vector{P} where P<:Number`: data vector
 
 ## Keyword Arguments
 
- - `bw::Float64 = 5/length(tt)`: bandwidth of estimate
+ - `bw = 5/length(tt)`: bandwidth of estimate
 
  - `k::Int64 = 2*bw*length(x)-1`: number of Slepian tapers, must be `<=
 2*bw*length(x)` 
 
  - `dt::T = tt[2]-tt[1]`: sampling rate in time units 
 
- - `nz::Float64 = 0.0`: zero padding factor
+ - `nz = 0.0`: zero padding factor
 
  - `Ftest::Bool = true`: Compute the F-test p-value
 
@@ -103,12 +103,12 @@ Slepians, if precomputed
 
 See also: [`multispec`](@ref), [`mdslepian`](@ref)
 """
-function mdmultispec(tt::Union{Vector{Int64},Vector{Float64}}, x::Vector{Float64}; 
+function mdmultispec(tt::Vector{T}, x::Vector{P}; 
                 bw=5/length(tt), k=Int64(2*bw*size(x,1)-1), 
                 lambdau::Union{Tuple{Array{Float64,1},
                                Array{Float64,2}},Nothing} = nothing,
                 dt=tt[2]-tt[1], nz=0, Ftest=true, jk=true,
-                dof=false)
+                dof=false) where{T<:Real,P<:Number}
   lambda,u = (lambdau == nothing) ? mdslepian(bw, k, tt) : lambdau
   s2    = var(x)
   n, nfft, nfft2 = _pregap(tt, x, nz)
@@ -163,15 +163,15 @@ Multitaper coherence estimation for time series with missing data (gaps)
 
 ## Positional Arguments 
 
- - `tt::Vector{T} where T<:Float64`: the vector containing the time indices
+ - `tt::Vector{T} where T<:Real`: the vector containing the time indices
 
- - `x::Vector{P}`: data vector 1
+ - `x::Vector{P} where P<:Number`: data vector 1
 
- - `y::Vector{Q}`: data vector 2
+ - `y::Vector{Q} where Q<:Number`: data vector 2
 
 ## Keyword Arguments
 
- - `bw<:Real = 5/length(tt)`: bandwidth of estimate
+ - `bw = 5/length(tt)`: bandwidth of estimate
 
  - `k::Int64 = 2*bw*length(x)-1`: number of Slepian tapers, must be `<=
 2*bw*length(x)`
@@ -198,16 +198,16 @@ Slepians, if precomputed
 
 See also: [`multispec`](@ref), [`mdslepian`](@ref)
 """
-function mdmultispec(t::Union{Vector{T}}, 
+function mdmultispec(t::Vector{T}, 
                 x::Vector{P},
                 y::Vector{Q};
                 bw = 5/length(t),
                 k::Int64    = Int64(2*bw*size(x,1) - 1),
-                dt = t[2]-t[1], jk::Bool = true,
+                dt = 1.0, jk::Bool = true,
                 nz = 0.0, 
                 Ftest::Bool = false,
-                lambdau::Union{Tuple{Array{Float64,1},
-                Array{Float64,2}},Nothing} = nothing) where{T<:Real,P<:Number,Q<:Number}
+                lambdau::Union{Tuple{Array{Float64,1}, Array{Float64,2}},Nothing} = 
+                    nothing) where{T<:Real,P<:Number,Q<:Number}
   (length(x) != length(y)) && error("The two series must have the same lengths.")
   n, nfft, nfft2 = _pregap(t, x, nz)
   lambda,u = (lambdau == nothing) ? mdslepian(bw, k, t) : lambdau
@@ -246,24 +246,24 @@ Multitaper coherence estimation for multiple time series with the same missing d
 
 # Arguments
 
-## Positional Arguments
-
- - `tt::Vector{T} where T<:Float64`: the vector containing the time indices
-
- - `x::Matrix{T}`: time series in the columns of a matrix
-
 ## Keyword Arguments
 
- - `bw<:Real = 5/length(tt)`: bandwidth of estimate
+ - `tt::Vector{T} where T<:Real`: the vector containing the time indices
+
+ - `x::Matrix{P} where P<:Number`: time series in the columns of a matrix
+
+## Positional Arguments
+
+ - `bw = 5/length(tt)`: bandwidth of estimate
 
  - `k::Int64 = 2*bw*length(x)-1`: number of Slepian tapers, must be `<=
-2*bw*length(x)`
+2*bw*length(x)` 
 
  - `dt = tt[2]-tt[1]`: sampling rate in time units 
 
  - `nz = 0.0`: zero padding factor
 
- - `Ftest::Bool = true`: Compute the F-test p-value
+ - `Ftest::Bool = false`: Compute the F-test p-value
 
  - `jk::Bool = true`: Compute jackknifed confidence intervals
 
@@ -286,12 +286,13 @@ See also: [`multispec`](@ref), [`mdslepian`](@ref)
 function mdmultispec(t::Vector{T}, 
                 xx::Matrix{P};
                 bw = 5/length(t),
-                k::Int64    = Int64(2*bw*size(x,1) - 1),
-                dt = t[2]-t[1], jk::Bool = true,
-                nz = 0.0, 
-                Ftest::Bool = false,
+                k::Int64    = Int64(2*bw*size(xx,1) - 1),
                 lambdau::Union{Tuple{Array{Float64,1},
-                Array{Float64,2}},Nothing} = nothing) where{T<:Real,P<:Number}
+                               Array{Float64,2}},Nothing} = nothing,
+                dt = 1.0,
+                nz = 0.0, 
+                jk::Bool = false, Ftest::Bool = false) where{T<:Real,P<:Number}
+
   n, p = size(xx)
   n, nfft, nfft2 = _pregap(t, xx[:,1], nz)
   fgrid = range(0,1,length=nfft)[1:nfft2]
@@ -413,6 +414,8 @@ sequences
  - `R` the Cholesky factor for the generalized eigenvalue problem
 
 ...
+
+This function is currently not exported, use `Multitaper.gpss`.
 
 See also: [`mdmultispec`](@ref), [`mdslepian`](@ref)
 
