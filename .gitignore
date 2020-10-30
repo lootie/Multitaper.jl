@@ -34,3 +34,5 @@ Manifest.toml
 *.hdf5
 *.fdb_latexmk
 *.xdv
+
+docs/build/
