@@ -13,7 +13,7 @@ makedocs(
 # for more information.
 
 deploydocs(
-    repo = "git@bitbucket.org:clhaley/multitaper.jl.git",
+    repo = "git@bitbucket.org:clhaley/multitaper.jl.git"
 )
 
 # deploydocs(
