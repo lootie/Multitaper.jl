@@ -14,6 +14,7 @@ makedocs(
 
 deploydocs(
     repo = "git@bitbucket.org:lootie/clhaley.bitbucket.io.git",
-    branch = "master"
+    branch = "master", 
+    root = "Multitaper.jl"
 )
 
