@@ -13,7 +13,7 @@ makedocs(
 # for more information.
 
 deploydocs(
-    repo = "bitbucket.org/clhaley/bitbucket.io.git",
+    repo = "bitbucket.org/clhaley/clhaley.bitbucket.io.git",
     branch = "master", 
     root = "Multitaper.jl"
 )
