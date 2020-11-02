@@ -1,5 +1,5 @@
 
-## Univariate time series functionality for Multitaper.jl
+# Univariate Functions 
 
 The univariate functionality of this package computes multitaper estimates of the
 power spectrum, autocorrelation, cepstrum, and complex demodulation of a time series.
@@ -32,7 +32,7 @@ Univariate
 
 * Jackknifing
 
-## Univariate Multitaper Estimation
+## Univariate spectrum estimation
 
 ### multispec
 
@@ -119,7 +119,7 @@ plotting of MTSpectrum structs completely trivial. Simply plot your MTSpectrum s
 they were vectors, and you'll get a bunch of preformatting for free. Consult the
 jupyter notebooks for examples of some of the recipes.
 
-# Welch
+### Welch
 
 The welch estimate of the spectrum is one that is an average of multitaper spectra
 computed on overlapping data blocks. You'd call the function like this
@@ -146,9 +146,9 @@ number of segments and overlap back in the params field of the output struct. Th
 toggle is by default set to :welch mode, but this code is also the backbone for a
 spectrogram, which is why this keyword argument is here. 
 
-## Time domain stuff
+## Time domain statistics
 
-# mt_acvf
+### mt_acvf
 
 This function computes multitaper estimates of the covariance, correlation, and
 cepstrum, by way of inverse-FFT of a multitaper spectrum estimate. Its signature is
@@ -184,7 +184,7 @@ The output is
   * MTAutocorrelationFunction: Contains lags, autocorrelation function, and a params struct (mentioned
     above) that carries around the relevant multitaper options. 
 
-# mt_acf
+### mt_acf
 
 This function computes multitaper estimates of the correlation by way of inverse-FFT
 of a multitaper spectrum estimate. Its signature is either
@@ -217,7 +217,7 @@ and using any other relevant input arguments mentioned in the multispec call abo
 The output is
   * MTAutocovarianceFunction: Contains lags, autocovariance function, and a params struct.
 
-# mt_cepstrum
+### `mt_cepstrum`
 
 This function computes multitaper estimate of the cepstrum, by way of inverse-FFT of
 the logarithm of a multitaper spectrum estimate. Its signature is either
@@ -248,14 +248,14 @@ struct handy.  If not, you can use the second version, putting in the time serie
 and using any other relevant input arguments mentioned in the multispec call above.
 
 The output is
-  * MTCepstrum: Contains lags (quefrency), a cepstrum estimate, and a params struct. The
+  * `MTCepstrum`: Contains lags (quefrency), a cepstrum estimate, and a params struct. The
     cepstrum is the inverse-FFT (or cosine transform, when the signal is real) of the
   logarithm of the spectrum. 
 
 When you plot one of the `MTAutocorrelationFunction`, `MTAutocovarianceFunction`, or
 `MTCepstrum` structs using the recipe, you'll get a stem plot. 
 
-# demodulate
+### `demodulate`
 
 This function computes the multitaper estimate of the complex demodulate. Note that
 there are several published implementations of this, but this one uses a single
@@ -268,27 +268,28 @@ function demodulate(x::Vector{Float64}, f0::Float64, NW::Float64, blockLen::Int6
 ```
 
 The inputs are the following:
-  * x is the data vector to be demodulated
-  * dt is the sampling rate (in years, for example)
-  * f0 is the center frequency (e.g. one cycle per year)
-  * NW is the time-bandwidth product for the filter (typically narrow, use a float)
-  * blockLen is a subjective length to use for the data filter, note that the output 
+  * `x` is the data vector to be demodulated
+  * `dt` is the sampling rate (in years, for example)
+  * `f0` is the center frequency (e.g. one cycle per year)
+  * `NW` is the time-bandwidth product for the filter (typically narrow, use a float)
+  * `blockLen` is a subjective length to use for the data filter, note that the output 
     will be shortened
     by this amount, so a short filter is sometimes better. 
-  * wrapphase is an optional boolean which tells the algorithm whether or not to 
+  * `wrapphase` is an optional boolean which tells the algorithm whether or not to 
     unwrap the phase for pretty plotting. 
-  * basetime is the time for the first time index
+  * `basetime` is the time for the first time index
 
 The output will be a `Demodulate` struct containing time (time), magnitude (mag), and
 phase (phase).  For easy plotting there is a Plots.jl recipe. See also the notebook
+[04_Demodulation.ipynb](https://bitbucket.org/clhaley/multitaper.jl/src/master/Examples/04_Demodulation.ipynb?at=master&viewer=nbviewer)
 in the Examples directory for usage.  
 
-# Data with gaps
+## Missing-data Spectrum
 
-## Spectrum estimation for data with gaps
+### `mdmultispec`
 
-Chave wrote a paper in GJI that shows how to compute dpss's on data with
-gaps and we have rewritten the code in Julia so that it can be used here. The
+Chave showed how to compute dpss's and multitaper spectra on data with
+gaps [(Chave,2019)](https://academic.oup.com/gji/article-abstract/218/3/2165/5519233). The
 function signature is 
 
 ```
@@ -301,24 +302,24 @@ function mdmultispec(tt::Union{Vector{Int64},Vector{Float64}}, x::Vector{Float64
 ```
 
 The inputs are the following:
-  * tt -- real vector of time (required)
-  * x -- real vector of data (required)
-  * bw -- bandwidth of estimate, 5/length(t) default
-  * k -- number of slepian tapers, must be <=2 bw length(x), 2 bw length(x)-1 default
-  * lambdau -- missing data Slepian tapers and their concentrations, if precomputed
-  * dt -- sampling in time
-  * nz -- zero padding factor, 0 default
-  * Ftest -- whether or not to compute the F-test p-value at all frequencies
-  * jk -- whether or not to compute jackknife variance estimates
-  * dof -- whether or not to output the degrees of freedom of the estimate
+  * `tt` -- real vector of time (required)
+  * `x` -- real vector of data (required)
+  * `bw` -- bandwidth of estimate, 5/length(t) default
+  * `k` -- number of slepian tapers, must be <=2 bw length(x), 2 bw length(x)-1 default
+  * `lambdau` -- missing data Slepian tapers and their concentrations, if precomputed
+  * `dt` -- sampling in time
+  * `nz` -- zero padding factor, 0 default
+  * `Ftest` -- whether or not to compute the F-test p-value at all frequencies
+  * `jk` -- whether or not to compute jackknife variance estimates
+  * `dof` -- whether or not to output the degrees of freedom of the estimate
 
 The outputs are simply a list of the following 
-  * sxx -- MTSpectrum spectrum 
-  * nu1 -- Degrees of freedom, if dof is set to true
+  * `sxx` -- MTSpectrum spectrum 
+  * `nu1` -- Degrees of freedom, if dof is set to true
 
-## Missing-data Slepian tapers
+### `mdslepian` 
 
-One can also simply generate Slepian tapers using the mdslepian function. Its
+One can also simply generate Slepian tapers for the missing data problem using the `mdslepian` function. Its
 function signature is 
 
 ```
@@ -326,19 +327,21 @@ function mdslepian(w, k, t)
 ``` 
 
 The inputs are the following:
-  * w -- the bandwidth of the taper
-  * k -- the number of Slepian tapers
-  * t -- the vector containing the time indicees
+  * `w` -- the bandwidth of the taper
+  * `k` -- the number of Slepian tapers
+  * `t` -- the vector containing the time indicees
 
 The outputs are
-  * lambda -- the concentrations of the missing-data Slepians
-  * u -- length(t) times k matrix containing the missing-data Slepians
+  * `lambda` -- the concentrations of the missing-data Slepians
+  * `u` -- length(t) times k matrix containing the missing-data Slepians
 
-## Generalized prolate spheroidal sequences
+### `gpss`
 
-Following the work of Bronez in 1988, one can compute optimally concentrated data
-tapers on a general, uneven, temporal grid. The function with the following signature
-computes these
+Following the work of 
+[(Bronez, 1988](https://ieeexplore.ieee.org/abstract/document/9031), one can compute
+optimally concentrated data tapers on a general, uneven, temporal grid. These are
+called generalized prolate spheroidal sequences. The function
+with the following signature computes these
 
 ```
 function gpss(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}, 
@@ -346,26 +349,20 @@ function gpss(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}},
 ```
 
 The inputs are the following:
-  * w -- the bandwidth of the taper
-  * k -- the number of Slepian tapers
-  * t -- the vector containing the time indicees
-  * f -- the frequency of interest, between 0 and beta
-  * beta -- the unequal sampling equivalent to the Nyquist rate
+  * `w` -- the bandwidth of the taper
+  * `k` -- the number of Slepian tapers
+  * `t` -- the vector containing the time indicees
+  * `f` -- the frequency of interest, between 0 and beta
+  * `beta` -- the unequal sampling equivalent to the Nyquist rate
 
 The outputs are
-  * lambda -- the concentrations of the missing-data Slepians
-  * u -- length(t) times k matrix containing the missing-data Slepians
-  * R -- Cholesky factor for the generalized eigenvalue problem
+  * `lambda` -- the concentrations of the missing-data Slepians
+  * `u` -- length(t) times k matrix containing the missing-data Slepians
+  * `R` -- Cholesky factor for the generalized eigenvalue problem
 
-Note that this function is unexported, so one needs to use `Multitaper.gpss(...)` to
-call it. This function is known to occasionally have numerical errors in computing
+!!! This function is known to occasionally have numerical errors in computing
 the Cholesky factors of the genealized eigenvalue problem, so use at own risk. For
 the cases we tested, however, this function generally returns the expected result.
 
-
-If you make use of the functions in this "Data with gaps" section, kindly
-cite: Chave, Alan D. "A multitaper spectral estimator for
-time-series with missing data." Geophysical Journal International 218.3 (2019):
-2165-2178.
 
 

@@ -7,7 +7,7 @@
 const OutputPoints = Union{Vector{Float64}, StepRangeLen{Float64}, UnitRange{Int64}}
 
 """ 
-Multitaper parameters: 
+Multitaper parameters `MTParameters` struct contains
   - time bandwidth (NW) as Float, 
   - number of tapers (K), 
   - number of samples (N), 
@@ -27,7 +27,7 @@ struct MTParameters
 end
 
 """ 
-The EigenCoefficient structure holds 
+The `EigenCoefficient` structure holds 
   - multitaper eigencoefficients (coef) and, optionally, 
   - adaptive weights (wts) 
 """
@@ -37,7 +37,7 @@ mutable struct EigenCoefficient
 end
 
 """ 
-The multitaper spectrum is given as a MTSpectrum structure which holds 
+The multitaper spectrum is given as a `MTSpectrum` structure which holds 
   - frequency (f), 
   - spectrum (S), 
   - phase (optional), 
@@ -60,7 +60,7 @@ mutable struct MTSpectrum{C,J,P}
 end
 
 """ 
-The multitaper autocovariance function is given in the MTAutocovarianceFunction structure, which holds
+The multitaper autocovariance function is given in the `MTAutocovarianceFunction` structure, which holds
   - lags (lags), 
   - autocovariance function (acvf), 
   - MTParameters (params)
@@ -72,7 +72,7 @@ mutable struct MTAutocovarianceFunction{T}
 end
 
 """ 
-The multitaper autocorrelation function is given in the MTAutocorrelationFunction
+The multitaper autocorrelation function is given in the `MTAutocorrelationFunction`
 structure which holds 
   - lags (lags), 
   - autocorrelation function (acf), 
@@ -85,7 +85,7 @@ mutable struct MTAutocorrelationFunction{T}
 end
 
 """ 
-The multitaper cepstrum is given in the MTCepstrum structure which holds 
+The multitaper cepstrum is given in the `MTCepstrum` structure which holds 
   - lags (lags), 
   - cepstrum (ceps), 
   - MTParameters (params)
@@ -97,7 +97,7 @@ mutable struct MTCepstrum{T}
 end
 
 """ 
-The multitaper coherence structure, MTCoherence, holds 
+The multitaper coherence structure, `MTCoherence`, holds 
   - frequency (f), 
   - coherence (coh), 
   - phase (phase), 
@@ -116,7 +116,7 @@ mutable struct MTCoherence{C,J,P}
 end
 
 """ 
-The multitaper transfer function is given as a MTTransferFunction structure which holds 
+The multitaper transfer function is given as a `MTTransferFunction` structure which holds 
   - frequency (f), 
   - transfer function (transf), 
   - phase (phase), 
@@ -135,7 +135,7 @@ mutable struct MTTransferFunction{C,J}
 end
 
 """ 
-The multitaper cross-covariance function is given in the MtCrossCovarianceFunction structure which holds 
+The multitaper cross-covariance function is given in the `MtCrossCovarianceFunction` structure which holds 
   - lags (lags), 
   - cross-covariance function (acvf), 
   - MTParameters (params)
@@ -147,7 +147,7 @@ mutable struct MtCrossCovarianceFunction{T}
 end
 
 """ 
-The multitaper cross-correlation function is given as a MTCrossCorrelationFunction structure which holds 
+The multitaper cross-correlation function is given as a `MTCrossCorrelationFunction` structure which holds 
   - lags (lags), 
   - cross-correlation function (acf), 
   - MTParameters (params)
@@ -159,7 +159,7 @@ mutable struct MTCrossCorrelationFunction{T}
 end
 
 """
-Multitaper complex demodulates are held in the Demodulate struct which contains
+Multitaper complex demodulates are held in the `Demodulate` struct which contains
   - magnitude (Mag), 
   - phase (Phase)
 """

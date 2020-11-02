@@ -16,7 +16,6 @@ module Multitaper
     export MTAutocorrelationFunction, MTAutocovarianceFunction, MTCepstrum
     export MtCrossCovarianceFunction, MTCrossCorrelationFunction, MTTransferFunction
     export MTCoherence 
-    export Demodulate
 
   include("Utils.jl")
     export tanhtrans, atanhtrans, ejn, unwrapphase
@@ -42,7 +41,7 @@ module Multitaper
   # Multivariate
 
   include("Multivariate.jl")
-    export multispec, mt_ccvf
+    export multispec, mt_ccf, mt_ccvf
   
   include("PlotsRecipes/multivariaterecipes.jl")
 

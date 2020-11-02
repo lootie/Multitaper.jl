@@ -1,5 +1,5 @@
 
-## Plots recipes for Multitaper.jl
+# Plotting
 
 For those using `Plots.jl`, we use `RecipesBase.jl` to quickly plot the output
 structs given by the base functions. 
@@ -31,9 +31,9 @@ will plot all of the spectra, coherences, and phases on a grid.
 functions, respectively. These are plots of the multitaper cross-covariance function
 or cross-correlation function.
 
-### Univariate recipes
+## Univariate recipes
 
-#### Plotting spectra
+### Plotting spectra
 
 To plot a univariate spectrum estimate, use the recipe with signature
 
@@ -59,7 +59,7 @@ The optional keyword argument specifies
 * `cross` shows a small cross-shaped mark in the corner of the plot having width
   twice the bandwidth, and height equal to the expected jackknifed variance. 
 
-#### Plotting autocorrelations
+### Plotting autocorrelations
 
 To plot a multitaper estimate of autocorrelation, use the recipe with signature
 
@@ -106,7 +106,7 @@ The resulting plot will show the cepstrum coefficient as a stem plot in terms of
 lags. 
 
 
-#### Demodulate plot
+### Demodulate plot
 
 To plot the complex demodulate, use the recipe with signature 
 
@@ -121,9 +121,9 @@ The following arguments are necessary
 The resulting plot will show the complex demoodulate in two stacked panels, one for
 the magnitude and one for the phase of the complex quantity. 
 
-### Multivariate recipes
+## Multivariate recipes
 
-#### Coherence plotting
+### Coherence plotting
 
 To plot a multitaper estimate of the coherence, use
 
@@ -150,7 +150,7 @@ The following keyword arguments can be set
   (1.0 - 10^{1:sigMax}). For example, if one selects the default, namely `sigMax = 4`,
 one obtains lines at 0.9, 0.99, 0.999, 0.9999. 
 
-#### Comparing coherences
+### Comparing coherences
 
 To plot multiple estimates of the coherence together on the same axes for comparison, 
 use
@@ -169,7 +169,7 @@ The following keyword arguments can be set
 
 * `jk` plots confidence intervals when set to true.
 
-#### Coherences and spectra
+### Coherences and spectra
 
 To plot the coherences and spectra from, say, a call to `multispec` where there are
 two or more time series, one uses the recipe with the following signature:
@@ -194,25 +194,22 @@ The keywork argument
 * `sigMax` is as above.
 
 
-#### Note on coherence plotting
-
-Note that at the time of this writing, it was impossible to not require Plots.jl as a
+!!! Note that at the time of this writing, it was impossible to not require Plots.jl as a
 dependency when using an advanced layoout, so some bonus plotting routines are in
-Multitaper.jl/src/PlotsRecipes/Coherence_Plot.jl. This code can be included on the
+`Multitaper.jl/src/PlotsRecipes/Coherence_Plot.jl`. This code can be included on the
 fly for an even more advanced layout. The layout one gets has three axes, one is the
 transformed MSC, one is the MSC in units from 0 to 1, and the third axes is the
 significance if the true MSC were zero. 
 
-The main function in this piece of code has the
-following signature:
+The main function in this piece of code has the following signature:
 
 ```
 @recipe function f(h::MTCoherence; siglines = true, msclines = true, sigMax = 4, legtext = false, 
         force_ylims = nothing, mscaxis = true, sigaxis = true, jk = true)
 ```
 
-The `MTCoherence` type input is explanatory (it is as above), but one has the additional
-keyword arguments as follows
+The `MTCoherence` type input is explanatory (it is as above), but one has the
+additional keyword arguments as follows
 
 * `siglines` allows one to put a selected number of horizontal lines on the plot
   (specifically, `sigMax` number of lines are added) 
@@ -235,7 +232,7 @@ one obtains lines at 0.9, 0.99, 0.999, 0.9999.
 
 * `jk` indicates whether jackknife confidence intervals will be drawn. 
  
-#### Cross-covariance and Cross-correlation plots
+### Cross-covariance and Cross-correlation plots
 
 The following two recipe signatures:
 
@@ -249,6 +246,7 @@ and
 @recipe function ccfplot(A::MTCrossCorrelationFunction)
 ```
 
-will show either the cross-covariance estimate (if the input is of type `MtCrossCovarianceFunction`) or
-the cross-correlation estimate (if the input is of type `MTCrossCorrelationFunction`) as a stem plot.
+will show either the cross-covariance estimate (if the input is of type
+`MtCrossCovarianceFunction`) or the cross-correlation estimate (if the input is of
+type `MTCrossCorrelationFunction`) as a stem plot.
 

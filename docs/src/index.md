@@ -1,4 +1,4 @@
-## Multitaper.jl Documentation
+# Multitaper.jl Documentation
 
 *Documentation for Multitaper.jl*
 
@@ -68,12 +68,6 @@ This package runs on julia v 1.4.2 and above.
 ## Manual
 
 ```@contents
-Pages = [
-    "univariate.md",
-    "multivariate.md",
-    "plotsrecipes.md",
-    "Examples.md"]
-Depth = 1
 ```
 
 ### [Index](@id main-index)

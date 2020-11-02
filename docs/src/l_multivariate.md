@@ -1,5 +1,5 @@
 
-## Multivariate time series analysis in Multitaper.jl
+# Multivariate Functions 
 
 The multivariate capabilities of this package include cross-spectrum and coherence
 analysis, which contain information about the covariance properties (respectively,
@@ -153,10 +153,14 @@ A note on plotting: if you are using Plots.jl there recipes to directly plot the
 output of the above multivariate calculations, especially the tuples, in a gridded
 plot format. See the second jupyter notebook for more details. 
 
-# Missing-data coherences
+## Missing-data coherences
 
-Extending the missing-data spectrum estimation of Chave from the univariate case to
-the bivariate case, one can compute coherences using the function with signature
+Extending the missing-data spectrum estimation of 
+[(Chave, 2019)](https://academic.oup.com/gji/article-abstract/218/3/2165/5519233) 
+from the univariate case to the bivariate case, one can compute coherences using the
+function with signature
+
+### `mdmultispec`
 
 ```
 function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}}, 
@@ -172,23 +176,23 @@ function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}},
 ```
 
 The inputs are the following:
-  * t -- real vector of time
-  * x -- first missing-data time series
-  * y -- second missing-data time series
-  * bw -- bandwidth of estimate, 5/length(t) default
-  * k -- number of slepian tapers, must be <=2 bw length(x), 2 bw length(x)-1 default
-  * dt -- sampling in time
-  * jk -- whether or not to compute jackknife variance estimates
-  * nz -- zero padding factor, 0 default
-  * Ftest -- whether or not to compute the F-test p-value at all frequencies
-  * lambdau -- missing data Slepian tapers and their concentrations, if precomputed
+  * `t` -- real vector of time
+  * `x` -- first missing-data time series
+  * `y` -- second missing-data time series
+  * `bw` -- bandwidth of estimate, 5/length(t) default
+  * `k` -- number of slepian tapers, must be <=2 bw length(x), 2 bw length(x)-1 default
+  * `dt` -- sampling in time
+  * `jk` -- whether or not to compute jackknife variance estimates
+  * `nz` -- zero padding factor, 0 default
+  * `Ftest` -- whether or not to compute the F-test p-value at all frequencies
+  * `lambdau` -- missing data Slepian tapers and their concentrations, if precomputed
 
 The output is 
-  * sxx -- MTCoherence coherence estimate 
+  * `sxx` -- `MTCoherence` coherence estimate 
 
-## Time domain:
+## Time domain statistics
 
-# mt_ccvf
+### mt_ccvf
 
 This function computes multitaper estimates of the cross-covariance and
 cross-correlation by way of inverse-FFT of a multitaper spectrum estimate. Its
@@ -216,10 +220,10 @@ above.  The `typ` kwarg can take values in (`:ccvf` and `:ccf`) with `:ccvf` bei
 the default value. Depending on the value of typ, you will get one of two different
 structs
 
-* MTCrossCorrelationFunction: Contains lags, cross correlation function, and a params struct (mentioned
-  above) that carries around the relevant multitaper options. 
+* `MTCrossCorrelationFunction`: Contains lags, cross correlation function, and a [`MTParams`](@ref) 
+  struct that carries around the relevant multitaper options. 
 
-* `MtCrossCovarianceFunction`: Contains lags, cross covariance function, and a params struct.
+* `MtCrossCovarianceFunction`: Contains lags, cross covariance function, and a [`MTParams`](@ref) struct.
 
 when you plot one of the `MTCrossCorrelationFunction` or `MtCrossCovarianceFunction` structs using the recipe, you'll get a
 stem plot. 
