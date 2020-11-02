@@ -4,7 +4,8 @@ using Multitaper
 makedocs(
     sitename = "Multitaper",
     format = Documenter.HTML(),
-    modules = [Multitaper]
+    modules = [Multitaper],
+    repo = "https://bitbucket.org/clhaley/multitaper.jl/{commit}{path}#{line}"
 )
 
 # Documenter can also automatically deploy documentation to gh-pages.
@@ -12,6 +13,6 @@ makedocs(
 # for more information.
 
 deploydocs(
-    repo = "github.com/lootie/lootie.github.io.git",
+    repo = "git@bitbucket.org:clhaley/multitaper.jl.git",
 )
 
