@@ -1,24 +1,32 @@
-using Documenter
-using Multitaper
+
+# Lifted very closely and with a great deal of gratitude from: 
+#
+#   https://bitbucket.org/mortenpi/documenterexample.jl/src/master/docs/make.jl
+#
+
+using Documenter, Multitaper
 
 makedocs(
-    sitename = "Multitaper",
-    format = Documenter.HTML(),
     modules = [Multitaper],
-    repo = "https://bitbucket.org/clhaley/multitaper.jl/{commit}{path}#{line}"
+    sitename = "Multitaper",
+    pages = [
+        "Home" => "index.md",
+    ],
+    repo = "https://bitbucket.org/clhaley/multitaper.jl/src/{commit}{path}#lines-{line}",
 )
 
-# Documenter can also automatically deploy documentation to gh-pages.
-# See "Hosting Documentation" and deploydocs() in the Documenter manual
-# for more information.
+withenv(
+    "TRAVIS_REPO_SLUG" => "bitbucket.org/clhaley/clhaley.bitbucket.io",
+    "TRAVIS_PULL_REQUEST" => get(ENV, "BITBUCKET_BRANCH", nothing),
+    "TRAVIS_BRANCH" => get(ENV, "BITBUCKET_BRANCH", nothing),
+    "TRAVIS_TAG" => get(ENV, "BITBUCKET_TAG", nothing),
+    "TRAVIS_PULL_REQUEST" => ("BITBUCKET_PR_ID" in keys(ENV)) ? "true" : "false",
+) do
+    deploydocs(
+        repo = "bitbucket.org/clhaley/clhaley.bitbucket.io.git",
+        branch = "master",
+        dirname = "Multitaper",
+    )
+end
 
-deploydocs(
-    repo = "git@bitbucket.org:clhaley/multitaper.jl.git"
-)
-
-# deploydocs(
-#    repo = "git@bitbucket.org:lootie/clhaley.bitbucket.io.git",
-#    branch = "master", 
-#    root = "Multitaper.jl"
-#)
 

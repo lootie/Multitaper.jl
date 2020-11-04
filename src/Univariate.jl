@@ -602,7 +602,7 @@ function welch(S1, nsegments, overlap=0.5; NW=4.0, K=6,
   # Get the sizes of the data chunks, note that overlap gets overwritten
   seq,seg_len,overlap = blockerr(lengt, nsegments, overlap=overlap) 
   if seg_len < K 
-    throw(AssertionError("Requested number of tapers ($K) exceeds length of segments ($seg_len)."))
+    throw(ArgumentError("Requested number of tapers ($K) exceeds length of segments ($seg_len)."))
   end
 
   # Effective bandwidth (2.13 in T&C91)
