@@ -146,6 +146,9 @@ number of segments and overlap back in the params field of the output struct. Th
 toggle is by default set to :welch mode, but this code is also the backbone for a
 spectrogram, which is why this keyword argument is here. 
 
+Note that this function returns a tuple: the first argument is a `MTSpectrum`
+object, and the second is the *effective bandwidth* (See Thomson and Chave 1991).
+
 ## Time domain statistics
 
 ### mt_acvf
