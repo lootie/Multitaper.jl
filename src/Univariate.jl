@@ -601,9 +601,16 @@ function welch(S1, nsegments, overlap=0.5; NW=4.0, K=6,
 
   # Get the sizes of the data chunks, note that overlap gets overwritten
   seq,seg_len,overlap = blockerr(lengt, nsegments, overlap=overlap) 
+  if seg_len < K 
+    throw(ArgumentError("Requested number of tapers ($K) exceeds length of segments ($seg_len)."))
+  end
 
   # Effective bandwidth (2.13 in T&C91)
-  bw        = NW*(1 + (lengt - 1)*(mean(diff(seq))/seg_len))/(lengt*dt) 
+  if isone(length(seq))
+    bw = NW
+  else
+    bw = NW*(1 + (lengt - 1)*(mean(diff(seq))/seg_len))/(lengt*dt) 
+  end
   if (dpVec == nothing)||((egval == nothing)&&a_weight)
     dpVec   = dpss_tapers(seg_len, NW, K)
     dpVec .*= sqrt(dt)
