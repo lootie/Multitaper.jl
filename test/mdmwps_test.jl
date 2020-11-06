@@ -17,6 +17,7 @@ alpha = 0.95;
 lams,ei = Multitaper.mdslepian(bw,k,tt)
 out1 = mdmultispec(tt,xx[:,1],jk=true,dof=true)
 out = mdmultispec(tt,xx)
+out2 = mdmultispec(tt,xx[:,1],xx[:,2])
 
 gdpss = gpss(bw,k,tt,0.0)
 
@@ -32,6 +33,9 @@ end
   # spectrum with gaps
   @test out[1][1].S[end-5:end] ≈ [0.14565610885883232, 0.13580424778417852,
   0.1293182864247158, 0.1395702616312291, 0.1664040092175493, 0.09202992618124456]
+
+  # coherence with gaps
+  @test out2.coh[1:5] ≈[0.5814720609688031, 0.39146527965688804, 0.5814720609688031, 0.18221543233882365, 0.2847616015676566] 
 
   # dof
   @test out1[2][end-5:end] ≈ [17.444104148892166, 17.408259466237617,

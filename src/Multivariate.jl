@@ -178,11 +178,11 @@ end
     mt_ccvf(S; <keyword arguments>)
 
 Computes univariate multitaper cross-covariance/cross-correlation function.
-Inputs a MTCoherence or MTSpectrum struct.
+Inputs a MTSpectrum struct.
 
 ...
 # Arguments
- - `S::Union{MTCoherence,MTSpectrum}`: the vector containing the result of an multiivariate call to `multispec`
+ - `S::MTSpectrum`: the vector containing the result of an multiivariate call to `multispec`
  - `typ::Symbol = :ccvf`: whether to compute cross-correlation function (:ccf) or cross-covariance function (:ccvf)
 ...
 
@@ -193,17 +193,6 @@ Inputs a MTCoherence or MTSpectrum struct.
 
 See also: [`multispec`](@ref)
 """
-function mt_ccvf(S::MTCoherence; typ=:ccvf)
-  lags = S.params.dt*S.params.N*range(-1.0, 1.0, length=length(S.coh))
-  if typ == :ccvf
-    error("Cannot compute cross covariance from coherence.")
-  elseif typ == :ccf
-    return MTCrossCorrelationFunction(lags, fftshift(real.(ifft(S.coh))), S.params)
-  else
-    throw(error("Select one of :ccvf (cross covariance), :ccf (cross correlation) for output"))
-  end
-end
-
 function mt_ccvf(S::MTSpectrum; typ=:ccvf)
   lags = S.params.dt*S.params.N*range(-1.0, 1.0, length=length(S.S))
   if typ == :ccvf

@@ -59,21 +59,21 @@ multiv = multispec(dat[:, 3:4], dt = dt, NW = NW, K = K, jk = true, Ftest = true
 
 end
 
-multiv = multispec(dat[:, 3], dat[:,4], outp = :transf, dt = dt, NW = NW, K = K, jk =
+multiv2 = multispec(dat[:, 3], dat[:,4], outp = :transf, dt = dt, NW = NW, K = K, jk =
                     true, guts = true, pad = 2.0)
 
 @testset "Transfer Function" begin
   #  multivariate frequency
-  @test multiv.f[1:5] ≈ 0.0:0.013245033112582781:0.052980132450331126
+  @test multiv2.f[1:5] ≈ 0.0:0.013245033112582781:0.052980132450331126
 
   #  transfer function
-  @test multiv.transf[1:5] ≈ [8977.335209581075, 9414.676069658892, 9808.02657929821, 8655.730134294896, 9433.008704433021] 
+  @test multiv2.transf[1:5] ≈ [8977.335209581075, 9414.676069658892, 9808.02657929821, 8655.730134294896, 9433.008704433021] 
 
   #  phase  
-  @test multiv.phase[1:5] ≈ [180.0, 182.39849609134032, 181.98452791869974, 182.58379890869585, 181.47460681717862]
+  @test multiv2.phase[1:5] ≈ [180.0, 182.39849609134032, 181.98452791869974, 182.58379890869585, 181.47460681717862]
 
   #  parameters
-  @test multiv.params == MTParameters(4.0, 6, 453, 0.08333333333333333, 906, 1, nothing)
+  @test multiv2.params == MTParameters(4.0, 6, 453, 0.08333333333333333, 906, 1, nothing)
 
   #  coefficients, jackknife variance already tested via univariate tests
 

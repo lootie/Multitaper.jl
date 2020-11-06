@@ -44,26 +44,6 @@ function unwrapphase(y::Vector{Complex{T}},typ=:deg) where{T}
   return cumsum(x)*((typ == :deg)*180.0/pi + (typ == :rad))
 end
 
-""" If freq is a StepRangeLen corresponding to the Fourier frequencies and f_spot is the
-frequency of interest, freqfinder gives the index of the Fourier frequency closest to
-f_spot """
-function freqfinder(f_spot, freq)::Int64 
-  out  = 1
-  mino = abs(f_spot - freq[1])
-  minn = abs(f_spot - freq[1])
-  for f in freq
-    minn = abs(f_spot - f)
-    if minn <= mino
-      out += 1
-      mino = minn
-    else
-      break
-    end
-  end
-  out -= 1
-  return out
-end
-
 """ Frequencies given as floats are transformed into indices, as integers, left
 unchanged when integers are given"""
 function freq_to_int(freq, lengt, dt=1.0) 

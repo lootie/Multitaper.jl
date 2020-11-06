@@ -18,9 +18,9 @@ NW = 4.0
   # Magnitude squared coherence significance
   @test Multitaper.mscsig(0.9, K) ≈ 0.999999
 
+  # Inverse Magnitude squared coherence significance
+  @test Multitaper.invmscsig(tanhtrans(7.3,6),6) ≈ 0.5446653173443718
+
   # Hyperbolic tangent transformation
   @test tanhtrans(7.0, 7) ≈  0.9654629992362074
-
 end
-
-
