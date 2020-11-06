@@ -36,3 +36,7 @@
 *.xdv
 
 docs/build/
+
+*.info
+*.cov
+
