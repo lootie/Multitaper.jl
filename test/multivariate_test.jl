@@ -46,7 +46,7 @@ multiv = multispec(dat[:, 3:4], dt = dt, NW = NW, K = K, jk = true, Ftest = true
   @test multiv[2][1,2].jkvar[2][1:5] ≈ [0.0, 2.2808214820275725, 1.252986500086001, 1.6043511134415998, 2.433432774031582]
 
   #  multivariate T-squared test
-  @test multiv[1][1].Tsq_pval       == [0.07046082220259418]
+  @test multiv[1][1].Tsq_pval       ≈ [0.07046082220259418]
 
   #  the coherency
   @test multiv[2][1,2].coh[1:5]     ≈ [7.046455236530036, 6.697940886784345, 
