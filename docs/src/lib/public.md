@@ -12,7 +12,7 @@ Demodulate
 MTAutocorrelationFunction
 MTAutocovarianceFunction
 MTCepstrum
-MTCrosscovarianceFunction
+MTCrossCovarianceFunction
 MTCrossCorrelationFunction
 MTTransferFunction
 MTCoherence

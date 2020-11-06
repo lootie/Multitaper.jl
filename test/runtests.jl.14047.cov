@@ -1,0 +1,17 @@
+        - 
+        - # GNU GPL v2 licenced to C. Haley and C. Geoga 12/2019
+        - 
+        - 
+        - using Multitaper, Test 
+        - using DelimitedFiles, LinearAlgebra, Statistics
+        - 
+        - printstyled("Running tests:\n", color=:blue)
+        - 
+        - tests = ["univariate", "crossings", "mdmwps", "multivariate"]
+        - 
+        1 for t in tests
+        0     @testset "$t multitaper" begin
+        8       include("$(t)_test.jl")
+        -     end
+        - end
+        - 

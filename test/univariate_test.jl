@@ -11,7 +11,7 @@ NW = 4.0
 K  = 6
 dt = 1.0/12
 univ = multispec(dat[:, 3], dt = dt, NW = NW, K = K, jk = true, Ftest = true, guts =
-        true, pad = 2.0)
+        true, pad = 2.0, a_weight = true)
  
 @testset "Spectrum:" begin 
 
@@ -33,6 +33,8 @@ univ = multispec(dat[:, 3], dt = dt, NW = NW, K = K, jk = true, Ftest = true, gu
   @test univ.coef.coef[1:2] ≈ [0.0763450617941093 + 0.0im, 
                               -0.018461837449426248 - 0.07253045824096403im] 
 
+  @test univ.coef.wts       == nothing
+
   # univariate F-test
   @test univ.Fpval[1:5]     ≈ [0.9999999498486979, 0.3106832963307704, 
                                0.46150154664925935, 
@@ -43,24 +45,49 @@ univ = multispec(dat[:, 3], dt = dt, NW = NW, K = K, jk = true, Ftest = true, gu
                                0.23173477815035817,
                                0.2766449068431087, 0.16729659627580204]
 
-  # Currently not testing T-squared functionality
-  # univariate T-squared test
-  @test univ.Tsq_pval       == nothing
+end
+
+uu = Multitaper.testTsq(ones(K),EigenCoefficient(univ.coef.coef[[1,3,5],:],
+      univ.coef.wts))
+
+@testset "T^2 test" begin
+  
+  # T squared test
+  @test uu ≈ 0.5645801176110739
+
+end
+
+univ =  welch(dat[:, 3], 3, 0.5, dt = dt, NW = NW, K = K, guts = false, pad = 2.0)
+
+@testset "Welch" begin
+  
+  # Univariate frequency
+  @test univ[1].f[1:3]  ≈ 0.0:0.02654867256637168:0.05309734513274336
+
+  # Univariate Welch Spectrum
+  @test univ[1].S[1:5] ≈[0.031851476832981986, 0.02690415047577252, 
+                  0.028692054543592537, 0.032023262389080605, 0.039447614292936535] 
+
+  # Welch Parameters
+  @test univ[1].params == MTParameters(4.0, 6, 453, 0.08333333333333333, 452, 3, 0.5)
+
+  # Effective bandwidth
+  @test univ[2] ≈ 24.15894039735099
 
 end
 
 # Time-domain type tests
 acvf = mt_acvf(dat[:,3], NW = NW, K = K, dt = dt)
-acvfspec = mt_acvf(univ)
+
+acf = mt_acf(dat[:,3], NW = NW, K = K, dt = dt)
 
 ceps = mt_cepstrum(dat[:,3], NW = NW, K = K, dt = dt)
-cepsspec = mt_cepstrum(univ)
 
 cet_path = @__DIR__()*"/../Examples/data/CETmonthly.dat"
 cet = readdlm(cet_path)
 cdm = demodulate(cet[:,3], 1.0, 2.0, 15*12, true, 1.0/12, 0.0)
 
-@testset "Autocorrelation" begin
+@testset "Autocovariance" begin
 
   # univariate acvf
   @test collect(acvf.lags[1:3]) ≈ [0.0, 0.0833333333333, 0.166666666667] 
@@ -68,6 +95,17 @@ cdm = demodulate(cet[:,3], 1.0, 2.0, 15*12, true, 1.0/12, 0.0)
                                 0.004502534551242927, 
                                 0.002412704328674198, 0.0002545617261240325]
   @test acvf.params.K       == K
+
+end
+
+@testset "Autocorrelation" begin
+
+  # univariate acvf
+  @test collect(acf.lags[1:3]) ≈ [0.0, 0.0833333333333, 0.166666666667] 
+  @test acf.acf[1:5]     ≈ [1.0, 0.5924298668411039, 0.3673769687396398, 
+                            0.196860677612935, 0.020770549173189858] 
+  @test acf.params       == MTParameters(4.0, 6, 453, 0.08333333333333333, 453, 1, 
+                            nothing)
 
 end
 

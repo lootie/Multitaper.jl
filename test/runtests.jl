@@ -7,7 +7,7 @@ using DelimitedFiles, LinearAlgebra, Statistics
 
 printstyled("Running tests:\n", color=:blue)
 
-tests = ["univariate", "crossings", "mdmwps", "multivariate"]
+tests = ["utils", "univariate", "crossings", "mdmwps", "multivariate", "twodim"]
 
 for t in tests
     @testset "$t multitaper" begin

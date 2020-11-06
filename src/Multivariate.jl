@@ -14,7 +14,8 @@ function testTsq(dcs,tap::EigenCoefficient)
     Rt      = copy(transpose(tap.coef)) - kron(transpose(Q),dcs) 
     # tap1 is ell by k, Q is 1 by ell, dc is k by 1
     Tsq     = ((k-ell)/ell)*sum2dc*real.(transpose(Q)*pinv(transpose(Rt)*Rt)*Q)
-    pval    = StatsFuns.fdistccdf(2*ell,2*(k-ell),Tsq)
+    # pval    = StatsFuns.fdistccdf(2*ell,2*(k-ell),Tsq)
+    pval    = Distributions.ccdf(FDist(2*ell,2*(k-ell)),Tsq)
     return pval
   end
 end
@@ -145,15 +146,14 @@ function multispec(S1::Union{Vector{T},EigenCoefficient}, S2::Union{Vector{P},Ei
 
   # Do the Tsquared test
   if typeof(Tsq) != Nothing
-    Tsq      = (typeof(Tsq) <: Vector{Number}) ? [Tsq] : Tsq
-    map!(x -> freq_to_int(Tsq[x], lengt, dt), Tsq, eachindex(Tsq))
-    Tsq = Vector{Vector{Int64}}(Tsq)  
+    Tsq      = (typeof(Tsq) <: Vector{Vector}) ? Tsq : [Tsq]
+    Tsq      = map(x -> freq_to_int(x, lengt, dt), Tsq)
     if (2*K < (true ? 1 : 2)*maximum(length.(Tsq)))
       error("There are too few tapers for the number of Tsq tests.")
     end
     Tv = map(x->testTsq(dcs,
-             EigenCoefficient(vcat(coefswts[1].coef[Tsq[x],:],coefswts[2].coef[Tsq[x],:]),
-             nothing)),eachindex(Tsq)) 
+             EigenCoefficient(vcat(coefswts[1].coef[x,:],coefswts[2].coef[x,:]),
+             nothing)), Tsq) 
   else
     Tv = nothing
   end
@@ -232,10 +232,6 @@ Computes bivariate multitaper cross-covariance/cross-correlation function from t
  - `ctr::Bool`: whether or not to remove the mean before computing the multitaper spectrum
  - `pad::Float64 = 1.0`: factor by which to pad the series, i.e. spectrum length will be pad times length of the time series.
  - `dpVec::Union{Matrix{Float64},Nothing} = nothing`: Matrix of dpss's, if they have been precomputed
- - `guts::Bool = false`: whether or not to return the eigencoefficients in the output struct
- - `jk::Bool = true`: Compute jackknifed confidence intervals
- - `Tsq::Union{Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing`: which frequency indices to compute the T-squared test for multiple line components. Defaults to none.
- - `alph::Float64 = 0.05`: significance cutoff for the Tsquared test
 ...
 
 ...
@@ -246,16 +242,14 @@ Computes bivariate multitaper cross-covariance/cross-correlation function from t
 See also: [`multispec`](@ref)
 """
 function mt_ccvf(S1::Vector{T}, S2::Vector{T}; typ=:ccvf, NW=4.0, K=6, dt=1.0,
-                 ctr=true, pad=1.0, dpVec=nothing, guts=false, jk=false,
-                 Tsq=nothing, alph=0.05) where{T}
+                 ctr=true, pad=1.0, dpVec=nothing) where{T}
   if !in(typ, (:ccvf, :ccf))
     error("Output type must be one of cross-covariance (:ccvf) or cross-correlation (:ccf).")
   end
   S = multispec(S1, S2, outp = :spec, 
                 NW = NW, K = K, dt = dt, ctr = ctr, pad = pad, dpVec = dpVec, 
-                guts = false, jk = false, Tsq = nothing, alph = alph) 
-  # return mt_ccvf(S; typ = typ)
-  return MtCrossCovarianceFunction(S.f, S.S, MTParameters(NW, K, length(S1), dt, pad, 1, nothing)) 
+                guts = false, jk = false, Tsq = nothing) 
+  return mt_ccvf(S; typ = typ) 
 end
 
 """
@@ -335,9 +329,8 @@ e end
   dcs = (Tsq != nothing) ? map(isodd,1:K).*vec(sum(dpVec,dims=1)) : nothing
   # Do the Tsquared test
   if typeof(Tsq) != Nothing
-    Tsq      = (typeof(Tsq) <: Vector{Number}) ? [Tsq] : Tsq
-    map!(x -> freq_to_int(Tsq[x], lengt, dt), Tsq, eachindex(Tsq))
-    Tsq = Vector{Vector{Int64}}(Tsq)  
+    Tsq      = (typeof(Tsq) <: Vector{Vector}) ? Tsq : [Tsq]
+    Tsq      = map(x -> freq_to_int(x, lengt, dt), Tsq)
     if (2*K < (true ? 1 : 2)*maximum(length.(Tsq)))
       error("There are too few tapers for the number of Tsq tests.")
     end

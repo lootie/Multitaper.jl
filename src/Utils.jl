@@ -68,7 +68,7 @@ end
 unchanged when integers are given"""
 function freq_to_int(freq, lengt, dt=1.0) 
   flag = (typeof(freq) == Vector{Int64}) 
-  flag ? freq : Vector{Int64}(round.(lengt*freq*dt) .+ 1)
+  flag ? freq : Int64.(round.(lengt*freq*dt) .+ 1)
 end
 
 """ Integer valued indices are converted to floats (frequencies) and left unchanged

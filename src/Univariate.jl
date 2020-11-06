@@ -149,7 +149,8 @@ function jknife_phase(loo_coh)
 end
 
 """ Here's the tdist quantile relevant to jackknife CI's """
-Tquant(K,alpha::Float64=0.05) = StatsFuns.tdistinvcdf(K-1, 1.0-alpha)
+Tquant(K,alpha::Float64=0.05) = Distributions.quantile(TDist(K-1), 1.0-alpha)
+# Tquant(K,alpha::Float64=0.05) = StatsFuns.tdistinvcdf(K-1, 1.0-alpha)
 
 """ Function that jackknifes spectra and/or coherences """
 function jknife(tap::EigenCoefficient, tap2::Union{EigenCoefficient,Nothing}=nothing, 
@@ -299,17 +300,15 @@ function multispec(S1; NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0, dpVec=nothing,
   S        = highres ? abs2.(uf)/dt : S
 
   freq = (1/dt)*range(0,1,length=fftleng+1)[1:halffreq]
-
   # Do the Tsquared test
   if typeof(Tsq) != Nothing
-    Tsq      = (typeof(Tsq) <: Vector{Number}) ? [Tsq] : Tsq
-    map!(x -> freq_to_int(Tsq[x], lengt, dt), Tsq, eachindex(Tsq))
-    Tsq = Vector{Vector{Int64}}(Tsq)  
+    Tsq      = (typeof(Tsq) <: Vector{Vector}) ? Tsq : [Tsq]
+    Tsq      = map(x -> freq_to_int(x, lengt, dt), Tsq)
     if (2*K < (true ? 1 : 2)*maximum(length.(Tsq)))
       error("There are too few tapers for the number of Tsq tests.")
     end
-    Tv = map(x->Tsqtest_pval(dcs,EigenCoefficient(coefswts.coef[Tsq[x],:],nothing)),
-             eachindex(Tsq)) 
+    Tv = map(x->testTsq(dcs,EigenCoefficient(coefswts.coef[x,:],nothing)),
+             Tsq) 
   else
     Tv = nothing
   end
@@ -568,16 +567,7 @@ struct
 
  - `a_weight::Bool = true`: whether or not to use adaptive weighting
 
- - `Ftest::Bool = true`: Compute the F-test p-value
-
- - `jk::Bool = true`: Compute jackknifed confidence intervals
-
- - `Tsq::Union{Vector{Int64},Vector{Vector{Int64}},Nothing} = nothing`: which
-frequency indices to compute the T-squared test for multiple line components.
-Defaults to none.
-
- - `alph::Float64`: significance level, between 0 and 1, for F-test and T-squared
-test.  ...
+...
 
 ...
 # Outputs
@@ -593,8 +583,7 @@ See also: [`multispec`](@ref)
 """
 function welch(S1, nsegments, overlap=0.5; NW=4.0, K=6,
                dt=1.0, ctr=true, pad=1.0, dpVec=nothing, egval=nothing,
-               guts=false, a_weight=true, Ftest=false, jk=false, Tsq=nothing,
-               alph=0.05) 
+               guts=false, a_weight=true) 
 
   !(typeof(S1) <: Vector) && error("S1 should be a vector")
   lengt = length(S1)
