@@ -2,21 +2,6 @@
 # Function index
 
 ## Public types and functions
-### Structs
-
-```@docs
-EigenCoefficient
-MTParameters
-MTSpectrum
-Demodulate
-MTAutocorrelationFunction
-MTAutocovarianceFunction
-MTCepstrum
-MTCrossCovarianceFunction
-MTCrossCorrelationFunction
-MTTransferFunction
-MTCoherence
-```
 
 ### Taper functions
 ```@docs
