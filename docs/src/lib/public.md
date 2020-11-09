@@ -3,6 +3,22 @@
 
 ## Public types and functions
 
+### Structs
+
+```@docs
+MTSpectrum
+MTCoherence
+MTTransferFunction
+EigenCoefficient
+MTParameters
+Demodulate
+MTAutocorrelationFunction
+MTAutocovarianceFunction
+MTCepstrum
+MtCrossCovarianceFunction
+MTCrossCorrelationFunction
+```
+
 ### Taper functions
 ```@docs
 dpss_tapers
@@ -21,10 +37,9 @@ welch
 ```@docs
 mt_acf
 mt_acvf
-mt_ccf
 mt_ccvf
 mt_cepstrum
-demodulation
+demodulate
 ```
 
 ### Utilities

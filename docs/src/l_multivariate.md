@@ -220,10 +220,10 @@ above.  The `typ` kwarg can take values in (`:ccvf` and `:ccf`) with `:ccvf` bei
 the default value. Depending on the value of typ, you will get one of two different
 structs
 
-* `MTCrossCorrelationFunction`: Contains lags, cross correlation function, and a [`MTParams`](@ref) 
+* `MTCrossCorrelationFunction`: Contains lags, cross correlation function, and a [`MTParameters`](@ref) 
   struct that carries around the relevant multitaper options. 
 
-* `MtCrossCovarianceFunction`: Contains lags, cross covariance function, and a [`MTParams`](@ref) struct.
+* `MtCrossCovarianceFunction`: Contains lags, cross covariance function, and a [`MTParameters`](@ref) struct.
 
 when you plot one of the `MTCrossCorrelationFunction` or `MtCrossCovarianceFunction` structs using the recipe, you'll get a
 stem plot. 

@@ -49,7 +49,7 @@ the following fields:
    nothing.
  - `params` is a [`MTParameters`](@ref) struct which stores the choice of bandwidth
    and other quantities for the multitaper.
- - `coef` is a [`Eigencoefficient`](@ref) struct which stores the intermediate values
+ - `coef` is a [`EigenCoefficient`](@ref) struct which stores the intermediate values
    of the calculation, if desired. These may be useful for subsequent calculations.
  - `Fpval` is the vector of F-test p-values at every frequency, see  
   [(Thomson, 1982)](https://ieeexplore.ieee.org/abstract/document/1456701).
@@ -90,7 +90,7 @@ notebook.
 The main advantage of the multitaper spectrum is that one can simultaneously control
 the bias and variance of the estimator by varying the time-bandwidth product, $NW$.
 This parameter is used to compute the multiple orthogonal tapers, see
-[dpss_tapers](@ref), on which the method depends. When one computes the multitaper
+[`dpss_tapers`](@ref), on which the method depends. When one computes the multitaper
 spectrum, this parameter, along with a number of other quantities is given in the
 output in the form of a `MTParameters` struct. 
 
@@ -104,7 +104,7 @@ This struct holds the following quantities
  - `K` which is the number of tapers. One typically chooses $K <= 2NW$ as the
    eigenvalue problem that gives the tapers has only $2NW$ large eigenvalues. For
    details on discrete prolate spheroidal sequences, which are used as data tapers,
-   consult [dpss_tapers](@ref) and 
+   consult [`dpss_tapers`](@ref) and 
    [(Slepian, 1978)](https://onlinelibrary.wiley.com/doi/abs/10.1002/j.1538-7305.1978.tb02104.x). 
  - `N` which is the number of data points in the time series.
  - `dt` is the sampling interval, typically in seconds. 
@@ -137,7 +137,7 @@ The struct containing eigencoefficients has two fields
   the optional adaptive weighting procedure).
 
 For details of the additional keyword arguments relevant to `multispec`, see
-[multispec](@ref) entry in index.
+[`multispec`](@ref) entry in index.
 
 ### `MTCoherence`
 
@@ -152,7 +152,7 @@ the following fields:
    values outside of [-180,180) degrees.
  - `params` is a [`MTParameters`](@ref) struct which stores the choice of bandwidth
    and other quantities for the multitaper.
- - `coef` is a [`Eigencoefficient`](@ref) struct which stores the intermediate values
+ - `coef` is a [`EigenCoefficient`](@ref) struct which stores the intermediate values
    of the calculation, if desired. These may be useful for subsequent calculations.
  - `jkvar` is the vector of jackknifed variance estimates at every frequency.
  - `Tsq_pval` contains the result of a $T^2$ test for multiple lines, if requested.
@@ -184,7 +184,7 @@ Chave, 1991) which consists of the following fields:
    values outside of [-180,180) degrees.
  - `params` is a [`MTParameters`](@ref) struct which stores the choice of bandwidth
    and other quantities for the multitaper.
- - `coef` is a [`Eigencoefficient`](@ref) struct which stores the intermediate values
+ - `coef` is a [`EigenCoefficient`](@ref) struct which stores the intermediate values
    of the calculation, if desired. These may be useful for subsequent calculations.
  - `jkvar` is the vector of jackknifed variance estimates at every frequency.
 

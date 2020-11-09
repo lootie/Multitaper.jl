@@ -15,6 +15,14 @@ leverages Slepian functions to estimate power spectral densities, coherences, an
 forth, is implemented here for application to univariate, multivariate, and
 higher-dimensional (e.g. space-time) processes.
 
+`Multitaper.jl` is a Julia package for spectrum analysis of time series, multivariate
+time series, and spatial or space-time processes. `Multitaper.jl` was designed to be
+useful to researchers in diverse fields, including geophysics (climate, seismology,
+limnology, and stratigraphy), cognitive radio, space science (solar physics), speech
+processing, astronomy, and biomedicine. For example, a researcher in geophysics might
+want to compute the multitaper spectrum of a time series so he or she can identify
+which periodic components contribute the most to signal variance. 
+
 ### Univariate time series
 
 * Discrete Prolate Spheroidal sequences (Slepian 1974) and with gaps (Chave 2019) 
@@ -63,7 +71,7 @@ This package is unregistered, so please install with
 Pkg> add https://bitbucket.org/clhaley/Multitaper.jl.git
 ```
 
-This package runs on julia v 1.4.2 and above.
+This package runs on Julia v 1.4.2 and above.
 
 ## Testing
 
