@@ -82,7 +82,6 @@ sphere [@simons2006] and the freely available `jlab` codes [@Lilly].
 # To contribute
 
 We welcome contributions of any kind via bitbucket issues or by pull requests.
-Support requests may be directed to the corresponding author.
 
 # Acknowledgements
 
