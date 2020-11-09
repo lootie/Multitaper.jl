@@ -9,7 +9,8 @@ tags:
 authors:
   - name: Charlotte L. Haley
     orcid: 0000-0003-3996-773X
-    affiliation: "1" 
+    affiliation: "1"
+    email: "haley@anl.gov" 
   - name: Christopher J. Geoga
     affiliation: "1, 2"
 affiliations:
@@ -39,25 +40,26 @@ univariate and bivariate time series analysis and provides routines for a number
 # Statement of need
 
 `Multitaper.jl` is a Julia package for spectrum analysis of time series, multivariate
-time series, and spatial or space-time processes. The high-level character of Julia
-allows for widely readable and extendible codes, while the low-level functionality
-provides speed and efficiency. The `Multitaper.jl` package provides a user-friendly
-implementation of many of the basic concepts such as spectrum analysis, F-testing for
-harmonic analysis [@T82], coherence and phase, jackknifed variance estimates [@TC91],
-and complex demodulation [@T07]; more advanced techniques such as dual-frequency
-spectra, cepstrum, multitaper for time series containing gaps [@chave2019multitaper],
-$T^2$ tests for multiple line components [@T11] implementations of higher-dimensional
-Slepian tapers on Cartesian domains [@SimonsWang2011] [@Geoga2018]; and others
-[@ThomsonHaley2014] [@HaleyAnitescu2017]. In addition, we provide tutorial-style
-notebooks to allow accessibility to those new to these concepts or to Julia in
-general.
+time series, and spatial or space-time processes. `Multitaper.jl` was designed to be
+useful to researchers in diverse fields, including geophysics (climate, seismology,
+limnology, and stratigraphy), cognitive radio, space science (solar physics), speech
+processing, astronomy, and biomedicine.
 
-`Multitaper.jl` was designed to be useful to researchears in diverse fields,
-including geophysics (climate, seismology, limnology, and stratigraphy), cognitive
-radio, space science (solar physics), speech processing, astronomy, and biomedicine.
-It has been used in graduate courses to provide fast spectrum estimates of unequally
-sampled time series. Early versions of this code have also been used to compute
-figures for research publications.
+The high-level character of Julia allows for widely readable and extendible codes,
+while the low-level functionality provides speed and efficiency. The `Multitaper.jl`
+package provides a user-friendly implementation of many of the basic concepts such as
+spectrum analysis, F-testing for harmonic analysis [@T82], coherence and phase,
+jackknifed variance estimates [@TC91], and complex demodulation [@T07]; more advanced
+techniques such as dual-frequency spectra, cepstrum, multitaper for time series
+containing gaps [@chave2019multitaper], $T^2$ tests for multiple line components
+[@T11] implementations of higher-dimensional Slepian tapers on Cartesian domains
+[@SimonsWang2011] [@Geoga2018]; and others [@ThomsonHaley2014] [@HaleyAnitescu2017].
+In addition, we provide tutorial-style notebooks to allow accessibility to those new
+to these concepts or to Julia in general.
+
+`Multitaper.jl` has been used in graduate courses to provide fast spectrum estimates
+of unequally sampled time series. Early versions of this code have also been used to
+compute statistics for research publications.
 
 # Other software
 
@@ -79,12 +81,14 @@ sphere [@simons2006] and the freely available `jlab` codes [@Lilly].
 
 # To contribute
 
-We welcome contributions of any kind via bitbucket issues or by personal
-communication. 
+We welcome contributions of any kind via bitbucket issues or by pull requests.
+Support requests may be directed to the corresponding author.
 
 # Acknowledgements
+
 We acknowledge contributions from Mihai Anitescu, David J. Thomson, and
-Sally Dodson-Robinson during the writing of these codes.
+Sally Dodson-Robinson during the writing of these codes. We also gratefully
+acknowledge the help of our reviewers in editing the code repository.
 
 This work was supported by the U.S. Department of Energy, Office of Science, Advanced
 Scientific Computing Research, under contract number DE-AC02-06CH11357.
@@ -98,6 +102,5 @@ derivative works, distribute copies to the public, and perform publicly and disp
 publicly, by or on behalf of the Government. The Department of Energy will provide
 public access to these results of federally sponsored research in accordance with the
 DOE Public Access Plan. http://energy.gov/downloads/doe-public-access-plan
-
 
 # References

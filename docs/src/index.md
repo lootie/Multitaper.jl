@@ -65,6 +65,16 @@ Pkg> add https://bitbucket.org/clhaley/Multitaper.jl.git
 
 This package runs on julia v 1.4.2 and above.
 
+## Testing
+
+In order to test this package, use
+
+```@julia-repl
+Pkg> test Multitaper
+```
+
+This will run the tests in `test/runtests.jl`.
+
 ## Manual
 
 ```@contents

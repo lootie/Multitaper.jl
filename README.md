@@ -31,4 +31,6 @@ This package runs on julia v 1.4.2 and above.
 
 ## Contributing
 
-Contributions to Multitaper.jl can be done in the form of issues or pull requests. 
+Contributions to Multitaper.jl can be done in the form of
+[issues](https://bitbucket.org/clhaley/multitaper.jl/issues?status=new&status=open)
+or pull requests. 
