@@ -596,7 +596,8 @@ function welch(S1, nsegments, overlap=0.5; NW=4.0, K=6,
 
   # Effective bandwidth (2.13 in T&C91)
   if isone(length(seq))
-    bw = NW
+    bw       = NW
+    seg_len += 1
   else
     bw = NW*(1 + (lengt - 1)*(mean(diff(seq))/seg_len))/(lengt*dt) 
   end
