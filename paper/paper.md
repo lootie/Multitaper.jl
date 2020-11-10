@@ -43,7 +43,10 @@ univariate and bivariate time series analysis and provides routines for a number
 time series, and spatial or space-time processes. `Multitaper.jl` was designed to be
 useful to researchers in diverse fields, including geophysics (climate, seismology,
 limnology, and stratigraphy), cognitive radio, space science (solar physics), speech
-processing, astronomy, and biomedicine.
+processing, astronomy, and biomedicine. For example, a researcher might
+want to compute the multitaper spectrum of a time series so he or she can identify
+which periodic components contribute the most to signal variance, and do so with
+jackknifed error bounds on the oscillation amplitudes. 
 
 The high-level character of Julia allows for widely readable and extendible codes,
 while the low-level functionality provides speed and efficiency. The `Multitaper.jl`
@@ -87,7 +90,8 @@ We welcome contributions of any kind via bitbucket issues or by pull requests.
 
 We acknowledge contributions from Mihai Anitescu, David J. Thomson, and
 Sally Dodson-Robinson during the writing of these codes. We also gratefully
-acknowledge the help of our reviewers in editing the code repository.
+acknowledge the help of our reviewers, Andy Nowacki and Robert Guggenberger, in 
+editing the code repository.
 
 This work was supported by the U.S. Department of Energy, Office of Science, Advanced
 Scientific Computing Research, under contract number DE-AC02-06CH11357.

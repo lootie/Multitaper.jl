@@ -9,9 +9,6 @@ using Documenter, Multitaper
 makedocs(
     modules = [Multitaper],
     sitename = "Multitaper",
-    pages = [
-        "Home" => "index.md",
-    ],
     repo = "https://bitbucket.org/clhaley/multitaper.jl/src/{commit}{path}#lines-{line}",
 )
 
@@ -24,8 +21,9 @@ withenv(
 ) do
     deploydocs(
         repo = "bitbucket.org/clhaley/clhaley.bitbucket.io.git",
-        branch = "master",
-        dirname = "Multitaper",
+        branch = "gh-pages",
+        dirname = "Multitaper.jl",
+        devbranch = "master"
     )
 end
 

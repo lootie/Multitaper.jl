@@ -19,9 +19,10 @@ higher-dimensional (e.g. space-time) processes.
 time series, and spatial or space-time processes. `Multitaper.jl` was designed to be
 useful to researchers in diverse fields, including geophysics (climate, seismology,
 limnology, and stratigraphy), cognitive radio, space science (solar physics), speech
-processing, astronomy, and biomedicine. For example, a researcher in geophysics might
+processing, astronomy, and biomedicine. For example, a researcher might
 want to compute the multitaper spectrum of a time series so he or she can identify
-which periodic components contribute the most to signal variance. 
+which periodic components contribute the most to signal variance, and do so with
+jackknifed error bounds on the oscillation amplitudes. 
 
 ### Univariate time series
 
