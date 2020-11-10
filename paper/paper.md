@@ -84,7 +84,8 @@ sphere [@simons2006] and the freely available `jlab` codes [@Lilly].
 
 # To contribute
 
-We welcome contributions of any kind via bitbucket issues or by pull requests.
+We welcome input of any kind via bitbucket issues or by pull requests.
+Support requests can be directed to haley@anl.gov.
 
 # Acknowledgements
 
