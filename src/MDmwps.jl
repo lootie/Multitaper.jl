@@ -425,7 +425,6 @@ function gpss(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}},
   n           = length(t)
   a           = 2*w*ones(n,n)
   b = 2.0*beta*ones(n,n) .+ 0.0im
-  beta = 0.5
   for i = 1:n
       for j in (i+1):n
           a[i,j]  = sin.(2*pi*w*(t[i] .- t[j]))./(pi*(t[i] .- t[j]))
