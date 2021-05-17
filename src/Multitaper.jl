@@ -38,6 +38,10 @@ module Multitaper
   include("crossings.jl")
     export  Pgram_upcrossings, MT_Upcrossings, uctable
 
+  # Unequally sampled multitaper
+  include("bspec_Ftest.jl")
+    export bspec
+
   # Multivariate
 
   include("Multivariate.jl")
