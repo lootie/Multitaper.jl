@@ -39,7 +39,7 @@ module Multitaper
     export  Pgram_upcrossings, MT_Upcrossings, uctable
 
   # Unequally sampled multitaper
-  include("bspec_Ftest.jl")
+  include("bronez.jl")
     export bspec
 
   # Multivariate
