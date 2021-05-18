@@ -46,8 +46,8 @@ Average data from the repeated indices
 # Outputs
   - `(new_dat, times)::Tuple{Vector{Float64}`: The tuple containing the new data and the new times
 """
-function ave_repeats(dat::Union{Vector, Matrix}, times::Vector)
-    good_times, bad_times = repeated_times(time)
+function ave_repeats(dat::Union{Vector{P}, Matrix{P}}, times::Vector{T}) where{T<:Number,P<:Number}
+    good_times, bad_times = repeated_times(times)
     new_dat = (typeof(dat) <: Matrix) ? dat[good_times,:] : dat[good_times] 
     for i = bad_times[end:-1:1]
         temp_idx = findall(times[i] .== times )
