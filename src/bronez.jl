@@ -184,7 +184,8 @@ function bspec(time::Vector{T}, dat1::Union{Vector{P},EigenCoefficient},
         N, M, M2 = _pregap(t, x, nz)
         freq = range(-0.5, 0.5, length = M + 1)
         params = MTParameters(N * W, K, N, 1.0, M, 1, nothing)
-        eigenc(j, fr, x) = mapslices(slep -> slow_nfft_adj(t, slep .* x, nfft = M, nfft2 = M2)[j], 
+        eigenc(j, fr, x) = mapslices(slep -> slow_nfft_adj(t, slep .* x, beta, 
+            nfft = M, nfft2 = M2)[j], 
             gpss(W, K, t, fr, beta = bet)[2], dims=1)
     
         eco_x = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], x), 
