@@ -261,7 +261,7 @@ function bspec(t::Vector{T}, x::Matrix{P}, W, K, bet, nz = 0.0;
     N, M, M2 = _pregap(t, x[:, 1], nz)
     freq = bet * range(-0.5, 0.5, length = M + 1)
     # Get the spectra
-    specs   = map(y -> bspec(t, y, W, K, nz, Ftest), x[:, k] for k in 1:p)
+    specs   = map(y -> bspec(t, y, W, K, nz, outp, Ftest), x[:, k] for k in 1:p)
     params  = specs[1].params
     # Get the coherences or cross spectra
     crosspecs = (outp == :cross) ? Array{MTSpectrum, 2}(undef, p, p) : 
