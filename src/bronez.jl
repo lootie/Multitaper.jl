@@ -257,8 +257,9 @@ See also: [`multispec`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref), [`gps
 """
 function bspec(t::Vector{T}, x::Matrix{P}, W, K, bet, nz = 0.0; 
         outp = :coh, Ftest = false) where{T<:Number,P<:Number}
-    N, p = size(x)
-    freq = 1.0 * range(-0.5, 0.5, length = M + 1)
+    p = size(x, 2)
+    N, M, M2 = _pregap(t, x[:, 1], nz)
+    freq = bet * range(-0.5, 0.5, length = M + 1)
     # Get the spectra
     specs   = map(y -> bspec(t, y, W, K, nz, Ftest), x[:, k] for k in 1:p)
     params  = specs[1].params
