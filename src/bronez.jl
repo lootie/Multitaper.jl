@@ -25,7 +25,7 @@ Verify that the time vector is monotone increasing and has no repeated values
 """
 function repeated_times(time::Vector{T}) where T<:Number
     dt = diff(time)
-    (sum(dt <. 0.0) > 0) && error("The time vector is not monotone increasing.")
+    (sum(dt .< 0.0) > 0) && error("The time vector is not monotone increasing.")
     good_times = vcat(findall(dt .> 1e-15), length(time))
     bad_times  = findall(diff(time) .< 1e-15)
     (length(bad_times) != 0) && println("Warning: There are repeated time stamps. 
@@ -174,7 +174,8 @@ See also: [`multispec`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref), [`gps
 """
 function bspec(time::Vector{T}, dat1::Union{Vector{P},EigenCoefficient}, 
         dat2::Union{Vector{P},EigenCoefficient}, W, K, bet, nz = 0.0; 
-        outp = :coh, params::Union{MTParameters,Nothing} = nothing) where{T<:Number,P<:Number}
+        outp = :coh, params::Union{MTParameters,Nothing} = nothing,
+        Ftest = false) where{T<:Number,P<:Number}
     
     if typeof(dat1) != EigenCoefficient
         x, t = ave_repeats(hcat(dat1,dat2), time)
