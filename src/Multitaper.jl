@@ -45,7 +45,7 @@ module Multitaper
   # Multivariate
 
   include("Multivariate.jl")
-    export multispec, mt_ccf, mt_ccvf
+    export multispec, mt_ccf, mt_ccvf, mtm_svd, LFV_spectrum
   
   include("PlotsRecipes/multivariaterecipes.jl")
 

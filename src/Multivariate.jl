@@ -335,4 +335,29 @@ e end
   return (specs, crosspecs, Tv)
 end
 
+""" Bare-bones mtm-svd starting with the eigencoefficients """
+function mtm_svd(X::Array{EigenCoefficient,1})
+    println("Note: data should have mean removed and be divided by standard deviation for this analysis to be meaningful.")
+    m    = length(X)
+    N, K = size(X[1].coef)
+    # for each frequency do an svd on the matrix of eigencoeffs
+    u    = 1.0im * zeros(N, K, m)
+    lam  = 1.0im * zeros(N, m)
+    v    = 1.0im * zeros(N, m, m)
+    for fr = 1:N
+        u[fr, :, :], lam[fr, :], v[fr, :, :] = svd(hcat([X[i].coef[fr,:] for i in 1:m]...))
+        
+    end
+    return u, lam, v
+end
 
+""" Bare-bones mtm-svd starting with the spectrum """
+function mtm_svd(S::Tuple{Array{MTSpectrum{EigenCoefficient,Array{Float64,1},Nothing},1},Array{MTCoherence,2},Nothing})
+    X = [S[1][i].coef for i in 1:length(S[1])]
+    return mtm_svd(X)
+end
+
+""" Least Fractional Variance Spectrum, Mann and Park 1999 """
+function LFV_spectrum(lam)
+    mapslices(x->abs2(x[1])/sum(abs2.(x[1:end])), lam, dims = 1)
+end
