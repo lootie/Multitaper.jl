@@ -359,5 +359,5 @@ end
 
 """ Least Fractional Variance Spectrum, Mann and Park 1999 """
 function LFV_spectrum(lam)
-    mapslices(x->abs2(x[1])/sum(abs2.(x[1:end])), lam, dims = 1)
+    mapslices(x->abs2(x[1])/sum(abs2.(x[1:end])), lam, dims = 2)
 end
