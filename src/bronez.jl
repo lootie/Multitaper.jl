@@ -194,7 +194,7 @@ function bspec(time::Vector{T}, dat1::Union{Vector{P},EigenCoefficient},
                                            vcat, 1:(Int(M / 2))), nothing)
     else
         M = params.M
-        freq = range(-0.5, 0.5, length = params.M + 1)
+        freq = range(-bet, bet, length = params.M + 1)
         eco_x = dat1
         eco_y = dat2
     end
