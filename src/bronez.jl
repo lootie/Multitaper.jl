@@ -268,7 +268,7 @@ function bspec(t::Vector{T}, x::Matrix{P}, W, K, bet, nz = 0.0;
                                   Array{MTCoherence, 2}(undef, p, p)
     for i in CartesianIndex.(filter(dat -> dat[2] > dat[1], 
                              Tuple.(eachindex(view(crosspecs, 1:p, 1:p)))))
-      crosspecs[i] = bspec(t, specs[i[1]].coef, specs[i[2]].coef, W, K, bet,nz= nz,
+      crosspecs[i] = bspec(t, specs[i[1]].coef, specs[i[2]].coef, W, K, bet, nz,
                            outp = ((outp == :cross) ? :spec : :coh), 
                            params = params)
     end
