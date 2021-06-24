@@ -1,7 +1,7 @@
 name = "Multitaper"
 uuid = "a81958ac-9ec9-4086-814d-3ae87249a5e8"
 authors = ["Charlotte Haley <haleycharlotte@gmail.com>"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 Arpack = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
