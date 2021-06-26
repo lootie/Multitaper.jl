@@ -2,7 +2,7 @@
 # Multitaper.jl
 
 [![Build Status](https://travis-ci.com/lootie/multitaper.jl.svg?branch=master)](https://travis-ci.com/github/lootie/multitaper.jl)
-[![Coverage Status](https://coveralls.io/repos/lootie/multitaper.jl/badge.svg?branch=master)](https://coveralls.io/lootie/multitaper.jl?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/lootie/Multitaper.jl/badge.svg?branch=master)](https://coveralls.io/github/lootie/Multitaper.jl?branch=master)
 
 When doing exploratory analysis of time series, frequency domain methods, that is,
 statistical methods that display information about the temporal correlations of one
