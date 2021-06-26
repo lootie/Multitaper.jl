@@ -1,8 +1,8 @@
 
 # Multitaper.jl
 
-[![Build Status](https://travis-ci.com/clhaley/multitaper.jl.svg?branch=master)](https://travis-ci.com/bitbucket/clhaley/multitaper.jl)
-[![Coverage Status](https://coveralls.io/repos/bitbucket/clhaley/multitaper.jl/badge.svg?branch=master)](https://coveralls.io/bitbucket/clhaley/multitaper.jl?branch=master)
+[![Build Status](https://travis-ci.com/lootie/multitaper.jl.svg?branch=master)](https://travis-ci.com/github/lootie/multitaper.jl)
+[![Coverage Status](https://coveralls.io/repos/lootie/multitaper.jl/badge.svg?branch=master)](https://coveralls.io/lootie/multitaper.jl?branch=master)
 
 When doing exploratory analysis of time series, frequency domain methods, that is,
 statistical methods that display information about the temporal correlations of one
@@ -15,7 +15,7 @@ higher-dimensional (e.g. space-time) processes.
 
 See documentation below. 
 
-[![Development branch documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://clhaley.bitbucket.io/Multitaper.jl/dev/)
+[![Development branch documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://lootie.github.io/Multitaper.jl/dev)
 
 ## Installation
 
@@ -23,7 +23,7 @@ This package is unregistered, so please install with
 
 ```
 
-Pkg> add https://bitbucket.org/clhaley/Multitaper.jl.git
+Pkg> add https://github.com/lootie/Multitaper.jl.git
 
 ```
 
@@ -31,11 +31,10 @@ This package runs on julia v 1.4.2 and above.
 
 ## Paper
 
-If you make use of Multitaper.jl, please cite the following paper: [![DOI](https://joss.theoj.org/papers/10.21105/joss.02463/status.svg)](https://doi.org/10.21105/joss.02463).
+If you make use of Multitaper.jl, please cite the following paper: [![DOI](https://joss.theoj.org/papers/10.21105/joss.02463/status.svg)](https://doi.org/10.21105/joss.02463). A previous, unregistered version of Multitaper.jl was hosted on bitbucket.
 
 ## Contributing
 
-We welcome input of any kind via bitbucket
-[issues](https://bitbucket.org/clhaley/multitaper.jl/issues?status=new&status=open)
+We welcome input of any kind via [issues](https://github.com/lootie/Multitaper.jl/issues)
  or by pull requests.
 Support requests can be directed to haley@anl.gov.
