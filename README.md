@@ -1,7 +1,7 @@
 
 # Multitaper.jl
 
-![Build Status](https://github.com/lootie/Multitaper.jl/actions/workflows/CI.yml/badge.svg)
+[![Build Status](https://github.com/lootie/Multitaper.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/lootie/Multitaper.jl/actions)
 [![Coverage Status](https://coveralls.io/repos/github/lootie/Multitaper.jl/badge.svg?branch=master)](https://coveralls.io/github/lootie/Multitaper.jl?branch=master)
 
 When doing exploratory analysis of time series, frequency domain methods, that is,
