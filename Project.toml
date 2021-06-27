@@ -23,7 +23,7 @@ FFTW = "1.2.4"
 FastGaussQuadrature = "0.4.3"
 NFFT = "0.5.2"
 RecipesBase = "1.1.0"
-SpecialFunctions = "0.10.3"
+SpecialFunctions = "0.10.3, 1"
 julia = "1.4.2"
 
 [extras]
