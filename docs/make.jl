@@ -7,11 +7,5 @@ makedocs(
 )
 
 deploydocs(
-    repo = "github.com/lootie/lootie.github.io",
-    branch = "gh-pages",
-    dirname = "Multitaper.jl",
-    devbranch = "master"
+    repo = "github.com/lootie/Multitaper.jl.git",
 )
-
-
-
