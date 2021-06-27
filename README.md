@@ -15,7 +15,8 @@ higher-dimensional (e.g. space-time) processes.
 
 See documentation below. 
 
-[![Development branch documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://lootie.github.io/Multitaper.jl/dev)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://lootie.github.io/Multitaper.jl/stable)
+[![](https://img.shields.io/badge/docs-dev-blue.svg)](https://lootie.github.io/Multitaper.jl/dev)
 
 ## Installation
 
