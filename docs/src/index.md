@@ -69,10 +69,10 @@ types.
 This package is unregistered, so please install with
 
 ```
-Pkg> add https://bitbucket.org/clhaley/Multitaper.jl.git
+Pkg> add https://github.com/lootie/Multitaper.jl.git
 ```
 
-This package runs on Julia v 1.4.2 and above.
+This package runs on Julia v 1.4.2 and above. 
 
 ## Testing
 
