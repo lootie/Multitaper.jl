@@ -63,4 +63,15 @@ uctable
 rectsleps
 multispec2_Rectangle
 ```
+## Under development
 
+### Slepians with gaps
+```@docs
+MDSlepian
+```
+
+### Unequal sampling
+```@docs
+gpss
+bspec
+```
