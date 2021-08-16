@@ -1,6 +1,8 @@
 using Documenter, Multitaper
 
-makedocs()
+makedocs(
+    sitename = "Multitaper.jl"
+)
 
 deploydocs(
     repo = "github.com/lootie/Multitaper.jl.git",
