@@ -20,11 +20,11 @@ See documentation below.
 
 ## Installation
 
-This package is unregistered, so please install with
+Please install using 
 
 ```
 
-Pkg> add https://github.com/lootie/Multitaper.jl.git
+Pkg> add Multitaper
 
 ```
 
