@@ -1,5 +1,7 @@
 # All of these windows are reproduced from F.J. Harris except for the R default window #
 
+using SpecialFunctions
+
 """ Lag grid """
 function lag(N::Int64)
   N2 = Int64(floor(N/2))
