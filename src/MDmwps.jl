@@ -48,8 +48,8 @@ function multispec_coef(tt, x, u, n, nfft, nfft2)
   x̂ = x .- mean(x)
   (length(x) != length(tt)) && error("The vector of data and the vector of times must
                                       have the same lengths.")
-  freqs = collect(LinRange(0.0,0.5,nfft2+1)[1:nfft2])
-  return mapreduce(slep -> nufft1d3(tt, ComplexF64.(slep.*x̂), -1, 1e-15, freqs), 
+  freqs = collect(LinRange(-pi,pi,nfft+1)[1:nfft])
+  return mapreduce(slep -> fftshift(nufft1d3(tt, ComplexF64.(slep.*x̂), -1, 1e-15, freqs))/2, 
                    hcat, eachcol(u))
 end
 
@@ -110,7 +110,7 @@ function mdmultispec(tt::Vector{T}, x::Vector{P};
   lambda,u = (lambdau == nothing) ? mdslepian(bw, k, tt) : lambdau
   s2    = var(x)
   n, nfft, nfft2 = _pregap(tt, x, nz)
-  ak = multispec_coef(tt, x, u, n, nfft, nfft2)
+  ak = multispec_coef(tt, x, u, n, nfft, nfft2)[1:nfft2]
   sxx   = zeros(size(ak,1))
   d = multispec_aweight(ak, lambda, s2)
   Threads.@threads for j in 1:nfft2
@@ -214,8 +214,8 @@ function mdmultispec(t::Vector{T},
   sy2    = var(y)
   sxy   = zeros(nfft2)
   
-  axk = multispec_coef(t, x, u, n, nfft, nfft2) 
-  ayk = multispec_coef(t, y, u, n, nfft, nfft2) 
+  axk = multispec_coef(t, x, u, n, nfft, nfft2)[1:nfft2] 
+  ayk = multispec_coef(t, y, u, n, nfft, nfft2)[1:nfft2]
   outputcoefs = [EigenCoefficient(axk,nothing),EigenCoefficient(ayk,nothing)]
     
   # Jacknife 
