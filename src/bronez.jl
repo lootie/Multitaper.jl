@@ -116,9 +116,10 @@ See also: [`gpss`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
 function gpss_orth(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}, 
         f::Float64; beta::Float64 = 0.5)
   lambda, u, R = gpss(w, k, t, f, beta = beta)
-  return (lambda, u*R)
+  return (lambda, R.L*u)
 end
 
+#=
 # Here is a manual nfft:
 function slow_nfft_adj(t::Union{Vector{Int64}, Vector{Float64}}, 
                 x::Union{Vector{ComplexF64}, Vector{Float64}, Matrix{Float64}}, beta::Float64;
@@ -127,6 +128,7 @@ function slow_nfft_adj(t::Union{Vector{Int64}, Vector{Float64}},
                      # ideal Nyquist frequency: Nyq_ratio = beta/0.5
   return map(i -> exp.(0.0 .- 2.0*pi*im*(Nyq_ratio*(i - 1)/nfft)*t)'*x, 1:nfft2)   
 end
+=#
 
 """ 
     repeated_times(time)
@@ -225,15 +227,15 @@ function bspec(times::Vector{T}, dat::Vector{P}, W::Float64, K::Int64, beta::Flo
     N, M, M2 = _pregap(t, x, nz)
     freq = collect(range(-1.0, 1.0, length = M + 1) * beta)
     params = MTParameters(N * W, K, N, 1.0, M, 1, nothing)
-    eigenc(j, fr, x) = mapslices(slep -> slow_nfft_adj(t, slep .* x, beta, nfft = M, 
-                               nfft2 = M2)[j], gpss(W, K, t, fr, beta = beta)[2], 
-                               dims = 1)
+    eigenc(j, fr, x) = mapslices(slep -> nufft1d3(t, ComplexF64.(slep .* x), -1, 
+                              1e-15, freq), gpss_orth(W, K, t, fr, beta = beta)[2], 
+                              dims = 1)
     eco = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], x), vcat, 
                                                  1:(Int(M / 2))), nothing)   
     jknifed = jknife(eco,nothing,:spec) 
     if Ftest
         freq = range(-beta, beta, length = M + 1)
-        gpsw0  = mapreduce(fr -> sum(gpss(W, K, t, fr, beta = beta)[2],
+        gpsw0  = mapreduce(fr -> sum(gpss_orth(W, K, t, fr, beta = beta)[2],
                                      dims = 1),vcat, freq[1:Int(M / 2)])
         gpsw0sq= sum(abs2, gpsw0, dims = 2)
         mu    = sum(broadcast(/, eco.coef .* gpsw0, gpsw0sq), dims = 2)  
@@ -304,8 +306,8 @@ function bspec(time::Vector{T}, dat1::Union{Vector{P},EigenCoefficient},
         N, M, M2 = _pregap(t, x, nz)
         freq = range(-bet, bet, length = M + 1)
         params = MTParameters(N * W, K, N, 1.0, M, 1, nothing)
-        eigenc(j, fr, x) = mapslices(slep -> slow_nfft_adj(t, slep .* x, bet, 
-            nfft = M, nfft2 = M2)[j], 
+        eigenc(j, fr, x) = mapslices(slep -> nufft1d3(t, ComplexF64.(slep .* x), -1,
+            1e-15,  collect(freq)), 
             gpss(W, K, t, fr, beta = bet)[2], dims=1)
     
         eco_x = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], x), 
