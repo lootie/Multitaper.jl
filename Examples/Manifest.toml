@@ -215,6 +215,12 @@ git-tree-sha1 = "3676abafff7e4ff07bbd2c42b3d8201f31653dcc"
 uuid = "f5851436-0d7a-5f13-b9de-f02708fd171a"
 version = "3.3.9+8"
 
+[[FINUFFT]]
+deps = ["finufft_jll"]
+git-tree-sha1 = "51f91baa88d47f9ce0c54a2e2c4d0565788a43ca"
+uuid = "d8beea63-0952-562e-9c6a-8e8ef7364055"
+version = "2.1.0"
+
 [[FastGaussQuadrature]]
 deps = ["LinearAlgebra", "SpecialFunctions", "StaticArrays"]
 git-tree-sha1 = "5829b25887e53fb6730a9df2ff89ed24baa6abf6"
@@ -1094,6 +1100,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "2c1332c54931e83f8f94d310fa447fd743e8d600"
 uuid = "3161d3a3-bdf6-5164-811a-617609db77b4"
 version = "1.4.8+0"
+
+[[finufft_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "FFTW_jll", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "6c140fb652b63da8c7795d9292df9c9d68bf7348"
+uuid = "c41cd5a2-72a3-5203-9076-a500b088fc82"
+version = "2.0.3+0"
 
 [[libass_jll]]
 deps = ["Artifacts", "Bzip2_jll", "FreeType2_jll", "FriBidi_jll", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]
