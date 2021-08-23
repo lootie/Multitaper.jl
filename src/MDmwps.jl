@@ -49,7 +49,7 @@ function multispec_coef(tt, x, u, n, nfft, nfft2)
   (length(x) != length(tt)) && error("The vector of data and the vector of times must
                                       have the same lengths.")
   freqs = collect(LinRange(-pi,pi,nfft+1)[1:nfft])
-  return mapreduce(slep -> fftshift(nufft1d3(tt, ComplexF64.(slep.*x̂), -1, 1e-15, freqs))/2, 
+  return mapreduce(slep -> fftshift(nufft1d3(tt, ComplexF64.(slep.*x̂), -1, 1e-15, freqs))[1:nfft2]/2, 
                    hcat, eachcol(u))
 end
 
@@ -140,7 +140,7 @@ function mdmultispec(tt::Vector{T}, x::Vector{P};
   end
   Tv = nothing
   # Package up the outputs
-  pkg = MTSpectrum((1/dt)*range(0,1,length=nfft)[1:length(sxx)], dt*sxx, nothing, 
+  pkg = MTSpectrum((1/dt)*range(0,1,length=nfft+1)[1:length(sxx)], dt*sxx, nothing, 
               MTParameters(bw*n, k, n, tt[2]-tt[1], 2*(nfft2-1), 1, nothing),
               coefswts, Fpval, jv, Tv)
   if dof 
@@ -223,7 +223,7 @@ function mdmultispec(t::Vector{T},
   ph_xy, phvar = jknife_phase(outputcoefs...)
   Tv = nothing
 
-  return MTCoherence((1/dt)*range(0,1,length=nfft+1)[1:nfft], sxy, ph_xy, 
+  return MTCoherence((1/dt)*range(0,1,length=nfft+1)[1:nfft2], sxy, ph_xy, 
                 MTParameters(bw*n, k, n, dt, 2*(nfft2-1), 1, nothing),
                 outputcoefs, [svar, phvar], Tv)
 end
