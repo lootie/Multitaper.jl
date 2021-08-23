@@ -110,7 +110,7 @@ function mdmultispec(tt::Vector{T}, x::Vector{P};
   lambda,u = (lambdau == nothing) ? mdslepian(bw, k, tt) : lambdau
   s2    = var(x)
   n, nfft, nfft2 = _pregap(tt, x, nz)
-  ak = multispec_coef(tt, x, u, n, nfft, nfft2)[1:nfft2]
+  ak = multispec_coef(tt, x, u, n, nfft, nfft2)
   sxx   = zeros(size(ak,1))
   d = multispec_aweight(ak, lambda, s2)
   Threads.@threads for j in 1:nfft2
@@ -214,8 +214,8 @@ function mdmultispec(t::Vector{T},
   sy2    = var(y)
   sxy   = zeros(nfft2)
   
-  axk = multispec_coef(t, x, u, n, nfft, nfft2)[1:nfft2] 
-  ayk = multispec_coef(t, y, u, n, nfft, nfft2)[1:nfft2]
+  axk = multispec_coef(t, x, u, n, nfft, nfft2) 
+  ayk = multispec_coef(t, y, u, n, nfft, nfft2)
   outputcoefs = [EigenCoefficient(axk,nothing),EigenCoefficient(ayk,nothing)]
     
   # Jacknife 
@@ -223,7 +223,7 @@ function mdmultispec(t::Vector{T},
   ph_xy, phvar = jknife_phase(outputcoefs...)
   Tv = nothing
 
-  return MTCoherence((1/dt)*range(0,1,length=nfft)[1:nfft2], sxy, ph_xy, 
+  return MTCoherence((1/dt)*range(0,1,length=nfft+1)[1:nfft], sxy, ph_xy, 
                 MTParameters(bw*n, k, n, dt, 2*(nfft2-1), 1, nothing),
                 outputcoefs, [svar, phvar], Tv)
 end
