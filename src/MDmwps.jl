@@ -13,7 +13,7 @@
 # The coherence routine is original work.
 #
 
-using Statistics, Arpack, LinearAlgebra, Distributions, NFFT
+using Statistics, Arpack, LinearAlgebra, Distributions, FINUFFT
 
 """
 Find all of the necessary lengths
@@ -48,11 +48,9 @@ function multispec_coef(tt, x, u, n, nfft, nfft2)
   x̂ = x .- mean(x)
   (length(x) != length(tt)) && error("The vector of data and the vector of times must
                                       have the same lengths.")
-  # plan the fft, compute eigencoefficients 
-  cent = (vcat(tt, tt[end] .+ collect(1:(nfft-n))) .- nfft/2)/nfft
-  p = NFFTPlan(cent, nfft)
-  return mapreduce(slep -> nfft_adjoint(p, vcat(slep.*x̂, zeros(nfft-n)) .+ 
-                    0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
+  freqs = collect(LinRange(0.0,0.5,nfft2+1)[1:nfft2])
+  return mapreduce(slep -> nufft1d3(tt, ComplexF64.(slep.*x̂), -1, 1e-15, freqs), 
+                   hcat, eachcol(u))
 end
 
 """
@@ -121,7 +119,7 @@ function mdmultispec(tt::Vector{T}, x::Vector{P};
   sxx[2:(nfft2-1)] .*= 2
   d = sxx*sqrt.(lambda')./(sxx*lambda' .+ s2*(1.0 .- lambda'))
   nu1      = 2*d.^2*lambda
-  coefswts = EigenCoefficient(ak,d.^2)
+  coefswts = EigenCoefficient(ak, d.^2)
   jv       = jk ? jknife(coefswts,nothing,:spec)[2] : nothing
   # F-test
   if Ftest
@@ -212,18 +210,12 @@ function mdmultispec(t::Vector{T},
   n, nfft, nfft2 = _pregap(t, x, nz)
   lambda,u = (lambdau == nothing) ? mdslepian(bw, k, t) : lambdau
     
-  x .-= mean(x)
-  y .-= mean(y)
   sx2    = var(x)
   sy2    = var(y)
   sxy   = zeros(nfft2)
-    
-  cent = (vcat(t, t[end] .+ collect(1:(nfft-n))) .- nfft/2)/nfft
-  p   = NFFTPlan(cent, nfft)
-  axk = mapreduce(slep -> nfft_adjoint(p, vcat(slep.*x, zeros(nfft-n)) .+ 
-                    0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
-  ayk = mapreduce(slep -> nfft_adjoint(p, vcat(slep.*y, zeros(nfft-n)) .+ 
-                    0.0im)[(end-nfft2+1):end], hcat, eachcol(u))
+  
+  axk = multispec_coef(t, x, u, n, nfft, nfft2) 
+  ayk = multispec_coef(t, y, u, n, nfft, nfft2) 
   outputcoefs = [EigenCoefficient(axk,nothing),EigenCoefficient(ayk,nothing)]
     
   # Jacknife 
