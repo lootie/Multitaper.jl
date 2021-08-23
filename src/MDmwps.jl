@@ -308,7 +308,7 @@ function mdmultispec(t::Vector{T},
       # Jacknife 
       sxy, svar = jknife(specs[x[1]].coef, specs[x[2]].coef, :coh)
       ph_xy, phvar = jknife_phase(specs[x[1]].coef, specs[x[2]].coef)
-      coherences[x] = MTCoherence((1/dt)*fgrid, sxy, ph_xy, 
+      coherences[x] = MTCoherence((1/dt)*fgrid, sxy, -ph_xy, 
                 MTParameters(bw*n, k, n, dt, 2*(nfft2-1), 1, nothing),
                 nothing, [svar, phvar], nothing)
   end
