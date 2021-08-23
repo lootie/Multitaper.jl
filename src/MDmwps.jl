@@ -49,7 +49,7 @@ function multispec_coef(tt, x, u, n, nfft, nfft2)
   (length(x) != length(tt)) && error("The vector of data and the vector of times must
                                       have the same lengths.")
   freqs = collect(LinRange(-pi,pi,nfft+1)[1:nfft])
-  return mapreduce(slep -> fftshift(nufft1d3(tt, ComplexF64.(slep.*x̂), -1, 1e-15, freqs))[1:nfft2]/2, 
+  return mapreduce(slep -> fftshift(nufft1d3(tt, ComplexF64.(slep.*x̂), -1, 1e-15, freqs))[1:nfft2]/sqrt.(2), 
                    hcat, eachcol(u))
 end
 
