@@ -227,8 +227,8 @@ function bspec(times::Vector{T}, dat::Vector{P}, W::Float64, K::Int64, beta::Flo
     N, M, M2 = _pregap(t, x, nz)
     freq = 2*pi*collect(range(-1.0, 1.0, length = M + 1) * beta)
     params = MTParameters(N * W, K, N, 1.0, M, 1, nothing)
-    eigenc(j, fr, x) = mapslices(slep -> nufft1d3(t, ComplexF64.(slep .* x), -1, 
-                              1e-15, freq)[j + Int(M/2)]/2, gpss_orth(W, K, t, fr, beta = beta)[2], 
+    eigenc(j, fr, x) = mapslices(slep -> fftshift(nufft1d3(t, ComplexF64.(slep .* x), -1, 
+                              1e-15, freq))[j + Int(M/2)]/2, gpss_orth(W, K, t, fr, beta = beta)[2], 
                               dims = 1)
     eco = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], x), vcat, 
                                                  1:(Int(M / 2))), nothing)   
@@ -246,7 +246,7 @@ function bspec(times::Vector{T}, dat::Vector{P}, W::Float64, K::Int64, beta::Flo
     else
         Fpval = nothing
     end
-    return MTSpectrum(freq[(Int(M/2)+1):M]/pi, mean(abs2.(eco.coef), dims=2)[:], 
+    return MTSpectrum(freq[(Int(M/2)+1):M]/(2*pi, mean(abs2.(eco.coef), dims=2)[:], 
                       nothing, params, eco, Fpval, jknifed[2], nothing)
 end
 
@@ -304,10 +304,10 @@ function bspec(time::Vector{T}, dat1::Union{Vector{P},EigenCoefficient},
         y = x[:,2]
         x = x[:,1]
         N, M, M2 = _pregap(t, x, nz)
-        freq = 2*pi*range(-bet, bet, length = M + 1)
+        freq = 2*pi*range(-bet, bet, length = M + 1)[1:M]
         params = MTParameters(N * W, K, N, 1.0, M, 1, nothing)
-        eigenc(j, fr, x) = mapslices(slep -> nufft1d3(t, ComplexF64.(slep .* x), -1,
-            1e-15,  collect(freq))[j + Int(M/2)] / 2, 
+        eigenc(j, fr, x) = mapslices(slep -> fftshift(nufft1d3(t, ComplexF64.(slep .* x), -1,
+            1e-15,  collect(freq)))[j + Int(M/2)] / 2, 
             gpss(W, K, t, fr, beta = bet)[2], dims=1)
     
         eco_x = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], x), 
@@ -323,13 +323,13 @@ function bspec(time::Vector{T}, dat1::Union{Vector{P},EigenCoefficient},
     if outp == :coh
         jknifed = jknife(eco_x, eco_y, :coh) 
         jphase = jknife(eco_x, eco_y, :phase) 
-        return MTCoherence(freq[(Int(M / 2) + 1):M], jknifed[1], jphase[1], params, 
+        return MTCoherence(freq[(Int(M / 2) + 1):M]/(2*pi), jknifed[1], jphase[1], params, 
                            [eco_x, eco_y], [jknifed[2], jphase[2]], nothing) 
     else 
         # returns cross spectrum
         jknifed = jknife(eco_x, eco_y, :spec)
         jphase = jknife(eco_x, eco_y, :phase) 
-        return MTSpectrum(freq[(Int(M / 2) + 1):M]/pi, 
+        return MTSpectrum(freq[(Int(M / 2) + 1):M]/(2*pi), 
                           ((eco_x.coef) * conj(eco_y.coef)' / K)[:], nothing, 
                           params, nothing, nothing, jknifed[2], nothing) 
     end
