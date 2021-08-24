@@ -560,7 +560,7 @@ version = "0.7.2"
 
 [[Multitaper]]
 deps = ["Arpack", "Distributions", "FFTW", "FINUFFT", "FastGaussQuadrature", "LinearAlgebra", "Printf", "RecipesBase", "SpecialFunctions", "Statistics", "StatsFuns"]
-git-tree-sha1 = "d3e4fe480fc31032aa174408bb9b5b89bfd569e9"
+git-tree-sha1 = "7a3b7a0fc99b6a5be63f8b50928ba02572b8f30e"
 repo-rev = "uneq"
 repo-url = "https://github.com/lootie/Multitaper.jl"
 uuid = "a81958ac-9ec9-4086-814d-3ae87249a5e8"
