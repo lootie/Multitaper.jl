@@ -246,7 +246,7 @@ function bspec(times::Vector{T}, dat::Vector{P}, W::Float64, K::Int64, beta::Flo
     else
         Fpval = nothing
     end
-    return MTSpectrum(freq[(Int(M/2)+1):M], mean(abs2.(eco.coef), dims=2)[:], 
+    return MTSpectrum(freq[(Int(M/2)+1):M]/pi, mean(abs2.(eco.coef), dims=2)[:], 
                       nothing, params, eco, Fpval, jknifed[2], nothing)
 end
 
@@ -329,7 +329,7 @@ function bspec(time::Vector{T}, dat1::Union{Vector{P},EigenCoefficient},
         # returns cross spectrum
         jknifed = jknife(eco_x, eco_y, :spec)
         jphase = jknife(eco_x, eco_y, :phase) 
-        return MTSpectrum(freq[(Int(M / 2) + 1):M], 
+        return MTSpectrum(freq[(Int(M / 2) + 1):M]/pi, 
                           ((eco_x.coef) * conj(eco_y.coef)' / K)[:], nothing, 
                           params, nothing, nothing, jknifed[2], nothing) 
     end
