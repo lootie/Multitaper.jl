@@ -227,8 +227,8 @@ function bspec(times::Vector{T}, dat::Vector{P}, W::Float64, K::Int64, beta::Flo
     N, M, M2 = _pregap(t, x, nz)
     freq = 2*pi*collect(range(-1.0, 1.0, length = M + 1) * beta)
     params = MTParameters(N * W, K, N, 1.0, M, 1, nothing)
-    eigenc(j, fr, x) = mapslices(slep -> fftshift(nufft1d3(t, ComplexF64.(slep .* x), -1, 
-                              1e-15, freq))[j + Int(M/2)]/2, gpss_orth(W, K, t, fr, beta = beta)[2], 
+    eigenc(j, fr, x) = mapslices(slep -> nufft1d3(t, ComplexF64.(slep .* x), -1, 
+                              1e-15, freq)[j + Int(M/2)]/2, gpss_orth(W, K, t, fr, beta = beta)[2], 
                               dims = 1)
     eco = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], x), vcat, 
                                                  1:(Int(M / 2))), nothing)   
