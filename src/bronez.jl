@@ -228,7 +228,7 @@ function bspec(times::Vector{T}, dat::Vector{P}, W::Float64, K::Int64, beta::Flo
     freq = pi*collect(range(-1.0, 1.0, length = M + 1) * beta)
     params = MTParameters(N * W, K, N, 1.0, M, 1, nothing)
     eigenc(j, fr, x) = mapslices(slep -> fftshift(nufft1d3(t, ComplexF64.(slep .* x), -1, 
-                              1e-15, freq))/2, gpss_orth(W, K, t, fr, beta = beta)[2], 
+                              1e-15, freq))[j + Int(M/2)]/2, gpss_orth(W, K, t, fr, beta = beta)[2], 
                               dims = 1)
     eco = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], x), vcat, 
                                                  1:(Int(M / 2))), nothing)   
@@ -307,7 +307,7 @@ function bspec(time::Vector{T}, dat1::Union{Vector{P},EigenCoefficient},
         freq = pi*range(-bet, bet, length = M + 1)
         params = MTParameters(N * W, K, N, 1.0, M, 1, nothing)
         eigenc(j, fr, x) = mapslices(slep -> fftshift(nufft1d3(t, ComplexF64.(slep .* x), -1,
-            1e-15,  collect(freq)))/2, 
+            1e-15,  collect(freq)))[j + Int(M/2)] / 2, 
             gpss(W, K, t, fr, beta = bet)[2], dims=1)
     
         eco_x = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], x), 
