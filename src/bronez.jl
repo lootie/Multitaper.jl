@@ -227,8 +227,8 @@ function bspec(times::Vector{T}, dat::Vector{P}, W::Float64, K::Int64, beta::Flo
     N, M, M2 = _pregap(t, x, nz)
     freq = 2*pi*collect(range(-1.0, 1.0, length = M + 1) * beta)
     params = MTParameters(N * W, K, N, 1.0, M, 1, nothing)
-    eigenc(j, fr, x) = mapslices(slep -> fftshift(nufft1d3(t, ComplexF64.(slep .* x), -1, 
-                              1e-15, freq))[j + Int(M/2)]/2, gpss_orth(W, K, t, fr, beta = beta)[2], 
+    eigenc(j, fr, x) = mapslices(slep -> nufft1d3(t, ComplexF64.(slep .* x), -1, 
+                              1e-15, freq)[j + Int(M/2)]/2, gpss_orth(W, K, t, fr, beta = beta)[2], 
                               dims = 1)
     eco = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], x), vcat, 
                                                  1:(Int(M / 2))), nothing)   
@@ -306,10 +306,9 @@ function bspec(time::Vector{T}, dat1::Union{Vector{P},EigenCoefficient},
         N, M, M2 = _pregap(t, x, nz)
         freq = 2*pi*range(-bet, bet, length = M + 1)[1:M]
         params = MTParameters(N * W, K, N, 1.0, M, 1, nothing)
-        eigenc(j, fr, x) = mapslices(slep -> fftshift(nufft1d3(t, ComplexF64.(slep .* x), -1,
-            1e-15,  collect(freq)))[j + Int(M/2)] / 2, 
+        eigenc(j, fr, x) = mapslices(slep -> nufft1d3(t, ComplexF64.(slep .* x), -1,
+            1e-15,  collect(freq))[j + Int(M/2)] / 2, 
             gpss(W, K, t, fr, beta = bet)[2], dims=1)
-    
         eco_x = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], x), 
                                            vcat, 1:(Int(M / 2))), nothing)
         eco_y = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], y), 
@@ -380,7 +379,6 @@ See also: [`multispec`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref), [`gps
 function bspec(t::Vector{T}, x::Matrix{P}, W, K, bet, nz = 0.0; 
         outp = :coh, Ftest = false) where{T<:Number,P<:Number}
     p = size(x, 2)
-    N, M, M2 = _pregap(t, x[:, 1], nz)
     # Get the spectra
     specs   = map(y -> bspec(t, y, W, K, bet, nz, Ftest), x[:, k] for k in 1:p)
     params  = specs[1].params
