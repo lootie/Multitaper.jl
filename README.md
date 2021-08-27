@@ -34,6 +34,13 @@ This package runs on julia v 1.4.2 and above.
 
 If you make use of Multitaper.jl, please cite the following paper: [![DOI](https://joss.theoj.org/papers/10.21105/joss.02463/status.svg)](https://doi.org/10.21105/joss.02463). A previous, unregistered version of Multitaper.jl was hosted on bitbucket.
 
+## Python
+
+Python users may wish to make use of the python wrapper for this package
+![multitaperpy](https://github.com/lootie/multitaperpy/). A demo for its useage
+is available
+![here](https://github.com/lootie/multitaperpy/blob/main/Notebooks/00_GettingStarted.ipynb).
+
 ## Contributing
 
 We welcome input of any kind via [issues](https://github.com/lootie/Multitaper.jl/issues)
