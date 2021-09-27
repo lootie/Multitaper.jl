@@ -115,20 +115,38 @@ See also: [`gpss`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
 """
 function gpss_orth(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}, 
         f::Float64; beta::Float64 = 0.5)
+  n           = length(t)
+  a           = 2*w*ones(n,n)
+  b = 2.0*beta*ones(n,n) .+ 0.0im
+  for i = 1:n
+      for j in (i+1):n
+          a[i,j]  = sin.(2*pi*w*(t[i] .- t[j]))./(pi*(t[i] .- t[j]))
+          b[i,j]  = exp.(-2*pi*1.0im*f*(t[i] .- t[j])).*
+                      sin.(2*pi*beta*(t[i] .- t[j]))./(pi*(t[i] .- t[j])) 
+      end
+  end
+  # If the Cholesky factorization fails, add a small number to the diagonal and
+  # try again. Then remove that same value from the eigenvalues. 
+  R, fudge = try (cholesky(Hermitian(b)), 0.0)
+  catch
+    (cholesky(Hermitian(b) + Matrix(I, size(b)...)*(1e-10)), 1.0)
+  end
+  V = eigen(Symmetric(real.(inv(R.L)*Symmetric(a)*inv(R.U))))
+  lambda = V.values[end:-1:(end-k+1)] .- fudge*(1e-10)
+  u = V.vectors[:,end:-1:(end-k+1)]
+  for i = 1:2:k
+      if mean(real.(u[:,i])) < 0 
+        u[:,i] = -u[:,i] 
+      end
+  end
+  for i = 2:2:k-1
+      if real(u[2,i] - u[1,i]) < 0
+        u[:,i] = -u[:,i] 
+      end
+  end
   lambda, u, R = gpss(w, k, t, f, beta = beta)
-  return (lambda, R.L*u)
+  return (lambda, u)
 end
-
-#=
-# Here is a manual nfft:
-function slow_nfft_adj(t::Union{Vector{Int64}, Vector{Float64}}, 
-                x::Union{Vector{ComplexF64}, Vector{Float64}, Matrix{Float64}}, beta::Float64;
-                nfft::Union{Int64} = length(t), nfft2::Union{Int64} = Int64(floor(length(t)/2)+1))
-  Nyq_ratio = 2*beta # Scale the quantity (i-1)/nfft by the ratio of the process bandwidth to the
-                     # ideal Nyquist frequency: Nyq_ratio = beta/0.5
-  return map(i -> exp.(0.0 .- 2.0*pi*im*(Nyq_ratio*(i - 1)/nfft)*t)'*x, 1:nfft2)   
-end
-=#
 
 """ 
     repeated_times(time)
