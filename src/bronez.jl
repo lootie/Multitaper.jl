@@ -144,7 +144,6 @@ function gpss_orth(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}
         u[:,i] = -u[:,i] 
       end
   end
-  lambda, u, R = gpss(w, k, t, f, beta = beta)
   return (lambda, u)
 end
 
