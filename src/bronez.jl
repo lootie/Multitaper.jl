@@ -262,7 +262,7 @@ function bspec(times::Vector{T}, dat::Vector{P}, W::Float64, K::Int64, beta::Flo
     else
         Fpval = nothing
     end
-    return MTSpectrum(freq[(Int(M/2)+1):M]/(2*pi), mean(abs2.(eco.coef), dims=2)[:], 
+    return MTSpectrum(freq[(Int(M/2)+1):M], mean(abs2.(eco.coef), dims=2)[:], 
                       nothing, params, eco, Fpval, jknifed[2], nothing)
 end
 
