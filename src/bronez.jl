@@ -242,18 +242,17 @@ function bspec(times::Vector{T}, dat::Vector{P}, W::Float64, K::Int64, beta::Flo
                nz::Float64 = length(times), Ftest::Bool = false) where{T<:Number,P<:Number}
     x, t = ave_repeats(dat, times)
     N, M, M2 = _pregap(t, x, nz)
-    freq = 2*pi*collect(range(-1.0, 1.0, length = M + 1) * beta)
+    freq = collect(range(-1.0, 1.0, length = M + 1) * beta)
     params = MTParameters(N * W, K, N, 1.0, M, 1, nothing)
     eigenc(j, fr, x) = mapslices(slep -> nufft1d3(t, ComplexF64.(slep .* x), -1, 
-                              1e-15, freq)[j + Int(M/2)]/2, gpss_orth(W, K, t, fr, beta = beta)[2], 
+                              1e-15, 2*pi*freq)[j + Int(M/2)]/2, gpss_orth(W, K, t, fr, beta = beta)[2], 
                               dims = 1)
-    eco = EigenCoefficient(mapreduce(j -> eigenc(j, freq[j + Int(M / 2)], x), vcat, 
+    eco = EigenCoefficient(mapreduce(j -> eigenc(j, 2*pi*freq[j + Int(M / 2)], x), vcat, 
                                                  1:(Int(M / 2))), nothing)   
     jknifed = jknife(eco,nothing,:spec) 
     if Ftest
-        freq = range(-beta, beta, length = M + 1)
         gpsw0  = mapreduce(fr -> sum(gpss_orth(W, K, t, fr, beta = beta)[2],
-                                     dims = 1),vcat, freq[1:Int(M / 2)])
+                                     dims = 1), vcat, freq[1:Int(M / 2)])
         gpsw0sq= sum(abs2, gpsw0, dims = 2)
         mu    = sum(broadcast(/, eco.coef .* gpsw0, gpsw0sq), dims = 2)  
         num   = real.((K - 1) * abs2.(mu) .* gpsw0sq)
