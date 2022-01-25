@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Haley"
+  given-names: "Charlotte L."
+  orcid: "https://orcid.org/0000-0003-3996-773X"
+- family-names: "Geoga"
+  given-names: "Christopher J."
+title: "Multitaper.jl"
+version: 1.2.0
+doi: 10.5281/zenodo.4274771
+date-released: 2020-01-01
+url: "https://github.com/lootie/Multitaper.jl"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Haley"
+    given-names: "Charlotte L."
+    orcid: "https://orcid.org/0000-0003-3996-773X"
+  - family-names: "Geoga"
+    given-names: "Christopher J."
+  doi: "10.21105/joss.02463"
+  journal: "Journal of Open Source Software"
+  month: 11
+  start: 2463
+  title: "Multitaper.jl: A Julia package for frequency domain analysis of time series"
+  issue: 55
+  volume: 5
+  year: 2020
