@@ -13,8 +13,6 @@
 # The coherence routine is original work.
 #
 
-using Statistics, Arpack, LinearAlgebra, Distributions, FINUFFT
-
 """
 Find all of the necessary lengths
 """
@@ -355,8 +353,8 @@ function mdslepian(w, k, t)
       a[i,j]  = sin.(2*pi*w*(t[i] .- t[j]))./(pi*(t[i] .- t[j]))
       a[j,i]  = a[i,j]
   end
-  lambda,v  = eigs(a, nev = k, which = :LR)
-  u         = copy(v)
+  lambda,v  = eigsolve(a, k, :LM, issymmetric = true)
+  u         = real.(hcat(v[1:k]))
   for i = 1:2:k
       if mean(real.(u[:,i])) < 0 
         u[:,i] = -u[:,i] 
@@ -367,7 +365,7 @@ function mdslepian(w, k, t)
         u[:,i] = -u[:,i] 
       end
   end
-  return (lambda, u)
+  return (real.(lambda[1:k]), u)
 end
 
 # Original copyright notice
