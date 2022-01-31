@@ -354,7 +354,7 @@ function mdslepian(w, k, t)
       a[j,i]  = a[i,j]
   end
   lambda,v  = eigsolve(a, k, :LM, issymmetric = true)
-  u         = real.(hcat(v[1:k]))
+  u         = real.(hcat(v))
   for i = 1:2:k
       if mean(real.(u[:,i])) < 0 
         u[:,i] = -u[:,i] 
@@ -365,7 +365,7 @@ function mdslepian(w, k, t)
         u[:,i] = -u[:,i] 
       end
   end
-  return (real.(lambda[1:k]), u)
+  return (real.(lambda[1:k]), u[:,1:k])
 end
 
 # Original copyright notice
