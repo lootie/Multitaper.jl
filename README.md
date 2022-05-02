@@ -41,6 +41,8 @@ Python users may wish to make use of the python wrapper for this package
 is available
 ![here](https://github.com/lootie/multitaperpy/blob/main/Notebooks/00_GettingStarted.ipynb).
 
+We also highly recommend the multitaper python package by G. A. Prieto, available ![here](https://github.com/gaprieto/multitaper).
+
 ## Contributing
 
 We welcome input of any kind via [issues](https://github.com/lootie/Multitaper.jl/issues)
