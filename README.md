@@ -1,5 +1,5 @@
 
-# Multitaper.jl
+![](docs/Multitaper_white.png)
 
 [![Build Status](https://github.com/lootie/Multitaper.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/lootie/Multitaper.jl/actions)
 [![Coverage Status](https://coveralls.io/repos/github/lootie/Multitaper.jl/badge.svg?branch=master)](https://coveralls.io/github/lootie/Multitaper.jl?branch=master)
