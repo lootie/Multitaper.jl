@@ -23,7 +23,7 @@ FFTW = "1.2.4"
 FINUFFT = "2"
 FastGaussQuadrature = "0.4.3"
 RecipesBase = "1.1.0"
-SpecialFunctions = "0.10.3, 1"
+SpecialFunctions = "0.10.3, 1, 2"
 StatsFuns = "0.9"
 julia = "1.4.2"
 
