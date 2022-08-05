@@ -1,15 +1,15 @@
-
 using StatsFuns, Multitaper, Plots, RecipesBase
 
 @userplot mtcoh
 
 @recipe function f(h::MTCoherence; siglines = true, msclines = true, sigMax = 4, legtext = false, 
-        force_ylims = nothing, mscaxis = true, sigaxis = true, jk = true)
+        force_xlims = nothing, force_ylims = nothing, mscaxis = true, sigaxis = true, jk = true,
+        vlines = nothing, bwmark = nothing)
     
     # Layout, ylabels, etc
     if mscaxis && sigaxis
         layout := @layout [a{0.01w} b{0.95w} c{0.01w}]
-        yguide --> ["MSC" "Transformed MSC" "Significance"]
+        yguide --> [L"\hat{C}^2_{xy}(f)" L"z(f)" "Significance"]
         grid --> [false true false]
         legend --> [false legtext false]
         foreground_color_guide --> [:blue :black :red]
@@ -17,7 +17,7 @@ using StatsFuns, Multitaper, Plots, RecipesBase
         sp = [1,2,3]
     elseif jk && !mscaxis && sigaxis
         layout := @layout [b{0.95w} c{0.01w}]
-        yguide --> ["Transformed MSC" "Significance"]
+        yguide --> [L"z(f)" "Significance"]
         grid --> [true false]
         legend --> [legtext false]
         xguide --> ["Frequency" ""]
@@ -25,7 +25,7 @@ using StatsFuns, Multitaper, Plots, RecipesBase
         sp = [3, 1, 2]
     elseif mscaxis && !sigaxis
         layout := @layout [a{0.01w} b{0.95w}]
-        yguide --> ["MSC" "Transformed MSC"]
+        yguide --> [L"\hat{C}^2_{xy}(f)" "Transformed MSC"]
         grid --> [false true]
         legend --> [false legtext]
         foreground_color_guide --> [:blue :black]
@@ -35,19 +35,19 @@ using StatsFuns, Multitaper, Plots, RecipesBase
         layout = (1,1)
         grid --> true
         legend --> legtext
-        yguide --> "Transformed MSC"
+        yguide --> L"z(f)"
         xguide --> "Frequency"
         sp = [1,1,1]
     elseif !jk && !mscaxis && !sigaxis
         layout = (1,1)
         grid --> true
         legend --> legtext
-        yguide --> "MSC"
+        yguide --> L"\hat{C}^2_{xy}(f)"
         xguide --> "Frequency"
         sp = [1,1,1]
     elseif !jk && !mscaxis && sigaxis
         layout := @layout [b{0.95w} c{0.01w}]
-        yguide --> ["MSC" "Significance"]
+        yguide --> [L"\hat{C}^2_{xy}(f)" "Significance"]
         grid --> [true false]
         legend --> [legtext false]
         foreground_color_guide --> [:black :red]
@@ -57,9 +57,10 @@ using StatsFuns, Multitaper, Plots, RecipesBase
     
     # Compute ticks
     z = norminvcdf(0,1,0.975)
+    xl = (force_xlims == nothing) ? [0, h.f[end]] : force_xlims
     yl = (force_ylims == nothing) ? [0, maximum(h.coh .+ jk*z*sqrt.(h.jkvar[1]))] : force_ylims
     yl_transf = Multitaper.tanhtrans.(yl, h.params.K)
-    ymsc = [0.0, 0.2, 0.4, 0.6, 0.8, 0.9, 0.99, 0.999]
+    ymsc = [0.4, 0.6, 0.8, 0.9, 0.99, 0.999]
     ymsc_transf = Multitaper.atanhtrans.(ymsc, h.params.K)
     sigs = Multitaper.logRange(1,sigMax,sigMax)
     labs = map(x -> Multitaper.atanhtrans(sqrt(Multitaper.invmscsig(x, h.params.K)), h.params.K), sigs) 
@@ -69,8 +70,9 @@ using StatsFuns, Multitaper, Plots, RecipesBase
     labs = map(x -> Multitaper.invmscsig(x, h.params.K), sigs)
     @series begin
         subplot := sp[1]
+        xlims --> xl
         ylims --> yl
-            h.f[2:end], Multitaper.tanhtrans.(h.coh[2:end], h.params.K)
+        h.f[2:end], Multitaper.tanhtrans.(h.coh[2:end], h.params.K)
     end  
     # If needed to guide a visual comparison
     if siglines
@@ -91,6 +93,7 @@ using StatsFuns, Multitaper, Plots, RecipesBase
         ymirror := true
         yticks := true
         ylims := yl
+        xticks := []
         yticks := (labs, sigs)
         tick_direction := :out
         xshowaxis := false
@@ -104,7 +107,9 @@ using StatsFuns, Multitaper, Plots, RecipesBase
         subplot := sp[1]
         linealpha := 0.0
         yticks --> (ymsc_transf, ymsc)
+        xticks --> []
         ylims --> yl
+        linewidth --> 2
         xshowaxis := false
         h.f[2:end], h.coh[2:end]
     end 
@@ -113,17 +118,41 @@ using StatsFuns, Multitaper, Plots, RecipesBase
     # Transformed scale
     if jk
     @series begin
+      xlims := xl
       subplot := sp[2]
+      seriescolor --> :mediumblue
       fillalpha --> 0.25
-      label --> "MSC & 95% CI"
       fill := 1
       linealpha --> 0.25
-                vcat(h.f[2:end],h.f[end:-1:2]), vcat((h.coh .+ z*sqrt.(h.jkvar[1]))[2:end], (h.coh .- z*sqrt.(h.jkvar[1]))[end:-1:2])
+      vcat(h.f[2:end],h.f[end:-1:2]), vcat((h.coh .+ z*sqrt.(h.jkvar[1]))[2:end], (h.coh .- z*sqrt.(h.jkvar[1]))[end:-1:2])
     end
+    end
+    if vlines != nothing
+      @series begin
+        subplot := sp[2]
+        seriescolor --> :black
+        line --> :dot
+        linewidth --> 2
+        vcat(vlines', vlines'), yl
+      end
+    end
+    if bwmark != nothing
+      @series begin
+        subplot := sp[2]
+        seriestype  :=  :path
+        markershape := :vline
+        seriescolor --> :black
+        linealpha --> 0.6
+        linewidth --> 2
+        [bwmark[1]-h.params.NW/h.params.N/h.params.dt, bwmark[1]+h.params.NW/h.params.N/h.params.dt], [bwmark[2], bwmark[2]]
+      end
     end
     @series begin
       subplot := sp[2]
+      xlims := xl
       ylims := yl
+      seriescolor --> :mediumblue
+      linewidth --> 2
       if jk
         primary --> false
       else
@@ -138,6 +167,7 @@ using StatsFuns, Multitaper, Plots, RecipesBase
         seriescolor --> :red
         line --> :dash
         label --> "" # sigs'
+        xlims --> xl
         ylims --> yl
         h.f[[2,end]], vcat(labs',labs')
       end
@@ -148,6 +178,7 @@ using StatsFuns, Multitaper, Plots, RecipesBase
         seriescolor --> :blue
         line --> :dash
         label --> "" # ymsc'
+        xlims --> xl
         ylims --> yl
         h.f[[2,end]], vcat(ymsc_transf',ymsc_transf')
       end
@@ -157,6 +188,7 @@ using StatsFuns, Multitaper, Plots, RecipesBase
     @series begin
         subplot := sp[3]
         linealpha := 0.0
+        xticks := []
         ymirror := true
         yticks := true
         ylims := yl
