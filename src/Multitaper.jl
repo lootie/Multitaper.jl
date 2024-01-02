@@ -32,6 +32,9 @@ module Multitaper
   include("MDmwps.jl")
     export mdslepian, mdmultispec, gpss
 
+  include("multispec_noadapt.jl")
+    export mdmultispec_noadapt
+
   include("Demodulation.jl")
     export demodulate
 
