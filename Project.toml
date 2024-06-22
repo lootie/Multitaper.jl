@@ -20,13 +20,16 @@ StatsFuns = "4c63d2b9-4356-54db-8cca-17b64c39e42c"
 
 [compat]
 Arpack = "0.4.0, 0.5"
+Conda = "1.10"
+DelimitedFiles = "1.9"
 Distributions = "0.23, 0.24, 0.25"
 FFTW = "1.2.4"
-FINUFFT = "2"
-FastGaussQuadrature = "0.4.3"
+FINUFFT = "2, 3"
+FastGaussQuadrature = "0.4.3, 0.5, 1"
+PyCall = "1.96"
 RecipesBase = "1.1.0"
 SpecialFunctions = "0.10.3, 1, 2"
-StatsFuns = "0.9"
+StatsFuns = "0.9, 1"
 julia = "1.4.2"
 
 [extras]
