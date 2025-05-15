@@ -36,7 +36,7 @@ sequences
 
 ...
 
-See also: [`gpss_orth`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
+See also: [`mdmultispec`](@ref), [`mdslepian`](@ref)
 
 """
 function gpss(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}, 
@@ -110,7 +110,7 @@ u*R for the ordinary `gpss` routine.
 
 ...
 
-See also: [`gpss`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
+See also: [`mdmultispec`](@ref), [`mdslepian`](@ref)
 
 """
 function gpss_orth(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}, 
