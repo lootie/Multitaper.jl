@@ -58,20 +58,7 @@ MT_Upcrossings
 uctable
 ```
 
-### Two Dimensional Spectrum 
-```@docs
-rectsleps
-multispec2_Rectangle
-```
-## Under development
-
-### Slepians with gaps
-```@docs
-MDSlepian
-```
-
 ### Unequal sampling
 ```@docs
-gpss
 bspec
 ```
