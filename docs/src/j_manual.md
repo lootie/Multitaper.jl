@@ -11,7 +11,7 @@ transfer function. For an accessible introduction to multitaper methods, we reco
 
 ## Structs
 
-[Multitaper.jl](bitbucket.org/clhaley/multitaper.jl) outputs spectra, coherences,
+[Multitaper.jl](https://github.com/lootie/Multitaper.jl) outputs spectra, coherences,
 transfer functions, etc. in the form of Julia structs. The main reason for this is in
 the ease of [Plotting](@ref Plotting).
 
@@ -71,7 +71,7 @@ plot(S)
 There is a plots recipe, see [Plotting](@ref), for plotting structs of this type. 
 
 There is an IJulia.jl notebook in 
-[`Multitaper.jl/Examples/01_basic_multitaper.ipynb`](https://bitbucket.org/clhaley/multitaper.jl/src/master/Examples/01_basic_multitaper.ipynb?at=master&viewer=nbviewer) 
+[`Multitaper.jl/Examples/01_basic_multitaper.ipynb`](https://github.com/lootie/Multitaper.jl/src/master/Examples/01_basic_multitaper.ipynb?at=master&viewer=nbviewer) 
 showing an example taken from the excellent text 
 [(Percival and Walden, 1993)](https://faculty.washington.edu/dbp/sapabook.html). To
 run this notebook on a cloned copy of the repo, follow the instructions in 
@@ -84,7 +84,7 @@ to compute the following quantities:
    line at every frequency. 
  - T-squared test p-value [(Thomson, 2011)](https://ieeexplore.ieee.org/document/6190385)
 
-An example of the former are available in the [`Multitaper.jl/Examples/01_basic_multitaper.ipynb`](https://bitbucket.org/clhaley/multitaper.jl/src/master/Examples/01_basic_multitaper.ipynb?at=master&viewer=nbviewer)
+An example of the former are available in the [`Multitaper.jl/Examples/01_basic_multitaper.ipynb`](https://github.com/lootie/Multitaper.jl/src/master/Examples/01_basic_multitaper.ipynb?at=master&viewer=nbviewer)
 notebook. 
 
 The main advantage of the multitaper spectrum is that one can simultaneously control
@@ -164,7 +164,7 @@ time series with the default output option.
 There is a plots recipe, see [Plotting](@ref), for plotting structs of this type. 
 
 There is an IJulia.jl notebook in 
-[`Multitaper.jl/Examples/02_multivariate.ipynb`](https://bitbucket.org/clhaley/multitaper.jl/src/master/Examples/02_multivariate.ipynb?at=master&viewer=nbviewer) 
+[`Multitaper.jl/Examples/02_multivariate.ipynb`](https://github.com/lootie/Multitaper.jl/src/master/Examples/02_multivariate.ipynb?at=master&viewer=nbviewer) 
 showing an example taken from the excellent (and freely available) text 
 [(Shumway and Stoffer)](https://www.stat.pitt.edu/stoffer/tsa4/). To
 run this notebook on a cloned copy of the repo, follow the instructions in 
@@ -211,7 +211,7 @@ called on the time series.
 There is a plots recipe, see [Plotting](@ref), for plotting structs of this type. 
 
 There is an IJulia.jl notebook in 
-[`Multitaper.jl/Examples/04_Demodulation.ipynb`](https://bitbucket.org/clhaley/multitaper.jl/src/master/Examples/04_Demodulation.ipynb?at=master&viewer=nbviewer) 
+[`Multitaper.jl/Examples/04_Demodulation.ipynb`](https://github.com/lootie/Multitaper.jl/src/master/Examples/04_Demodulation.ipynb?at=master&viewer=nbviewer) 
 showing an example taken from the paper
 [(Thomson, 1995)](https://science.sciencemag.org/content/268/5207/59.abstract?casa_token=uor0W6-iLrAAAAAA:CTYmHFYTI3QIIF75nF2F4Zwl47nYmqNJNXMn8ryLVDkNjX8ZbmHqDsvG9y1hwnKteAD2Y0Fvvq3vtg) 
 and [R multitaper](https://cran.r-project.org/web/packages/multitaper/index.html). To
