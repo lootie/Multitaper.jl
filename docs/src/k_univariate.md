@@ -133,7 +133,7 @@ welch(S1::Union{Vector{Float64}, Vector{ComplexF64}, Matrix{Float64},
                ctr::Bool = true, pad::Union{Int,Float64} = 1.0,
                dpVec::Union{Vector{Float64},Matrix{Float64},Nothing} = nothing, 
                egval::Union{Vector{Float64},Nothing} = nothing, 
-               guts::Bool = false, a_weight::Bool = true, Ftest::Bool = false, 
+               guts::Bool = false, a_weight::Bool = true, 
                jk::Bool = false, 
                Tsq::Union{Array{Int64,1},Array{Array{Int64,1},1},Nothing}=nothing,
                alph::Float64 = 0.05) 
