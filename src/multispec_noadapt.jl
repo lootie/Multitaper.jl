@@ -40,10 +40,9 @@ See also: [`mdmultispec`](@ref), [`mdslepian`](@ref), [`MTSpectrum`](@ref), [`mu
 
 function mdmultispec_noadapt(tt::Vector{T}, x::Vector{P}; 
                 bw=5/length(tt), k=Int64(2*bw*size(x,1)-1), 
-                lambdau::Union{Tuple{Array{Float64,1},
-                               Array{Float64,2}},Nothing} = nothing,
-                dt=tt[2]-tt[1], nz=0, Ftest=true, jk=true)
-                where{T<:Real,P<:Number}
+                lambdau::Union{Tuple{Array{Float64,1}, Array{Float64,2}},Nothing} = nothing,
+                dt=tt[2]-tt[1], nz=0, Ftest=true, jk=true) where{T<:Real,P<:Number}
+
   lambda,u = (lambdau == nothing) ? Multitaper.mdslepian(bw, k, tt) : lambdau
   s2    = var(x)
   n, nfft, nfft2 = Multitaper._pregap(tt, x, nz)
