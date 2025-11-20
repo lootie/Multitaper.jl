@@ -20,7 +20,6 @@ Multitaper complex demodulation
  - A struct of type `Demodulate`
 ...
 
-See also: [`Demodulate`](@ref), and relevant plots recipe [`demodplot`](@ref)
 """
 function demodulate(x, f0, NW, blockLen, wrapphase=true, dt = 1.0, basetime = 0.0)
   # Generate the zeroth order Slepian taper as a lowpass filter

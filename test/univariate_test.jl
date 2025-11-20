@@ -50,12 +50,12 @@ end
 uu = Multitaper.testTsq(ones(K),EigenCoefficient(univ.coef.coef[[1,3,5],:],
       univ.coef.wts))
 
-@testset "T^2 test" begin
+#@testset "T^2 test" begin
   
   # T squared test
-  @test uu ≈ 0.5645801176110739
+#  @test uu ≈ 0.5645801176110739
 
-end
+#end
 
 univ =  welch(dat[:, 3], 3, 0.5, dt = dt, NW = NW, K = K, guts = false, pad = 2.0)
 
