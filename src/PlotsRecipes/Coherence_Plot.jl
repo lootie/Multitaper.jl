@@ -1,4 +1,4 @@
-using StatsFuns, Multitaper, Plots, RecipesBase
+using StatsFuns, Multitaper, Plots, RecipesBase, LaTeXStrings
 
 @userplot mtcoh
 
