@@ -14,7 +14,7 @@ unevenly spaced grid
 ...
 # Positional Arguments
  - `w::Float64`: the bandwidth
- - `k::Int64`: number of Slepian tapers, must be <=2*bw*length(x) 
+ - `k::Int64`: number of generalized prolate spheriodal sequence tapers, must be <=2*bw*length(x) 
  - `t::Union{Vector{Int64}, Vector{Float64}}`: vector containing the time indices
  - `f::Float64`: frequency at which the tapers are to be computed
 ...
@@ -151,7 +151,7 @@ Bronez (1988) multitaper power spectrum estimate
  - `time::Union{Vector{Float64}, Vector{Int64}}`: vector of observing times
  - `obs::Vector{Float64}`: vector of observations
  - `W::Float64`: bandwidth
- - `K::Int64`: number of Slepian tapers, must be <=2*W*length(obs) 
+ - `K::Int64`: number of generalized prolate spheroidal sequence tapers, must be <=2*W*length(obs) 
 ## Keyword Arguments
  - `oversample::Float64 = 1.0`: oversampling factor for frequency grid
  - `Ftest::Bool = false`: whether to perform F-test for harmonic components
