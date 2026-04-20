@@ -12,8 +12,7 @@ using Base.Threads: nthreads, @spawn, @threads
 Generalized, orthogonalized prolate spheroidal sequences on an
 unevenly spaced grid
 ...
-# Arguments
-## Positional Arguments
+# Positional Arguments
  - `w::Float64`: the bandwidth
  - `k::Int64`: number of Slepian tapers, must be <=2*bw*length(x) 
  - `t::Union{Vector{Int64}, Vector{Float64}}`: vector containing the time indices
@@ -65,8 +64,7 @@ end
     rescale_time(times, observations, tscale)
 Sort and rescale vector of observation times to get characteristic dt ~ 1
 ...
-# Arguments
-## Positional Arguments
+# Positional Arguments
  - `times::Vector{T} where T<:Real`: vector of observing times
  - `observations::Vector{P} where P<:Number`: vector of data
  - `tscale::Float64`: characteristic timestep for rescaling
@@ -103,8 +101,7 @@ end
 If there are duplicate time stamps, remove the duplicate by
 averaging the two measurements
 ...
-# Arguments
-## Positional Arguments
+# Positional Arguments
  - `t:: Union{Vector{Float64}, Vector{Int64}}`: vector of time stamps
  - `x::Vector{Float64}`: vector of data
 ...
@@ -114,7 +111,6 @@ averaging the two measurements
  - `x::Vector{Float64}`: vector of data with duplicates removed
 See also: [`gpss`](@ref), [`rescale_time`](@ref), [`bronez`](@ref)
 """
-# Average data with repeated time stamps
 function remove_repeats(t::Union{Vector{Float64}, Vector{Int64}}, x::Vector{Float64})
 # t = timestamps; x = measurements
     
