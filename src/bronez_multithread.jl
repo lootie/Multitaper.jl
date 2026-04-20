@@ -283,3 +283,4 @@ See also: [`rescale_time`](@ref), [`bspec`](@ref), [`remove_repeats`](@ref)
 function rescale_frequency(spectrum::MTSpectrum, tsc::Float64)
     spectrum.f = spectrum.f ./ tsc
     spectrum.S = spectrum.S ./ tsc
+end
