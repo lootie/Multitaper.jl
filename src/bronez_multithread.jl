@@ -104,6 +104,7 @@ averaging the two measurements
 # Positional Arguments
  - `t:: Union{Vector{Float64}, Vector{Int64}}`: vector of time stamps
  - `x::Vector{Float64}`: vector of data
+...
 Changes to t and x vectors are made inplace
 ...
 ...
@@ -264,3 +265,21 @@ function bspec(time::Union{Vector{Float64}, Vector{Int64}},
     end
        
 end
+
+
+"""
+    rescale_frequency(spectrum, tsc)
+If observation times were rescaled, convert frequencies to physical units
+...
+# Positional Arguments
+ - `spectrum::MTSpectrum`: MTSpectrum structure returned by bspec()
+ - `tsc::Float64`: characteristic timestep
+...
+Spectrum is modified inplace
+...
+...
+See also: [`rescale_time`](@ref), [`bspec`](@ref), [`remove_repeats`](@ref)
+"""
+function rescale_frequency(spectrum::MTSpectrum, tsc::Float64)
+    spectrum.f = spectrum.f ./ tsc
+    spectrum.S = spectrum.S ./ tsc
