@@ -9,21 +9,20 @@ using Base.Threads: nthreads, @spawn, @threads
 
 """
     gpss_uneven(w, k, t, f)
-Generalized, orthogonalized prolate spheroidal sequences on an unequal grid
+Generalized, orthogonalized prolate spheroidal sequences on an
+unevenly spaced grid
 ...
 # Arguments
 ## Positional Arguments
  - `w::Float64`: the bandwidth
  - `k::Int64`: number of Slepian tapers, must be <=2*bw*length(x) 
- - `t::Vector{Int64}`: vector containing the time indices
+ - `t::Union{Vector{Int64}, Vector{Float64}}`: vector containing the time indices
  - `f::Float64`: frequency at which the tapers are to be computed
 ...
 ...
 # Outputs
- - `lambda::Vector{Float64}` the concentrations of the generalized prolate spheroidal
-sequences
- - `u::Matrix{Float64}` the matrix containing the sequences themselves, equivalent to 
-u*R for the ordinary `gpss` routine.
+ - `lambda::Vector{Float64}` the concentrations of the generalized prolate spheroidal sequences
+ - `u::Matrix{Float64}` the matrix containing the sequences themselves
 ...
 See also: [`gpss`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
 """
@@ -62,7 +61,24 @@ function gpss_uneven(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64
 end
 
 
-function rescale_time(times::Vector{T}, observations::Vector{P}) where{T<:Number, P<:Number}
+"""
+    rescale_time(times, observations, tscale)
+Sort and rescale vector of observation times to get characteristic dt ~ 1
+...
+# Arguments
+## Positional Arguments
+ - `times::Vector{T} where T<:Real`: vector of observing times
+ - `observations::Vector{P} where P<:Number`: vector of data
+ - `tscale::Float64`: characteristic timestep for rescaling
+...
+...
+# Outputs
+ - `t::Vector{T} where T<:Real`: sorted, rescaled time stamps
+ - `obs::Vector{P} where P<:Number`: sorted data
+See also: [`gpss`](@ref), [`remove_repeats`](@ref), [`bronez`](@ref)
+"""
+function rescale_time(times::Vector{T}, observations::Vector{P},
+                      tscale::Float64) where{T<:Real, P<:Number}
     
     t = copy(times)
     obs = copy(observations)
@@ -73,16 +89,32 @@ function rescale_time(times::Vector{T}, observations::Vector{P}) where{T<:Number
     t = t .- t[1]
     obs = obs[tind]
     
-    # Divide timestamps by min(dt)
-    tscale = minimum(diff(t))
+    # Divide timestamps by characteristic timescale
     t ./= tscale
 
-    # Return altered timestamps, observed data, time axis scaling factor
-    return (t, obs, tscale)
+    # Return sorted and altered timestamps, sorted observed data 
+    return t, obs
 
 end
 
 
+"""
+    remove_repeats(t::Union{Vector{Float64}, Vector{Int64}},
+                   x::Vector{Float64})
+If there are duplicate time stamps, remove the duplicate by
+averaging the two measurements
+...
+# Arguments
+## Positional Arguments
+ - `t:: Union{Vector{Float64}, Vector{Int64}}`: vector of time stamps
+ - `x::Vector{Float64}`: vector of data
+...
+...
+# Outputs
+ - `t:: Union{Vector{Float64}, Vector{Int64}}`: vector of time stamps with duplicated removed
+ - `x::Vector{Float64}`: vector of data with duplicates removed
+See also: [`gpss`](@ref), [`rescale_time`](@ref), [`bronez`](@ref)
+"""
 # Average data with repeated time stamps
 function remove_repeats(t::Union{Vector{Float64}, Vector{Int64}}, x::Vector{Float64})
 # t = timestamps; x = measurements
@@ -117,9 +149,33 @@ function lsq_sinusoid(tobs::Vector{T}, tapered_series::Vector{P}, fr::Float64) w
 end
 
 
+"""
+    bspec(time, obs, W, K; <keyword arguments>)
+Bronez (1988) multitaper power spectrum estimate
+...
+# Arguments
+## Positional Arguments
+ - `time::Union{Vector{Float64}, Vector{Int64}}`: vector of observing times
+ - `obs::Vector{Float64}`: vector of observations
+ - `W::Float64`: bandwidth
+ - `K::Int64`: number of Slepian tapers, must be <=2*W*length(obs) 
+## Keyword Arguments
+ - `oversample::Float64 = 1.0`: oversampling factor for frequency grid
+ - `Ftest::Bool = false`: whether to perform F-test for harmonic components
+ - `return_tapers::Bool = false`: whether to return array containing tapers
+...
+...
+# Outputs
+ - `spectrum::MTSpectrum`: MTSpectrum structure containing the spectrum
+ - `tapers::Array{Float64}`: optional array containing tapers for each frequency
+...
+See also: [`gpss`](@ref), [`mdmultispec`](@ref), [`multispec`](@ref)
+"""
 # Multi-threaded Bronez spectrum
-function bspec(time::Union{Vector{Float64}, Vector{Int64}}, obs::Vector{Float64}, W::Float64,
-               K::Int64; oversample::Float64 = 1.0, Ftest::Bool = false, return_tapers::Bool = false)
+function bspec(time::Union{Vector{Float64}, Vector{Int64}},
+               obs::Vector{Float64}, W::Float64, K::Int64;
+               oversample::Float64 = 1.0, Ftest::Bool = false,
+               return_tapers::Bool = false)
     
     if length(time) != length(obs)
         throw(ArgumentError("Time and data vectors must be the same length."))
