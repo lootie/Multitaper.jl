@@ -99,8 +99,7 @@ end
 
 
 """
-    remove_repeats(t::Union{Vector{Float64}, Vector{Int64}},
-                   x::Vector{Float64})
+    remove_repeats(t::Union{Vector{Float64}, Vector{Int64}}, x::Vector{Float64})
 If there are duplicate time stamps, remove the duplicate by
 averaging the two measurements
 ...
@@ -171,7 +170,6 @@ Bronez (1988) multitaper power spectrum estimate
 ...
 See also: [`gpss`](@ref), [`mdmultispec`](@ref), [`multispec`](@ref)
 """
-# Multi-threaded Bronez spectrum
 function bspec(time::Union{Vector{Float64}, Vector{Int64}},
                obs::Vector{Float64}, W::Float64, K::Int64;
                oversample::Float64 = 1.0, Ftest::Bool = false,
