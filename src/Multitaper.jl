@@ -49,7 +49,7 @@ module Multitaper
 
   # Unequally sampled multitaper
   include("bronez_multithread.jl")
-    export bspec, gpss_uneven, rescale_time, remove_repeats
+    export bspec, gpss_uneven, rescale_time, remove_repeats, rescale_frequency
 
   # Multivariate
 
