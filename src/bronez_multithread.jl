@@ -104,11 +104,9 @@ averaging the two measurements
 # Positional Arguments
  - `t:: Union{Vector{Float64}, Vector{Int64}}`: vector of time stamps
  - `x::Vector{Float64}`: vector of data
+Changes to t and x vectors are made inplace
 ...
 ...
-# Outputs
- - `t:: Union{Vector{Float64}, Vector{Int64}}`: vector of time stamps with duplicated removed
- - `x::Vector{Float64}`: vector of data with duplicates removed
 See also: [`gpss`](@ref), [`rescale_time`](@ref), [`bronez`](@ref)
 """
 function remove_repeats(t::Union{Vector{Float64}, Vector{Int64}}, x::Vector{Float64})
