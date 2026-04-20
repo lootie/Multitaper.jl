@@ -1,4 +1,3 @@
-# Similar to mdmultispec, but adaptive weighting has been turned off
 """
    mdmultispec_noadapt(tt, x; <keyword arguments>)
 
@@ -6,11 +5,13 @@ Computes multitaper spectrum for missing-data time series without adaptive weigh
 
 ...
 
-# Arguments
+# Positional Arguments
 
 - `tt::Vector{T} where T<:Real`: the vector containing the time indices. Must have dt = 1 except across gaps corresponding to missing data.
 
 - `x::Vector{P} where P<:Number`: the vector containing the measurements
+
+# Keyword Arguments
 
 - `bw=5/length(tt)`: multitaper bandwidth, default corresponds to NW=5
 
@@ -37,7 +38,6 @@ Computes multitaper spectrum for missing-data time series without adaptive weigh
 See also: [`mdmultispec`](@ref), [`mdslepian`](@ref), [`MTSpectrum`](@ref), [`multispec`](@ref)
 
 """
-
 function mdmultispec_noadapt(tt::Vector{T}, x::Vector{P}; 
                 bw=5/length(tt), k=Int64(2*bw*size(x,1)-1), 
                 lambdau::Union{Tuple{Array{Float64,1}, Array{Float64,2}},Nothing} = nothing,
