@@ -1,6 +1,4 @@
-using StatsFuns, Multitaper, Plots, RecipesBase, LaTeXStrings
-
-@userplot mtcoh
+@userplot cohplot
 
 @recipe function f(h::MTCoherence; siglines = true, msclines = true, sigMax = 4, legtext = false, 
         force_xlims = nothing, force_ylims = nothing, mscaxis = true, sigaxis = true, jk = true,
