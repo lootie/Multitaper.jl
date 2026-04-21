@@ -338,7 +338,7 @@ The outputs are
   * `lambda` -- the concentrations of the missing-data Slepians
   * `u` -- length(t) times k matrix containing the missing-data Slepians
 
-### `gpss`
+### `gpss_uneven`
 
 Following the work of 
 [(Bronez, 1988](https://ieeexplore.ieee.org/abstract/document/9031), one can compute
@@ -347,8 +347,8 @@ called generalized prolate spheroidal sequences. The function
 with the following signature computes these
 
 ```
-function gpss(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}, 
-        f::Float64; beta::Float64 = 0.5)
+function gpss_uneven(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}, 
+        f::Float64)
 ```
 
 The inputs are the following:
@@ -356,12 +356,10 @@ The inputs are the following:
   * `k` -- the number of Slepian tapers
   * `t` -- the vector containing the time indicees
   * `f` -- the frequency of interest, between 0 and beta
-  * `beta` -- the unequal sampling equivalent to the Nyquist rate
 
 The outputs are
   * `lambda` -- the concentrations of the missing-data Slepians
   * `u` -- length(t) times k matrix containing the missing-data Slepians
-  * `R` -- Cholesky factor for the generalized eigenvalue problem
 
 !!! This function is known to occasionally have numerical errors in computing
 the Cholesky factors of the genealized eigenvalue problem, so use at own risk. For
