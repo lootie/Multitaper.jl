@@ -1,3 +1,5 @@
+using LaTeXStrings
+
 @userplot cohplot
 
 @recipe function f(h::MTCoherence; siglines = true, msclines = true, sigMax = 4, legtext = false, 
