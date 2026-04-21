@@ -58,7 +58,7 @@ module Multitaper
   
   include("PlotsRecipes/multivariaterecipes.jl")
 
-  include("PlotsRecipes/Coherence_plot.jl")
+  include("PlotsRecipes/Coherence_Plot.jl")
 
 end
 
