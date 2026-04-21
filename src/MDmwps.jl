@@ -273,7 +273,7 @@ coherences, and T^2 test significances (currently set to return nothing)
 
 ...
 
-See also: [`multispec`](@ref), [`mdslepian`](@ref)
+See also: [`mdmultispec_noadapt`](@ref), [`multispec`](@ref), [`mdslepian`](@ref)
 """
 function mdmultispec(t::Vector{T}, 
                 xx::Matrix{P};

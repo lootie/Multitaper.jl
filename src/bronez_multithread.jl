@@ -23,7 +23,7 @@ unevenly spaced grid
  - `lambda::Vector{Float64}` the concentrations of the generalized prolate spheroidal sequences
  - `u::Matrix{Float64}` the matrix containing the sequences themselves
 ...
-See also: [`gpss_uneven`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
+See also: [`dpss_tapers`](@ref), [`mdmultispec`](@ref), [`mdmultispec_noadapt`](@ref), [`mdslepian`](@ref)
 """
 function gpss_uneven(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}, f::Float64)
   beta        = 0.5
