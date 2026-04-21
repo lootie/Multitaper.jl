@@ -344,7 +344,7 @@ Generalized prolate spheroidal sequences for the 1D missing data problem
 
 ...
 
-See also: [`mdmultispec`](@ref), [`gpss`](@ref)
+See also: [`mdmultispec`](@ref), [`gpss_uneven`](@ref)
 
 """
 function mdslepian(w, k, t)

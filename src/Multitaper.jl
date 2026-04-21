@@ -30,7 +30,7 @@ module Multitaper
   # Multitaper on data with gaps 
 
   include("MDmwps.jl")
-    export mdslepian, mdmultispec, gpss
+    export mdslepian, mdmultispec
 
   # Multitaper on data with gaps, turning off adaptive weighting
 
