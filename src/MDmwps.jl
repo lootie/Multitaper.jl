@@ -99,7 +99,7 @@ Slepians, if precomputed
 
 ...
 
-See also: [`multispec`](@ref), [`mdslepian`](@ref)
+See also: [`multispec`](@ref), [`mdmultispec_noadapt`](@ref), [`mdslepian`](@ref), [`bspec`](@ref)
 """
 function mdmultispec(tt::Vector{T}, x::Vector{P}; 
                 bw=5/length(tt), k=Int64(2*bw*size(x,1)-1), 
@@ -194,7 +194,7 @@ Slepians, if precomputed
  - `pkg::MTCoherence` struct containing the coherence
 ...
 
-See also: [`multispec`](@ref), [`mdslepian`](@ref)
+See also: [`mdmultispec(tt, x; <keyword arguments>)`](@ref), [`mdslepian`](@ref), [`multispec(S1, S2; <keyword arguments>)`](@ref), [`bspec`](@ref) 
 """
 function mdmultispec(t::Vector{T}, 
                 x::Vector{P},
@@ -229,10 +229,9 @@ function mdmultispec(t::Vector{T},
 end
 
 """
-    mdmultispec(tt, x; <keyword arguments>)
+    mdmultispec(t, xx; <keyword arguments>)
 
-Multitaper coherence estimation for multiple time series with the same missing data
-(gaps)
+Multitaper coherence estimation for multiple time series with the same missing data (gaps)
 
 ...
 
@@ -240,9 +239,9 @@ Multitaper coherence estimation for multiple time series with the same missing d
 
 ## Keyword Arguments
 
- - `tt::Vector{T} where T<:Real`: the vector containing the time indices
+ - `t::Vector{T} where T<:Real`: the vector containing the time indices
 
- - `x::Matrix{P} where P<:Number`: time series in the columns of a matrix
+ - `xx::Matrix{P} where P<:Number`: time series in the columns of a matrix
 
 ## Positional Arguments
 
@@ -273,7 +272,7 @@ coherences, and T^2 test significances (currently set to return nothing)
 
 ...
 
-See also: [`mdmultispec_noadapt`](@ref), [`multispec`](@ref), [`mdslepian`](@ref)
+See also: [`mdmultispec(tt, x; <keyword arguments>)`](@ref), [`mdmultispec(tt, x, y; <keyword arguments>)`](@ref), [`multispec`](@ref), [`mdslepian`](@ref), [`bspec`](@ref)
 """
 function mdmultispec(t::Vector{T}, 
                 xx::Matrix{P};
@@ -344,7 +343,8 @@ Generalized prolate spheroidal sequences for the 1D missing data problem
 
 ...
 
-See also: [`mdmultispec`](@ref), [`gpss_uneven`](@ref)
+See also: [`mdmultispec(tt, x); <keyword arguments>`](@ref),
+[`gpss_uneven`](@ref), [`mdmultispec_noadapt`](@ref)
 
 """
 function mdslepian(w, k, t)

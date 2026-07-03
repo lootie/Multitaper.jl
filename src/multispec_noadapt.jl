@@ -35,7 +35,7 @@ Computes multitaper spectrum for missing-data time series without adaptive weigh
 - `MTSpectrum` structure containing the spectrum
 ...
 
-See also: [`mdmultispec`](@ref), [`mdslepian`](@ref), [`MTSpectrum`](@ref), [`multispec`](@ref)
+See also: [`mdmultispec(tt, x; <keyword arguments>)`](@ref), [`mdslepian`](@ref), [`MTSpectrum`](@ref), [`multispec`](@ref), [`bspec`](@ref)
 
 """
 function mdmultispec_noadapt(tt::Vector{T}, x::Vector{P}; 

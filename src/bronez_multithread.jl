@@ -23,7 +23,7 @@ unevenly spaced grid
  - `lambda::Vector{Float64}` the concentrations of the generalized prolate spheroidal sequences
  - `u::Matrix{Float64}` the matrix containing the sequences themselves
 ...
-See also: [`dpss_tapers`](@ref), [`mdmultispec`](@ref), [`mdmultispec_noadapt`](@ref), [`mdslepian`](@ref)
+See also: [`dpss_tapers`](@ref), [`mdslepian`](@ref)
 """
 function gpss_uneven(w::Float64, k::Int64, t::Union{Vector{Int64},Vector{Float64}}, f::Float64)
   beta        = 0.5
@@ -73,7 +73,7 @@ Sort and rescale vector of observation times to get characteristic dt ~ 1
 # Outputs
  - `t::Vector{T} where T<:Real`: sorted, rescaled time stamps
  - `obs::Vector{P} where P<:Number`: sorted data
-See also: [`gpss_uneven`](@ref), [`remove_repeats`](@ref), [`bronez`](@ref)
+See also: [`gpss_uneven`](@ref), [`remove_repeats`](@ref)
 """
 function rescale_time(times::Vector{T}, observations::Vector{P},
                       tscale::Float64) where{T<:Real, P<:Number}
@@ -108,7 +108,7 @@ averaging the two measurements
 Changes to t and x vectors are made inplace
 ...
 ...
-See also: [`gpss_uneven`](@ref), [`rescale_time`](@ref), [`bronez`](@ref)
+See also: [`gpss_uneven`](@ref), [`rescale_time`](@ref)
 """
 function remove_repeats(t::Union{Vector{Float64}, Vector{Int64}}, x::Vector{Float64})
 # t = timestamps; x = measurements
@@ -163,7 +163,7 @@ Bronez (1988) multitaper power spectrum estimate
  - `spectrum::MTSpectrum`: MTSpectrum structure containing the spectrum
  - `tapers::Array{Float64}`: optional array containing tapers for each frequency
 ...
-See also: [`gpss_uneven`](@ref), [`mdmultispec`](@ref), [`multispec`](@ref)
+See also: [`gpss_uneven`](@ref), [`mdmultispec(tt, x; <keyword arguments>)`](@ref), [`multispec`](@ref)
 """
 function bspec(time::Union{Vector{Float64}, Vector{Int64}},
                obs::Vector{Float64}, W::Float64, K::Int64;
