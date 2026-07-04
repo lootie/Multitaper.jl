@@ -34,7 +34,7 @@ Univariate
 
 ## Univariate spectrum estimation
 
-### multispec
+### multispec(S1)
 
 ```@docs
 multispec(S1)
@@ -289,7 +289,7 @@ in the Examples directory for usage.
 
 ## Missing-data Spectrum
 
-### `mdmultispec`
+### `mdmultispec(tt, x)`
 
 Chave showed how to compute dpss's and multitaper spectra on data with
 gaps [(Chave,2019)](https://academic.oup.com/gji/article-abstract/218/3/2165/5519233). The

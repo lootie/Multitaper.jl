@@ -163,7 +163,7 @@ Bronez (1988) multitaper power spectrum estimate
  - `spectrum::MTSpectrum`: MTSpectrum structure containing the spectrum
  - `tapers::Array{Float64}`: optional array containing tapers for each frequency
 ...
-See also: [`gpss_uneven`](@ref), [`mdmultispec(tt, x; <keyword arguments>)`](@ref), [`multispec`](@ref)
+See also: [`gpss_uneven`](@ref), [`mdmultispec`](@ref), [`multispec`](@ref)
 """
 function bspec(time::Union{Vector{Float64}, Vector{Int64}},
                obs::Vector{Float64}, W::Float64, K::Int64;

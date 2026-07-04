@@ -268,7 +268,8 @@ Computes univariate multitaper spectra with a handful of extra gadgets.
  - `MTSpectrum` struct containing the spectrum
 ...
 
-See also: [`dpss_tapers`](@ref), [`MTSpectrum`](@ref), [`mdmultispec(tt, x; <keyword arguments>)`](@ref), [`mdslepian`](@ref)
+See also: [`dpss_tapers`](@ref), [`MTSpectrum`](@ref),
+[`mdmultispec`](@ref), [`mdmultispec_noadapt`](@ref), [`mdslepian`](@ref)
 """
 function multispec(S1; NW=4.0, K=6, dt=1.0, ctr=true, pad=1.0, dpVec=nothing,
                    egval=nothing, guts=false, a_weight=true, Ftest=false,
