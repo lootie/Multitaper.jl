@@ -53,8 +53,11 @@ function multispec_coef(tt, x, u, n, nfft, nfft2)
                    hcat, eachcol(u))
 end
 
+
 """
     mdmultispec(tt, x; <keyword arguments>)
+    mdmultispec(tt, x, y; <keyword arguments>)
+    mdmultispec(t, xx; <keyword arguments)
 
 Multitaper power spectrum estimation for time series with missing data (gaps)
 
@@ -63,9 +66,15 @@ Multitaper power spectrum estimation for time series with missing data (gaps)
 
 ## Positional Arguments
 
- - `tt::Vector{T} where T<:Real`: the vector containing the time indices
+ - `tt::Vector{T} where T<:Real`: vector of time indices
 
  - `x::Vector{P} where P<:Number`: data vector
+
+ - `y::Vector{Q} where Q<:Number`: second data vector used in coherence calculations
+
+ - `t::Vector{T} where T<:Real`: vector of time indices
+
+ - `xx:Matrix{P} where P<:Number`: matrix with time series arranged in columns
 
 ## Keyword Arguments
 
@@ -99,8 +108,10 @@ Slepians, if precomputed
 
 ...
 
-See also: [`multispec`](@ref), [`mdslepian`](@ref)
+See also: [`multispec`](@ref), [`mdmultispec_noadapt`](@ref), [`mdslepian`](@ref), [`bspec`](@ref)
 """
+function mdmultispec end
+
 function mdmultispec(tt::Vector{T}, x::Vector{P}; 
                 bw=5/length(tt), k=Int64(2*bw*size(x,1)-1), 
                 lambdau::Union{Tuple{Array{Float64,1},
@@ -150,52 +161,7 @@ function mdmultispec(tt::Vector{T}, x::Vector{P};
   end
 end
 
-"""
-    mdmultispec(tt, x, y; <keyword arguments>)
 
-Multitaper coherence estimation for time series with missing data (gaps)
-
-...
-
-# Arguments
-
-## Positional Arguments 
-
- - `tt::Vector{T} where T<:Real`: the vector containing the time indices
-
- - `x::Vector{P} where P<:Number`: data vector 1
-
- - `y::Vector{Q} where Q<:Number`: data vector 2
-
-## Keyword Arguments
-
- - `bw = 5/length(tt)`: bandwidth of estimate
-
- - `k::Int64 = 2*bw*length(x)-1`: number of Slepian tapers, must be `<=
-2*bw*length(x)`
-
- - `dt = tt[2]-tt[1]`: sampling rate in time units 
-
- - `nz = 0.0`: zero padding factor
-
- - `Ftest::Bool = true`: Compute the F-test p-value
-
- - `jk::Bool = true`: Compute jackknifed confidence intervals
-
- - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`:
-Slepians, if precomputed
-
-...
-
-...
-
-# Outputs
-
- - `pkg::MTCoherence` struct containing the coherence
-...
-
-See also: [`multispec`](@ref), [`mdslepian`](@ref)
-"""
 function mdmultispec(t::Vector{T}, 
                 x::Vector{P},
                 y::Vector{Q};
@@ -228,53 +194,7 @@ function mdmultispec(t::Vector{T},
                 outputcoefs, [svar, phvar], Tv)
 end
 
-"""
-    mdmultispec(tt, x; <keyword arguments>)
 
-Multitaper coherence estimation for multiple time series with the same missing data
-(gaps)
-
-...
-
-# Arguments
-
-## Keyword Arguments
-
- - `tt::Vector{T} where T<:Real`: the vector containing the time indices
-
- - `x::Matrix{P} where P<:Number`: time series in the columns of a matrix
-
-## Positional Arguments
-
- - `bw = 5/length(tt)`: bandwidth of estimate
-
- - `k::Int64 = 2*bw*length(x)-1`: number of Slepian tapers, must be `<=
-2*bw*length(x)` 
-
- - `dt = tt[2]-tt[1]`: sampling rate in time units 
-
- - `nz = 0.0`: zero padding factor
-
- - `Ftest::Bool = false`: Compute the F-test p-value
-
- - `jk::Bool = true`: Compute jackknifed confidence intervals
-
- - `lambdau::Union{Tuple{Array{Float64,1},Array{Float64,2}},Nothing} = nothing`:
-Slepians, if precomputed
-
-...
-
-...
-
-# Outputs
-
- - `Tuple{Vector{MTSpectrum},Matrix{MTCoherence},Nothing}` struct containing the spectra, 
-coherences, and T^2 test significances (currently set to return nothing)
-
-...
-
-See also: [`multispec`](@ref), [`mdslepian`](@ref)
-"""
 function mdmultispec(t::Vector{T}, 
                 xx::Matrix{P};
                 bw = 5/length(t),
@@ -316,6 +236,7 @@ function mdmultispec(t::Vector{T},
   return (specs, coherences, Tv)
 end
 
+
 """
     mdslepian(w, k, t)
 
@@ -344,7 +265,7 @@ Generalized prolate spheroidal sequences for the 1D missing data problem
 
 ...
 
-See also: [`mdmultispec`](@ref), [`gpss`](@ref)
+See also: [`mdmultispec`](@ref), [`gpss_uneven`](@ref), [`mdmultispec_noadapt`](@ref)
 
 """
 function mdslepian(w, k, t)

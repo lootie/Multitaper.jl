@@ -30,20 +30,26 @@ module Multitaper
   # Multitaper on data with gaps 
 
   include("MDmwps.jl")
-    export mdslepian, mdmultispec, gpss
+    export mdslepian, mdmultispec
+
+  # Multitaper on data with gaps, turning off adaptive weighting
 
   include("multispec_noadapt.jl")
     export mdmultispec_noadapt
 
+  # Complex demodulation
+
   include("Demodulation.jl")
     export demodulate
+
+  # Upcrossings
 
   include("crossings.jl")
     export  Pgram_upcrossings, MT_Upcrossings, uctable
 
   # Unequally sampled multitaper
-  include("bronez.jl")
-    export bspec
+  include("bronez_multithread.jl")
+    export bspec, gpss_uneven, rescale_time, remove_repeats, rescale_frequency
 
   # Multivariate
 
@@ -51,6 +57,8 @@ module Multitaper
     export multispec, mt_ccf, mt_ccvf, mtm_svd, LFV_spectrum
   
   include("PlotsRecipes/multivariaterecipes.jl")
+
+  include("PlotsRecipes/Coherence_Plot.jl")
 
 end
 

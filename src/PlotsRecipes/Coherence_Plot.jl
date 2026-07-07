@@ -1,6 +1,4 @@
-using StatsFuns, Multitaper, Plots, RecipesBase
-
-@userplot mtcoh
+@userplot cohplot
 
 @recipe function f(h::MTCoherence; siglines = true, msclines = true, sigMax = 4, legtext = false, 
         force_xlims = nothing, force_ylims = nothing, mscaxis = true, sigaxis = true, jk = true,
@@ -9,7 +7,7 @@ using StatsFuns, Multitaper, Plots, RecipesBase
     # Layout, ylabels, etc
     if mscaxis && sigaxis
         layout := @layout [a{0.01w} b{0.95w} c{0.01w}]
-        yguide --> [L"\hat{C}^2_{xy}(f)" L"z(f)" "Significance"]
+        yguide --> ["MSC" "Transformed MSC" "Significance"]
         grid --> [false true false]
         legend --> [false legtext false]
         foreground_color_guide --> [:blue :black :red]
@@ -17,7 +15,7 @@ using StatsFuns, Multitaper, Plots, RecipesBase
         sp = [1,2,3]
     elseif jk && !mscaxis && sigaxis
         layout := @layout [b{0.95w} c{0.01w}]
-        yguide --> [L"z(f)" "Significance"]
+        yguide --> ["Transformed MSC" "Significance"]
         grid --> [true false]
         legend --> [legtext false]
         xguide --> ["Frequency" ""]
@@ -25,7 +23,7 @@ using StatsFuns, Multitaper, Plots, RecipesBase
         sp = [3, 1, 2]
     elseif mscaxis && !sigaxis
         layout := @layout [a{0.01w} b{0.95w}]
-        yguide --> [L"\hat{C}^2_{xy}(f)" "Transformed MSC"]
+        yguide --> ["MSC" "Transformed MSC"]
         grid --> [false true]
         legend --> [false legtext]
         foreground_color_guide --> [:blue :black]
@@ -35,19 +33,19 @@ using StatsFuns, Multitaper, Plots, RecipesBase
         layout = (1,1)
         grid --> true
         legend --> legtext
-        yguide --> L"z(f)"
+        yguide --> "Transformed MSC"
         xguide --> "Frequency"
         sp = [1,1,1]
     elseif !jk && !mscaxis && !sigaxis
         layout = (1,1)
         grid --> true
         legend --> legtext
-        yguide --> L"\hat{C}^2_{xy}(f)"
+        yguide --> "MSC"
         xguide --> "Frequency"
         sp = [1,1,1]
     elseif !jk && !mscaxis && sigaxis
         layout := @layout [b{0.95w} c{0.01w}]
-        yguide --> [L"\hat{C}^2_{xy}(f)" "Significance"]
+        yguide --> ["MSC" "Significance"]
         grid --> [true false]
         legend --> [legtext false]
         foreground_color_guide --> [:black :red]

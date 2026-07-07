@@ -23,13 +23,14 @@ MTCrossCorrelationFunction
 ```@docs
 dpss_tapers
 mdslepian
-gpss
+gpss_uneven
 ```
 
 ### Multitaper Spectrum 
 ```@docs
 multispec
 mdmultispec
+mdmultispec_noadapt
 welch
 ```
 
@@ -49,6 +50,9 @@ atanhtrans
 ejn
 unwrapphase
 blockerr
+remove_repeats
+rescale_time
+rescale_frequency
 ```
 
 ### Number of Crossings

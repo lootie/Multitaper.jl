@@ -40,6 +40,9 @@ jackknifed error bounds on the oscillation amplitudes.
 * Multitaper spectrum estimation for time series with equal temporal spacing except
   with gaps (Chave 2019)
 
+* Multithreaded multitaper spectrum estimation for time series
+  with unequal temporal spacing (Bronez 1988)
+
 ### Multivariate time series
 
 * Magnitude squared coherence, implemented in the spirit of Thomson and Chave, 1991.
@@ -66,10 +69,10 @@ types.
 
 ## Installation
 
-This package is unregistered, so please install with
+Please install with
 
 ```
-Pkg> add https://github.com/lootie/Multitaper.jl.git
+Pkg> add Multitaper
 ```
 
 This package runs on Julia v 1.4.2 and above. 
