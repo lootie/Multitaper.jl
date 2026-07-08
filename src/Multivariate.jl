@@ -78,7 +78,7 @@ transfer function, depending on the selection of `outp` input.
 
 ...
 
-See also: [`dpss_tapers`](@ref), [`MTCoherence`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
+See also: [`dpss_tapers`](@ref), [`MTSpectrum`](@ref), [`mdmultispec`](@ref), [`mdslepian`](@ref)
 
 """
 function multispec(S1::Union{Vector{T},EigenCoefficient}, S2::Union{Vector{P},EigenCoefficient}; 
@@ -177,7 +177,7 @@ end
 """
     mt_ccvf(S; <keyword arguments>)
 
-Computes multivariate multitaper cross-covariance/cross-correlation function.
+Computes univariate multitaper cross-covariance/cross-correlation function.
 Inputs a MTSpectrum struct.
 
 ...

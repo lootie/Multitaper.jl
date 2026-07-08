@@ -1,4 +1,6 @@
-@userplot cohplot
+using StatsFuns, Multitaper, Plots, RecipesBase
+
+@userplot mtcoh
 
 @recipe function f(h::MTCoherence; siglines = true, msclines = true, sigMax = 4, legtext = false, 
         force_xlims = nothing, force_ylims = nothing, mscaxis = true, sigaxis = true, jk = true,
@@ -7,7 +9,7 @@
     # Layout, ylabels, etc
     if mscaxis && sigaxis
         layout := @layout [a{0.01w} b{0.95w} c{0.01w}]
-        yguide --> ["MSC" "Transformed MSC" "Significance"]
+        yguide --> [L"\hat{C}^2_{xy}(f)" L"z(f)" "Significance"]
         grid --> [false true false]
         legend --> [false legtext false]
         foreground_color_guide --> [:blue :black :red]
@@ -15,7 +17,7 @@
         sp = [1,2,3]
     elseif jk && !mscaxis && sigaxis
         layout := @layout [b{0.95w} c{0.01w}]
-        yguide --> ["Transformed MSC" "Significance"]
+        yguide --> [L"z(f)" "Significance"]
         grid --> [true false]
         legend --> [legtext false]
         xguide --> ["Frequency" ""]
@@ -23,7 +25,7 @@
         sp = [3, 1, 2]
     elseif mscaxis && !sigaxis
         layout := @layout [a{0.01w} b{0.95w}]
-        yguide --> ["MSC" "Transformed MSC"]
+        yguide --> [L"\hat{C}^2_{xy}(f)" "Transformed MSC"]
         grid --> [false true]
         legend --> [false legtext]
         foreground_color_guide --> [:blue :black]
@@ -33,19 +35,19 @@
         layout = (1,1)
         grid --> true
         legend --> legtext
-        yguide --> "Transformed MSC"
+        yguide --> L"z(f)"
         xguide --> "Frequency"
         sp = [1,1,1]
     elseif !jk && !mscaxis && !sigaxis
         layout = (1,1)
         grid --> true
         legend --> legtext
-        yguide --> "MSC"
+        yguide --> L"\hat{C}^2_{xy}(f)"
         xguide --> "Frequency"
         sp = [1,1,1]
     elseif !jk && !mscaxis && sigaxis
         layout := @layout [b{0.95w} c{0.01w}]
-        yguide --> ["MSC" "Significance"]
+        yguide --> [L"\hat{C}^2_{xy}(f)" "Significance"]
         grid --> [true false]
         legend --> [legtext false]
         foreground_color_guide --> [:black :red]

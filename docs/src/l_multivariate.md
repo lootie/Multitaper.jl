@@ -20,7 +20,7 @@ Multivariate
 
 ## Multivariate spectrum estimation 
 
-### multispec(S1, S2)
+### multispec
 
 The multispec command does a lot of the multivariate stuff as well. You will
 recognize most of the keyword arguments from the univariate version of this call.
@@ -160,7 +160,7 @@ Extending the missing-data spectrum estimation of
 from the univariate case to the bivariate case, one can compute coherences using the
 function with signature
 
-### `mdmultispec(t, x, y)`
+### `mdmultispec`
 
 ```
 function mdmultispec(t::Union{Vector{Int64}, Vector{Float64}}, 

@@ -8,7 +8,7 @@ w = 0.008
 K = 5
 Distributions.Random.seed!(123)
 
-lamc, slepsc = gpss_uneven(w, K, t, 0.0)
+lamc, slepsc = gpss_orth(w, K, t, 0.0)
 t = collect(1:256) .^ (1.05)
 x = sin.(2 * pi * 0.01 * t) + randn(256)
 y = x .* (1 .+ cos.(2 * pi * 0.05 * t))
